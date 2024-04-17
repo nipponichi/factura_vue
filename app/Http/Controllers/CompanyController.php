@@ -14,6 +14,8 @@ class CompanyController extends Controller
     {
         $companies = Company::paginate(10);
         return inertia('Companies/Index', ['companies' => $companies]);
+        //$products = Company::all(); // Asume que tienes un modelo de Eloquent llamado 'Product'
+        //return response()->json($products);
     }
 
     /**

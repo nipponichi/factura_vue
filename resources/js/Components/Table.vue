@@ -65,7 +65,6 @@ export default{
                 </template>
 
                 <template #end>
-                    <FileUpload mode="basic" accept="image/*" :maxFileSize="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block" />
                     <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)"  />
                 </template>
             </Toolbar>
@@ -76,7 +75,7 @@ export default{
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products">
                 <template #header>
                     <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
-                        <h4 class="m-0">Manage Products</h4>
+                        <h4 class="m-0">Manage Companies</h4>
 						<IconField iconPosition="left">
                             <InputIcon>
                                 <i class="pi pi-search" />
@@ -87,29 +86,11 @@ export default{
                 </template>
 
                 <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
-                <Column field="code" header="Code" sortable style="min-width:12rem"></Column>
-                <Column field="name" header="Name" sortable style="min-width:16rem"></Column>
-                <Column header="Image">
-                    <template #body="slotProps">
-                        <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`" :alt="slotProps.data.image" class="border-round" style="width: 64px" />
-                    </template>
-                </Column>
-                <Column field="price" header="Price" sortable style="min-width:8rem">
-                    <template #body="slotProps">
-                        {{formatCurrency(slotProps.data.price)}}
-                    </template>
-                </Column>
-                <Column field="category" header="Category" sortable style="min-width:10rem"></Column>
-                <Column field="rating" header="Reviews" sortable style="min-width:12rem">
-                    <template #body="slotProps">
-                        <Rating :modelValue="slotProps.data.rating" :readonly="true" :cancel="false" />
-                    </template>
-                </Column>
-                <Column field="inventoryStatus" header="Status" sortable style="min-width:12rem">
-                    <template #body="slotProps">
-                        <Tag :value="slotProps.data.inventoryStatus" :severity="getStatusLabel(slotProps.data.inventoryStatus)" />
-                    </template>
-                </Column>
+                <Column field="name" header="Name" sortable style="min-width:12rem"></Column>
+                <Column field="taxNumber" header="Tax Number" sortable style="min-width:16rem"></Column>
+                <Column field="phone" header="Phone" sortable style="min-width:10rem"></Column>
+                <Column field="email" header="Email" sortable style="min-width:10rem"></Column>
+                <Column field="town" header="Town" sortable style="min-width:10rem"></Column>
                 <Column :exportable="false" style="min-width:8rem">
                     <template #body="slotProps">
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editProduct(slotProps.data)" />
@@ -119,57 +100,18 @@ export default{
             </DataTable>
         </div>
 
+        <!-- MODAL -->
         <Dialog v-model:visible="productDialog" :style="{width: '450px'}" header="Product Details" :modal="true" class="p-fluid">
-            <img v-if="product.image" :src="`https://primefaces.org/cdn/primevue/images/product/${product.image}`" :alt="product.image" class="block m-auto pb-3" />
             <div class="field">
                 <label for="name">Name</label>
-                <InputText id="name" v-model.trim="product.name" required="true" autofocus :invalid="submitted && !product.name" />
+                <InputText id="name" v-model.trim="product.name" required="true" autofocus />
                 <small class="p-error" v-if="submitted && !product.name">Name is required.</small>
             </div>
             <div class="field">
-                <label for="description">Description</label>
-                <Textarea id="description" v-model="product.description" required="true" rows="3" cols="20" />
+                <label for="taxNumber">Tax Number</label>
+                <InputText id="taxNumber" v-model="product.description" required="true" />
+                <small class="p-error" v-if="submitted && !product.description">Desc is required.</small>
             </div>
-
-            <div class="field">
-				<label for="inventoryStatus" class="mb-3">Inventory Status</label>
-				<Dropdown id="inventoryStatus" v-model="product.inventoryStatus" :options="statuses" optionLabel="label" placeholder="Select a Status">
-					<template #value="slotProps">
-						<div v-if="slotProps.value && slotProps.value.value">
-                            <Tag :value="slotProps.value.value" :severity="getStatusLabel(slotProps.value.label)" />
-                        </div>
-                        <div v-else-if="slotProps.value && !slotProps.value.value">
-                            <Tag :value="slotProps.value" :severity="getStatusLabel(slotProps.value)" />
-                        </div>
-						<span v-else>
-							{{slotProps.placeholder}}
-						</span>
-					</template>
-				</Dropdown>
-			</div>
-
-            <div class="field">
-                <label class="mb-3">Category</label>
-                <div class="formgrid grid">
-                    <div class="field-radiobutton col-6">
-                        <RadioButton id="category1" name="category" value="Accessories" v-model="product.category" />
-                        <label for="category1">Accessories</label>
-                    </div>
-                    <div class="field-radiobutton col-6">
-                        <RadioButton id="category2" name="category" value="Clothing" v-model="product.category" />
-                        <label for="category2">Clothing</label>
-                    </div>
-                    <div class="field-radiobutton col-6">
-                        <RadioButton id="category3" name="category" value="Electronics" v-model="product.category" />
-                        <label for="category3">Electronics</label>
-                    </div>
-                    <div class="field-radiobutton col-6">
-                        <RadioButton id="category4" name="category" value="Fitness" v-model="product.category" />
-                        <label for="category4">Fitness</label>
-                    </div>
-                </div>
-            </div>
-
             <div class="formgrid grid">
                 <div class="field col">
                     <label for="price">Price</label>
@@ -186,6 +128,7 @@ export default{
             </template>
         </Dialog>
 
+        <!-- MODAL DELETE SIMPLE -->
         <Dialog v-model:visible="deleteProductDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
@@ -197,6 +140,7 @@ export default{
             </template>
         </Dialog>
 
+        <!-- MODAL DELETE MULTIPLE -->
         <Dialog v-model:visible="deleteProductsDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
@@ -212,38 +156,40 @@ export default{
 
 <script>
 import { FilterMatchMode } from 'primevue/api';
-import { ProductService } from '@/service/ProductService';
+import axios from 'axios';
 
 export default {
     data() {
         return {
             products: null,
+
             productDialog: false,
+            // Borrado individual
             deleteProductDialog: false,
+            // Borrado grupal
             deleteProductsDialog: false,
+
             product: {},
             selectedProducts: null,
+            // Filtro en tiempo real
             filters: {},
             submitted: false,
-            statuses: [
-				{label: 'INSTOCK', value: 'instock'},
-				{label: 'LOWSTOCK', value: 'lowstock'},
-				{label: 'OUTOFSTOCK', value: 'outofstock'}
-            ]
         }
     },
     created() {
         this.initFilters();
     },
     mounted() {
-        ProductService.getProducts().then((data) => (this.products = data));
+        // Realiza una solicitud GET a la API de compañías
+        axios.get('/companies')
+            .then(response => {
+                this.products = response.data;
+            })
+            .catch(error => {
+                console.log(error);
+            });
     },
     methods: {
-        formatCurrency(value) {
-            if(value)
-				return value.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
-			return;
-        },
         openNew() {
             this.product = {};
             this.submitted = false;
@@ -263,8 +209,6 @@ export default {
                     this.$toast.add({severity:'success', summary: 'Successful', detail: 'Product Updated', life: 3000});
                 }
                 else {
-                    this.product.id = this.createId();
-                    this.product.code = this.createId();
                     this.product.image = 'product-placeholder.svg';
                     this.product.inventoryStatus = this.product.inventoryStatus ? this.product.inventoryStatus.value : 'INSTOCK';
                     this.products.push(this.product);
@@ -289,25 +233,6 @@ export default {
             this.product = {};
             this.$toast.add({severity:'success', summary: 'Successful', detail: 'Product Deleted', life: 3000});
         },
-        findIndexById(id) {
-            let index = -1;
-            for (let i = 0; i < this.products.length; i++) {
-                if (this.products[i].id === id) {
-                    index = i;
-                    break;
-                }
-            }
-
-            return index;
-        },
-        createId() {
-            let id = '';
-            var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            for ( var i = 0; i < 5; i++ ) {
-                id += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return id;
-        },
         exportCSV() {
             this.$refs.dt.exportCSV();
         },
@@ -325,21 +250,6 @@ export default {
                 'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
             }
         },
-        getStatusLabel(status) {
-            switch (status) {
-                case 'INSTOCK':
-                    return 'success';
-
-                case 'LOWSTOCK':
-                    return 'warning';
-
-                case 'OUTOFSTOCK':
-                    return 'danger';
-
-                default:
-                    return null;
-            }
-        }
     }
 }
 </script>
