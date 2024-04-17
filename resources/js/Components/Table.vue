@@ -1,3 +1,60 @@
+
+<!--
+    <template>
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+
+            <div class="table-responsive">
+                <DataTable class="table table-striped table-bordered display">
+                    <thead>
+                        <tr>
+                            <th>Column 1</th>
+                            <th>Column 2</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Row 1 Data 1</td>
+                            <td>Row 1 Data 2</td>
+                        </tr>
+                        <tr>
+                            <td>Row 2 Data 1</td>
+                            <td>Row 2 Data 2</td>
+                        </tr>
+                    </tbody>
+                </DataTable>
+            </div>
+        </div>
+    </div>
+    
+</template>
+
+<script>
+import axios from 'axios';
+import DataTable from 'datatables.net-vue3';
+import DataTableLib from 'datatables.net-bs5'
+import Button from 'datatables.net-buttons-bs5'
+import ButtonHtml5 from 'datatables.net-buttons/js/buttons.html5'
+import print from 'datatables.net-buttons/js/buttons.print'
+import pdfmake from 'pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
+
+import JsZip from 'jszip';
+window.JsZip = JsZip;
+DataTable.use(DataTableLib);
+DataTable.use(pdfmake);
+DataTable.use(ButtonHtml5);
+export default{
+    components: {DataTable},
+}
+
+</script>
+
+
+-->
+
+
+
 <template>
     <div>
         <div class="card">
@@ -31,7 +88,7 @@
                 <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
                 <Column field="name" header="Name" sortable style="min-width:12rem"></Column>
                 <Column field="taxNumber" header="Tax Number" sortable style="min-width:16rem"></Column>
-                <Column field="phone1" header="Phone" sortable style="min-width:10rem"></Column>
+                <Column field="phone" header="Phone" sortable style="min-width:10rem"></Column>
                 <Column field="email" header="Email" sortable style="min-width:10rem"></Column>
                 <Column field="town" header="Town" sortable style="min-width:10rem"></Column>
                 <Column :exportable="false" style="min-width:8rem">
@@ -99,6 +156,7 @@
 
 <script>
 import { FilterMatchMode } from 'primevue/api';
+import axios from 'axios';
 
 export default {
     data() {
@@ -112,7 +170,6 @@ export default {
             deleteProductsDialog: false,
 
             product: {},
-
             selectedProducts: null,
             // Filtro en tiempo real
             filters: {},
@@ -122,13 +179,16 @@ export default {
     created() {
         this.initFilters();
     },
-
     mounted() {
         // Realiza una solicitud GET a la API de compañías
-        this.products = this.$page.props.company;
-
+        axios.get('/companies')
+            .then(response => {
+                this.products = response.data;
+            })
+            .catch(error => {
+                console.log(error);
+            });
     },
-
     methods: {
         openNew() {
             this.product = {};
@@ -165,9 +225,6 @@ export default {
         },
         confirmDeleteProduct(product) {
             this.product = product;
-            
-            axios.delete(`/${this.$page.props.type}/${product.id}`)
-            
             this.deleteProductDialog = true;
         },
         deleteProduct() {

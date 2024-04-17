@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Customer;
-use Inertia\Inertia;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
@@ -13,8 +11,7 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customers = Customer::all();
-        return Inertia::render('Customers/Index',  ['company' => $customers, 'type' => 'customers']);
+        //
     }
 
     /**
@@ -60,16 +57,8 @@ class CustomerController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(string $id)
     {
-        // Encuentra la compañía por su ID
-        $company = Customer::findOrFail($id);
-        
-        // Elimina la compañía
-        $company->delete();
-        
-        // Redirige a alguna parte apropiada de tu aplicación después de eliminar
-        return redirect()->route('customers.index')->with('success', 'Compañía eliminada correctamente.');
+        //
     }
-
 }
