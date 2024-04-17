@@ -1,49 +1,23 @@
+<script setup>
+import AppLayout from '@/Layouts/AppLayout.vue';
+import Tables from '@/Components/Table.vue';
+
+
+</script>
 
 <template>
-    <div class="card">
-        <DataTable :value="products" removableSort tableStyle="min-width: 50rem">
-            <Column field="code" header="Code" sortable style="width: 25%"></Column>
-            <Column field="name" header="Name" sortable style="width: 25%"></Column>
-            <Column field="category" header="Category" sortable style="width: 25%"></Column>
-            <Column field="quantity" header="Quantity" sortable style="width: 25%"></Column>
-        </DataTable>
-    </div>
-</template>
-
-<script setup>
-import { ref, onMounted } from 'vue';
-
-
-onMounted(() => {
-    ProductService.getProductsMini().then((data) => (products.value = data));
-});
-
-const products = ref();
-
-</script>
-
-
-
-<!--<script>
-    export default {
-        name: 'CompaniesIndex'
-    }
-</script>
-
-<script setup>
-    import AppLayout from '@/Layouts/AppLayout.vue';      
-</script>
-    
-<template>
-    <AppLayout>
+    <AppLayout title="Dashboard">
         <template #header>
-            <h1 class="font-semibold text-xl text-gray-800 leading-tight">My company</h1>
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                My company
+            </h2>
         </template>
-
         <div class="py-12">
-            <div class="max-w-7xl max-auto sm:px-6">
-
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
+                    <Tables />
+                </div>
             </div>
         </div>
-    </AppLayout>       
-</template>-->
+    </AppLayout>
+</template>
