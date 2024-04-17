@@ -16,12 +16,12 @@ class CompanyController extends Controller
     public function index()
     {
         // Obtiene el ID del usuario autenticado
-        //$userId = Auth::id();
+        $userId = Auth::id();
         
         // Recupera las compañías asociadas al usuario actual
-        //$companies = Company::where('user_id', $userId)->get();
+        $companies = Company::where('user_id', $userId)->get();
 
-        $companies = Company::all();
+        //$companies = Company::all();
         
         return Inertia::render('Companies/Index', ['company' => $companies, 'type' => 'companies']);
 

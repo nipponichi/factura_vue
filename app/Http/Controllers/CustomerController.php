@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class CustomerController extends Controller
@@ -14,14 +15,14 @@ class CustomerController extends Controller
     public function index()
     {
         // Obtiene el ID del usuario autenticado
-        //$userId = Auth::id();
+        $userId = Auth::id();
         
         // Recupera las compañías asociadas al usuario actual
-        //$companies = Company::where('user_id', $userId)->get();
+        $companies = Customer::where('company_id', $userId)->get();
 
-        $customers = Customer::all();
+        //$companies = Customer::all();
         
-        return Inertia::render('Customers/Index', ['company' => $customers, 'type' => 'customers']);
+        return Inertia::render('Customers/Index', ['company' => $companies, 'type' => 'customers']);
 
     }
 
