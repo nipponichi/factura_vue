@@ -18,11 +18,11 @@ class CustomerController extends Controller
         $userId = Auth::id();
         
         // Recupera las compañías asociadas al usuario actual
-        $companies = Customer::where('company_id', $userId)->get();
+        $customers = Customer::where('company_id', $userId)->get();
 
         //$companies = Customer::all();
         
-        return Inertia::render('Customers/Index', ['company' => $companies, 'type' => 'customers']);
+        return Inertia::render('Customers/Index', ['company' => $customers, 'type' => 'customers']);
 
     }
 

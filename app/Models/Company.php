@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Company extends Model
 {
     use HasFactory;
-    protected $guarded = [
+    protected $fillable = [
         'name', 
         'taxNumber', 
         'address1', 
@@ -18,10 +18,12 @@ class Company extends Model
         'phone2',
         'province', 
         'town', 
-        'postCode'
+        'postCode',
+        'country'
     ];
 
     // Tiene key user_id foránea
+    
     public function users(){
         return $this -> belongsTo(User::class);
     }
