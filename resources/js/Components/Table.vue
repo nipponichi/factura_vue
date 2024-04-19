@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="card">
-            <Toolbar class="mb-4">
+            <Toolbar class="mb-4 border border-slate-200 ...">
                 <template #start>
                     <Button label="New" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
                     <Button label="Delete" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
@@ -12,29 +12,29 @@
                 </template>
             </Toolbar>
 
-            <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id"
+            <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id" 
                 :paginator="true" :rows="10" :filters="filters"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products">
                 <template #header>
                     <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
                         <h4 class="m-0">Manage Companies</h4>
-						<IconField iconPosition="left">
+						<IconField >
                             <InputIcon>
                                 <i class="pi pi-search" />
                             </InputIcon>
-                            <InputText v-model="filters['global'].value" placeholder="Search..." />
+                            <InputText class="inputSearch" v-model="filters['global'].value" placeholder="Search..." />
                         </IconField>
 					</div>
                 </template>
 
-                <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
-                <Column field="name" header="Name" sortable style="min-width:12rem"></Column>
-                <Column field="taxNumber" header="Tax Number" sortable style="min-width:16rem"></Column>
-                <Column field="phone1" header="Phone" sortable style="min-width:10rem"></Column>
-                <Column field="email" header="Email" sortable style="min-width:10rem"></Column>
-                <Column field="town" header="Town" sortable style="min-width:10rem"></Column>
-                <Column :exportable="false" style="min-width:8rem">
+                <Column selectionMode="multiple" style="width: 3rem" :exportable="false" class="dateTable" ></Column>
+                <Column field="name" header="Name" sortable style="min-width:12rem" class="dateTable"></Column>
+                <Column field="taxNumber" header="Tax Number" sortable style="min-width:16rem" class="dateTable"></Column>
+                <Column field="phone1" header="Phone" sortable style="min-width:10rem" class="dateTable"></Column>
+                <Column field="email" header="Email" sortable style="min-width:10rem" class="dateTable"></Column>
+                <Column field="town" header="Town" sortable style="min-width:10rem" class="dateTable"></Column>
+                <Column :exportable="false" style="min-width:8rem" class="dateTable">
                     <template #body="slotProps">
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editProduct(slotProps.data)" />
                         <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteProduct(slotProps.data)" />
@@ -55,16 +55,16 @@
                 <InputText class="input email" placeholder="Email" type="email" id="email" v-model="productos.email" />
             </div>
             <div class="field">
-                <InputText class="input phone1" id="phone1" placeholder="Phone" v-model="productos.phone1"/>
+                <InputMask class="input phone1" id="phone1" v-model="productos.phone1"  mask="(99) 999-999-999" placeholder="(+34) 123-123-123" />
             </div>
             <div class="field">
-                <InputText class="input phone2" id="phone2" placeholder="Other phone" v-model="productos.phone2"/>
+                <InputMask class="input phone1" id="phone2" v-model="productos.phone2"  mask="(99) 999-999-999" placeholder="(+34) 123-123-123" />
             </div>
             <div class="field">
                 <InputText class="input address1" id="address1" placeholder="Address" v-model="productos.address1"/>
             </div>
             <div class="field">
-                <InputText class="input postCode" id="postCode" placeholder="Post code" v-model="productos.postCode"/>
+                <InputText class="input postCode" id="postCode" placeholder="Post code" v-model="productos.postCode" />
             </div>
             <div class="field">
                 <InputText class="input town" id="town" placeholder="Town" v-model="productos.town"/>
@@ -75,6 +75,8 @@
             <div class="field">
                 <InputText class="input country" id="country" placeholder="Country" v-model="productos.country"/>
             </div>
+
+            
             <template #footer>
                 <Button label="Cancel" class="cancel-button" icon="pi pi-times" text @click="hideDialog"/>
                 <Button label="Save" class="save-button" icon="pi pi-check" text @click="saveProduct" />
@@ -107,10 +109,12 @@
 	</div>
 </template>
 
+
 <script>
 import { FilterMatchMode } from 'primevue/api';
 
 import axios from 'axios';
+
 
 
 export default {
@@ -282,9 +286,22 @@ export default {
         color:rgb(34, 197, 94);
         border: 1px solid;
     }
+
+    .edit-button:hover {
+        background-color:rgb(229, 245, 236);
+        transition-duration: 0.5s;
+        padding:7px;
+    }
+
     .simpleDelete-button {
         color:rgb(239, 68, 68);
         border: 1px solid;
+    }
+
+    .simpleDelete-button:hover {
+        background-color:rgb(245, 229, 229);
+        transition-duration: 0.5s;
+        padding:7px;
     }
     .save-button {
         color:rgb(34, 197, 94);
@@ -311,11 +328,43 @@ export default {
         margin-top:10px;
     }
 
-    .input:focus {
+    .inputSearch{
+
+        border:1px solid rgb(203, 213, 225);
+        border-radius:10px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin-right: 10px;
+        text-indent: 20px; 
+
+    }
+
+    .inputSearch:focus{
+
         outline:none !important;
-        border:1px solid green !important;
+        border:1px solid rgb(34, 197, 94) !important;
         border-radius:10px;
         box-shadow: none !important;
+    }
+
+    .input:focus {
+        outline:none !important;
+        border:2px solid rgb(153, 228, 153) !important;
+        border-radius:10px;
+        box-shadow: none !important;
+    
+    }
+
+    .card{
+        padding: 3% 3% 0% 3%;
+    }
+
+    .dateTable{
+        
+        border-top: #E2E8F0 1px solid;
+        border-bottom: #E2E8F0 1px solid;
+    
     }
 
 </style>

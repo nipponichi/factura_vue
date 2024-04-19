@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import Tables from '@/Components/Table.vue';
+import TablaCustomer from '@/Components/TablaCustomer.vue';
 
 
 </script>
@@ -15,7 +15,7 @@ import Tables from '@/Components/Table.vue';
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
-                    <Tables />
+                    <TablaCustomer />
                 </div>
             </div>
         </div>

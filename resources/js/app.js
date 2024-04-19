@@ -20,7 +20,7 @@ createInertiaApp({
             .use(plugin)
             .use(PrimeVue)
             .use(ZiggyVue)
-            .mount(el);
+            .mount(el)
     },
     progress: {
         color: '#4B5563',
