@@ -6,8 +6,9 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import PrimeVue from "primevue/config";
-import 'primevue/resources/themes/aura-light-green/theme.css'
-import 'primeicons/primeicons.css'
+import 'primevue/resources/themes/aura-light-green/theme.css';
+import 'primeicons/primeicons.css';
+import 'flowbite';
 
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
