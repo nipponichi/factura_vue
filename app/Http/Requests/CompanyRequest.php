@@ -27,10 +27,11 @@ class CompanyRequest extends FormRequest
             'address1' => 'string|max:255',
             'address2' => 'nullable|string|max:255',
             'email' => 'string',
-            'phone' => 'string',
+            'phone1' => 'string',
+            'phone2' => 'string',
             'province' => 'string',
             'town' => 'string',
-            'postcode' => 'string',
+            'postCode' => 'string',
             'country' => 'string'
         ];
     }

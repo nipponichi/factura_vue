@@ -17,25 +17,29 @@
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products">
                 <template #header>
-                    <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
-                        <h4 class="m-0">Manage Companies</h4>
-						<IconField >
-                            <InputIcon>
-                                <i class="pi pi-search" />
-                            </InputIcon>
-                            <InputText class="inputSearch" v-model="filters['global'].value" placeholder="Search..." />
-                        </IconField>
-					</div>
+                    <div class="flex justify-between items-center mt-2">
+                        <h4>Manage Companies</h4>
+                        <div class="relative rounded-md shadow-sm w-1/4">
+                            <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm" v-model="filters['global'].value" placeholder="Search...">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
                 </template>
 
-                <Column selectionMode="multiple" style="width: 3rem" :exportable="false" class="dateTable" ></Column>
-                <Column field="name" header="Name" sortable style="min-width:12rem" class="dateTable"></Column>
-                <Column field="taxNumber" header="Tax Number" sortable style="min-width:16rem" class="dateTable"></Column>
-                <Column field="phone1" header="Phone" sortable style="min-width:10rem" class="dateTable"></Column>
-                <Column field="email" header="Email" sortable style="min-width:10rem" class="dateTable"></Column>
-                <Column field="town" header="Town" sortable style="min-width:10rem" class="dateTable"></Column>
-                <Column :exportable="false" style="min-width:8rem" class="dateTable">
+                <Column selectionMode="multiple" :exportable="false" class="datetable checkbox" ></Column>
+                <Column field="name" header="Name" sortable class="dateTable"></Column>
+                <Column field="taxNumber" header="Tax Number" class="dateTable"></Column>
+                <Column field="phone1" header="Phone" sortable class="dateTable"></Column>
+                <Column field="email" header="Email" sortable class="dateTable"></Column>
+                <Column field="town" header="Town" sortable class="dateTable"></Column>
+                <Column :exportable="false" class="dateTable">
                     <template #body="slotProps">
+                        <Button icon="pi pi-users" outlined rounded class="mr-2 customers-button" />
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editProduct(slotProps.data)" />
                         <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteProduct(slotProps.data)" />
                     </template>
@@ -44,72 +48,66 @@
         </div>
 
         <!-- MODAL -->
-        <Dialog v-model:visible="productDialog" :style="{width: '450px'}" header="Create company" id="titleCompany" :modal="true" class="p-fluid">
+        <Dialog v-model:visible="productDialog" :header="productos.id ? 'Modify company' : 'Create company'" id="titleCompany" :modal="true" class="p-fluid">
             
-            <form>
-                <div class="grid gap-6 mb-6 md:grid-cols-2">
-                    <div class="relative">
-                        <input type="text" id="floating_outlined" class="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border-1 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " />
-                        <label for="floating_outlined" class="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Floating outlined</label>
+            <form style="width: 800px;" @submit.prevent="saveProduct">
+                <div class="grid gap-3 mb-6 md:grid-cols-2">
+                    <div>
+                        <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company name</label>
+                        <input type="text" id="name" v-model="productos.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Company name" required />
                     </div>
                     <div>
-                        <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">First name</label>
-                        <input type="text" id="first_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="John" required />
+                        <label for="taxNumber" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tax number</label>
+                        <input type="text" id="taxNumber" v-model="productos.taxNumber" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Tax number" required />
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <div>
+                        <label for="address1" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address 1</label>
+                        <input type="text" id="address1" v-model="productos.address1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Address" required />
+                    </div>
+                </div>
+                <div class="grid gap-3 mb-6 md:grid-cols-2">  
+                    <div>
+                        <label for="address2" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address 2</label>
+                        <input type="text" id="address2" v-model="productos.address2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Address line 2" />
                     </div>
                     <div>
-                        <label for="last_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Last name</label>
-                        <input type="text" id="last_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Doe" required />
-                    </div>
-                    <div>
-                        <label for="company" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company</label>
-                        <input type="text" id="company" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Flowbite" required />
+                        <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Town</label>
+                        <input type="text" id="town" v-model="productos.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Town" required />
                     </div>  
                     <div>
-                        <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone number</label>
-                        <input type="tel" id="phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="123-45-678" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}" required />
+                        <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Province</label>
+                        <input type="text" id="province" v-model="productos.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Province" required />
+                    </div>  
+                    <div>
+                        <label for="postCode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Post code</label>
+                        <input type="text" id="postCode" v-model="productos.postCode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Post code" pattern="^\d+$" required />
                     </div>
                     <div>
-                        <label for="website" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Website URL</label>
-                        <input type="url" id="website" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="flowbite.com" required />
+                        <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
+                        <input type="text" id="country" v-model="productos.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Country" required />
+                    </div> 
+                    <div>
+                        <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email address</label>
+                        <input type="email" id="email" v-model="productos.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="info@mycompany.com" required />
+                    </div>    
+                    <div>
+                        <label for="phone1" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
+                        <input type="tel" id="phone1" v-model="productos.phone1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Phone" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
                     </div>
                     <div>
-                        <label for="visitors" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Unique visitors (per month)</label>
-                        <input type="number" id="visitors" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="" required />
+                        <label for="phone2" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mobile phone</label>
+                        <input type="tel" id="phone2" v-model="productos.phone2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Mobile phone" pattern="^\+\d{1,3}\s?\d{1,14}$" />
                     </div>
                 </div>
-                <div class="mb-6">
-                    <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email address</label>
-                    <input type="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="john.doe@company.com" required />
-                </div> 
-                <div class="mb-6">
-                    <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                    <input type="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="•••••••••" required />
-                </div> 
-                <div class="mb-6">
-                    <label for="confirm_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
-                    <input type="password" id="confirm_password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="•••••••••" required />
-                </div> 
-                <div class="flex items-start mb-6">
-                    <div class="flex items-center h-5">
-                    <input id="remember" type="checkbox" value="" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800" required />
-                    </div>
-                    <label for="remember" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">I agree with the <a href="#" class="text-blue-600 hover:underline dark:text-blue-500">terms and conditions</a>.</label>
+                <div class="grid gap-3 md:grid-cols-1 justify-items-end">
+                    <div>
+                        <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" text @click="hideDialog">Close</button>
+                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ productos.id ? 'Modify' : 'Save' }}</button>
+                    </div>    
                 </div>
-
-                <label for="zip-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">ZIP code:</label>
-    <div class="relative">
-        <div class="absolute inset-y-0 start-0 top-0 flex items-center ps-3.5 pointer-events-none">
-            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
-                <path d="M8 0a7.992 7.992 0 0 0-6.583 12.535 1 1 0 0 0 .12.183l.12.146c.112.145.227.285.326.4l5.245 6.374a1 1 0 0 0 1.545-.003l5.092-6.205c.206-.222.4-.455.578-.7l.127-.155a.934.934 0 0 0 .122-.192A8.001 8.001 0 0 0 8 0Zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"/>
-            </svg>
-        </div>
-        <input type="text" id="zip-input" aria-describedby="helper-text-explanation" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="12345 or 12345-6789" pattern="^\d{5}(-\d{4})?$" required />
-    </div>
-    <p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">Please select a 5 digit number from 0 to 9.</p>
-                
-                <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
             </form>
-
         </Dialog>
 
         <!-- MODAL DELETE SIMPLE -->
@@ -128,13 +126,47 @@
         <Dialog v-model:visible="deleteProductsDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="product">Are you sure you want to delete the selected products?</span>
+                <span v-if="productos">Are you sure you want to delete the selected products?</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteProductsDialog = false"/>
                 <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedProducts" />
             </template>
         </Dialog>
+
+        
+
+        <!--
+            Toast alertas
+        <div id="toast-success" class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+                </svg>
+                <span class="sr-only">Check icon</span>
+            </div>
+
+            <div class="ms-3 text-sm font-normal">Item moved successfully.</div>
+        </div>
+        <div id="toast-danger" class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
+                </svg>
+                <span class="sr-only">Error icon</span>
+            </div>
+            <div class="ms-3 text-sm font-normal">Item has been deleted.</div>
+        </div>
+        <div id="toast-warning" class="flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-orange-500 bg-orange-100 rounded-lg dark:bg-orange-700 dark:text-orange-200">
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5Z"/>
+                </svg>
+                <span class="sr-only">Warning icon</span>
+            </div>
+        </div>-->
+
+
 	</div>
 </template>
 
@@ -144,10 +176,11 @@ import { FilterMatchMode } from 'primevue/api';
 
 import axios from 'axios';
 
-
+console.log("Inicio");
 
 export default {
     data() {
+        console.log("PRIMER PASO");
         return {
             products: null, // Aquí almacenarás los productos recuperados de alguna fuente, como una API
             productDialog: false, // Controla la visibilidad del diálogo de creación/edición de producto
@@ -160,102 +193,121 @@ export default {
                 phone1: '',
                 phone2: '',
                 address1: '',
+                address2: '',
                 postCode: '',
                 town: '',
                 province: '',
                 country: ''
             },
-            selectedProducts: null, // Almacena los productos seleccionados para borrado en grupo
+            selectedProducts: [], // Almacena los productos seleccionados para borrado en grupo
             filters: {}, // Almacena los filtros de búsqueda en tiempo real
             submitted: false, // Indica si se ha enviado el formulario de creación/edición de producto
         };
     },
     created() {
-        this.initFilters();
+        console.log("Created");
+        this.filters = {
+            'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
+        }
     },
     mounted() {
         // Asigna los datos de la compañía pasados desde Laravel a una variable local
         this.products = this.$page.props.companies;
-
+        console.log("MOUNTED-----------------------");
     },
 
+    
     methods: {
         openNew() {
+            console.log("OPEN NEW-------------------")
             this.productos = {};
             this.submitted = false;
             this.productDialog = true;
         },
         hideDialog() {
+            console.log("HIDE")
             this.productDialog = false;
             this.submitted = false;
         },
         
         saveProduct() {
-            console.log('/'+this.$page.props.type);
-
-            // Realiza la solicitud para guardar el producto
-            axios.post('/'+ this.$page.props.type, this.productos)
+            if (!this.productos.id) {
+                
+                // Realiza la solicitud para guardar el producto
+                axios.post('/'+ this.$page.props.type, this.productos)
                 .then(response => {
                     // La solicitud se completó con éxito, puedes hacer lo que necesites con la respuesta, como imprimirlo en la consola
                     console.log(response);
 
                     // Cierra el diálogo de producto
                     this.productDialog = false;
-                    this.submitted = true;
-                    // Verifica si el nuevo producto ya existe en this.products
-                    const productExists = this.products.some(product => product.id === this.productos.id);
 
-                    // Si el producto no existe en la lista, añádelo
-                    if (!productExists) {
-                        this.products.push(this.productos);
-                    }
+                    this.products.push(response.data.company)
+                
                 })
                 .catch(error => {
                     // Si hay algún error en la solicitud, puedes manejarlo aquí
                     console.log(error.response);
-                });
-                //this.productos = {};
-                this.submitted = true;
+                });   
+
+            }else {
+                
+                this.updateProduct();
+                
+            }
         },
 
 
-        editProduct(productos) {
+        editProduct(slotProduct) {
 
-            console.log(productos);
-            axios.get('/' + this.$page.props.type + '/' + productos.id + '/edit').then(response => {
-                this.editedProduct = response.data;
+
+            axios.get('/' + this.$page.props.type + '/' + slotProduct.id + '/edit').then(response => {
+
+
+                this.productos = response.data.product;
                 this.productDialog = true;
+
             })
             .catch(error => {
                 console.error('Error al obtener los datos del producto para editar:', error);
-                this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Hubo un error al obtener los datos del producto para editar.', life: 3000 });
             });
-            this.product = {...productos};     
-            this.productDialog = true;       
+            
+            
         },
 
         updateProduct() {
 
-            console.log("Update" + this.product)
-            axios.put('/' + this.$page.props.type + '/' + productos.id, this.product)
+            console.log("Update" + this.productos.name)
+
+
+
+            axios.put('/' + this.$page.props.type + '/' + this.productos.id, this.productos)
             .then(response => {
-                console.log('Respuesta del servidor:', response.data);
-                this.$toast.add({ severity: 'success', summary: 'Éxito', detail: response.data.message, life: 3000 });
-                this.productDialog = false;  
+                
+                // Busca el índice del objeto en la lista actual
+                const index = this.products.findIndex(producto => producto.id === this.productos.id);
+
+                // Actualiza los valores del objeto existente en la lista
+                if (index !== -1) {
+                this.products[index] = response.data.company;
+                } 
+                this.productDialog = false; 
             })
             .catch(error => {
                 console.error('Error al actualizar la compañía:', error);
                 // Mostrar un mensaje de error al usuario
-                this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Hubo un error al actualizar la compañía.', life: 3000 });
+                
             });
         },        
 
         confirmDeleteProduct(productos) {
+            console.log("Confirm deletee");
             this.product = productos;
             this.deleteProductDialog = true;       
         },
 
         deleteProduct() {
+            console.log("DELETE")
             this.products = this.products.filter(val => val.id !== this.product.id);
             this.deleteProductDialog = false;
 
@@ -267,32 +319,49 @@ export default {
                 
             this.product = {};
         },
-
-        exportCSV() {
-            this.$refs.dt.exportCSV();
-        },
-
         
         confirmDeleteSelected() {
+            console.log("CONFIRM DELETE SELECTED")
             this.deleteProductsDialog = true;
         },
+        
         deleteSelectedProducts() {
-            this.products = this.products.filter(val => !this.selectedProducts.includes(val));
+            // Envía una solicitud de eliminación para cada producto seleccionado
+            this.selectedProducts.forEach(productos => {
+            axios.delete('/' + this.$page.props.type + '/' + productos.id)
+                .then(response => {
+                console.log('Producto eliminado:', productos.id);
+                // Elimina el producto de la lista de productos
+                this.products = this.products.filter(p => p.id !== productos.id);
+                })
+                .catch(error => {
+                console.error('Error al eliminar el producto:', error);
+                });
+            });
+            this.selectedProducts = [];
             this.deleteProductsDialog = false;
-            this.selectedProducts = null;
-            this.$toast.add({severity:'success', summary: 'Successful', detail: 'Products Deleted', life: 3000});
         },
-        initFilters() {
-            this.filters = {
-                'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
-            }
+
+        exportCSV() {
+            console.log("Export");
+            this.$refs.dt.exportCSV();
         },
     }
 }
+
+
 </script>
 
 
 <style>
+
+    .checkbox {
+        background-color: rgba(246, 246, 246, 0.609);
+        border-top: #E2E8F0 1px solid;
+        border-bottom: #E2E8F0 1px solid;
+        
+    }
+
     .success-button {
         background-color: rgb(34, 197, 94);
         color: #ffffff;
@@ -306,11 +375,23 @@ export default {
         padding: 8px;
     }
     .export-button {
-        background-color:rgb(147, 51, 234);
+        background-color:#007BFF;
         color: #ffffff;
         font-size:15px;
         padding: 8px;
     }
+
+    .customers-button {
+        color:#007BFF;
+        border: 1px solid;
+    }
+
+    .customers-button:hover {
+        background-color:rgba(0, 4, 252,0.1);
+        transition-duration: 0.5s;
+        padding:7px;
+    }
+
     .edit-button {
         color:rgb(34, 197, 94);
         border: 1px solid;
@@ -356,27 +437,19 @@ export default {
         border-radius:10px;
         margin-top:10px;
     }
-
-    .inputSearch{
-
-        border:1px solid rgb(203, 213, 225);
-        border-radius:10px;
+    .search-wrapper {
+        position: relative;
+        width: 271px;
+    }
+    .input-icon {
+        color: #191919;
         position: absolute;
-        top: 0;
-        right: 0;
-        margin-right: 10px;
-        text-indent: 20px; 
-
+        width: 20px;
+        height: 20px;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
     }
-
-    .inputSearch:focus{
-
-        outline:none !important;
-        border:1px solid rgb(34, 197, 94) !important;
-        border-radius:10px;
-        box-shadow: none !important;
-    }
-
     .input:focus {
         outline:none !important;
         border:2px solid rgb(153, 228, 153) !important;
@@ -390,10 +463,9 @@ export default {
     }
 
     .dateTable{
-        
         border-top: #E2E8F0 1px solid;
         border-bottom: #E2E8F0 1px solid;
-    
+        min-width:10rem;
     }
 
 </style>
