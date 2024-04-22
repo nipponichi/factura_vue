@@ -14,7 +14,7 @@ import NewCompany from '@/Components/NewCompany.vue';
             </h2>
         </template>
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-2">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                     <!-- Utiliza v-if para mostrar u ocultar la tabla -->
                     <Tables v-if="companyExists && !isLoading" />

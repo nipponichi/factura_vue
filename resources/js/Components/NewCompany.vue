@@ -15,9 +15,6 @@
     </section>
 </template>
 
-
-
-
 <script>
 export default {
     methods: {
