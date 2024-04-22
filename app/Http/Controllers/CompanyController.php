@@ -21,10 +21,11 @@ class CompanyController extends Controller
     public function index()
     {
         // Obtiene el ID del usuario autenticado
-        //$userId = Auth::id();
+        $userId = Auth::id();
         
         // Recupera las compañías asociadas al usuario actual
-        $companies = Company::all();
+        //$companies = Company::all();
+        $companies = Company::where('user_id', $userId)->get();
 
         //$companies = Company::all();
         
@@ -118,4 +119,17 @@ class CompanyController extends Controller
             return response()->json(['message' => 'Error al eliminiar la compañia: '. $id . $e->getMessage()], 500);
         }
     }
+
+    public function hasCompany()
+    {
+    $user_id = Auth::id();
+
+    // Busca empresas relacionadas con el usuario actual
+    $company = Company::where('user_id', $user_id)->get();
+
+
+    // Si la colección de empresas está vacía, devuelve false, de lo contrario, devuelve true
+    return $company->isEmpty() ? false : true;
+    }
+
 }

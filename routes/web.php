@@ -24,4 +24,6 @@ Route::middleware([
     Route::resource('/invoices', InvoiceController::class);
     Route::resource('/products', ProductController::class);
     Route::resource('/customers/ofCustomers', OfCustomerController::class);
+
+    Route::get('/has-company', [CompanyController::class, 'hasCompany'])->name('companies.hasCompany');
 });
