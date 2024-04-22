@@ -6,10 +6,6 @@
                     <Button label="New" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
                     <Button label="Delete" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
                 </template>
-
-                <template #end>
-                    <Button label="Export" class="export-button" icon="pi pi-upload" severity="help" @click="exportCSV($event)"  />
-                </template>
             </Toolbar>
 
             <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id" 
@@ -33,13 +29,13 @@
 
                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox" ></Column>
                 <Column field="name" header="Name" sortable class="dateTable"></Column>
-                <Column field="taxNumber" header="Tax Number" class="dateTable"></Column>
+                <Column field="taxNumber" header="Tax Number" sortable class="dateTable"></Column>
                 <Column field="phone1" header="Phone" sortable class="dateTable"></Column>
                 <Column field="email" header="Email" sortable class="dateTable"></Column>
                 <Column field="town" header="Town" sortable class="dateTable"></Column>
                 <Column :exportable="false" class="dateTable">
                     <template #body="slotProps">
-                        <Button icon="pi pi-users" outlined rounded class="mr-2 customers-button" />
+                        <Button icon="pi pi-eye" outlined rounded class="mr-2 info-button" @click="handleInfoButtonClick(slotProps.data.id)" />
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editProduct(slotProps.data)" />
                         <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteProduct(slotProps.data)" />
                     </template>
@@ -342,10 +338,10 @@ export default {
             this.deleteProductsDialog = false;
         },
 
-        exportCSV() {
-            console.log("Export");
-            this.$refs.dt.exportCSV();
-        },
+
+        handleInfoButtonClick(companyId) {
+            this.$inertia.get('/' + this.$page.props.type + '/' + companyId);
+        }
     }
 }
 
@@ -381,12 +377,12 @@ export default {
         padding: 8px;
     }
 
-    .customers-button {
+    .info-button {
         color:#007BFF;
         border: 1px solid;
     }
 
-    .customers-button:hover {
+    .info-button:hover {
         background-color:rgba(0, 4, 252,0.1);
         transition-duration: 0.5s;
         padding:7px;

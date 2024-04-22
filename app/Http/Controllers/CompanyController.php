@@ -69,7 +69,16 @@ class CompanyController extends Controller
      */
     public function show(string $id)
     {
-        //
+        
+        try {
+            $company = Company::findOrFail($id);
+
+            return Inertia::render('Companies/Show', ['company' => $company]);
+
+        }catch (Exception $e) {
+            
+            return response()->json(['message' => 'Compañía no encontrada ', $e->getMessage()], 500);
+        }
     }
 
     /**
