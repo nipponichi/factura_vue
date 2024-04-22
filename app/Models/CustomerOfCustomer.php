@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CustomerOfCustomer extends Model
 {
     use HasFactory;
-    protected $guarded = [
+    protected $fillable = [
         'name', 
         'taxNumber', 
         'address1', 
@@ -18,7 +18,8 @@ class CustomerOfCustomer extends Model
         'phone2',
         'province', 
         'town', 
-        'postCode'
+        'postCode',
+        'country'
     ];
 
         // Tiene customer_id foránea
