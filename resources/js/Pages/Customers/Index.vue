@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import TablaCustomer from '@/Components/NewCompany.vue';
+import TablaCustomer from '@/Components/TableCompany.vue';
 
 
 </script>

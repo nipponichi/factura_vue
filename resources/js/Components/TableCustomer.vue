@@ -90,11 +90,11 @@
                     </div>    
                     <div>
                         <label for="phone1" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
-                        <input type="tel" id="phone1" v-model="productos.phone1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Phone" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
+                        <input type="tel" id="phone1" v-model="productos.phone1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Phone"/>
                     </div>
                     <div>
                         <label for="phone2" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mobile phone</label>
-                        <input type="tel" id="phone2" v-model="productos.phone2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Mobile phone" pattern="^\+\d{1,3}\s?\d{1,14}$" />
+                        <input type="tel" id="phone2" v-model="productos.phone2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Mobile phone" />
                     </div>
                 </div>
                 <div class="grid gap-3 md:grid-cols-1 justify-items-end">
@@ -172,11 +172,10 @@ import { FilterMatchMode } from 'primevue/api';
 
 import axios from 'axios';
 
-console.log("Inicio");
 
 export default {
     data() {
-        console.log("PRIMER PASO");
+        
         return {
             products: null, // Aquí almacenarás los productos recuperados de alguna fuente, como una API
             productDialog: false, // Controla la visibilidad del diálogo de creación/edición de producto
@@ -201,27 +200,39 @@ export default {
         };
     },
     created() {
-        console.log("Created");
+        
         this.filters = {
             'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
         }
     },
     mounted() {
-        // Asigna los datos de la compañía pasados desde Laravel a una variable local
-        this.products = this.$page.props.companies;
-        console.log("MOUNTED-----------------------");
+        
+        axios.get('/customers').then(response => {
+        
+       
+
+        this.products = response.data.customers;
+        
+
+        })
+        .catch(error => {
+            console.error('Error al obtener los datos del producto para editar:', error);
+        });
+
+       
+        
     },
 
     
     methods: {
         openNew() {
-            console.log("OPEN NEW-------------------")
+            
             this.productos = {};
             this.submitted = false;
             this.productDialog = true;
         },
         hideDialog() {
-            console.log("HIDE")
+            
             this.productDialog = false;
             this.submitted = false;
         },
@@ -230,7 +241,7 @@ export default {
             if (!this.productos.id) {
                 
                 // Realiza la solicitud para guardar el producto
-                axios.post('/'+ this.$page.props.type, this.productos)
+                axios.post('/customers', this.productos)
                 .then(response => {
                     // La solicitud se completó con éxito, puedes hacer lo que necesites con la respuesta, como imprimirlo en la consola
                     console.log(response);
@@ -255,12 +266,13 @@ export default {
 
 
         editProduct(slotProduct) {
+           
 
-
-            axios.get('/' + this.$page.props.type + '/' + slotProduct.id + '/edit').then(response => {
+            axios.get('/customers/' + slotProduct.id + '/edit').then(response => {
 
 
                 this.productos = response.data.product;
+                 console.log("edit: " + this.productos.name);
                 this.productDialog = true;
 
             })
@@ -277,13 +289,15 @@ export default {
 
 
 
-            axios.put('/' + this.$page.props.type + '/' + this.productos.id, this.productos)
+            axios.put('/customers/' + this.productos.id, this.productos)
             .then(response => {
                 
                 // Busca el índice del objeto en la lista actual
                 const index = this.products.findIndex(producto => producto.id === this.productos.id);
 
                 // Actualiza los valores del objeto existente en la lista
+
+                console.log("Emilio" + response.data.company.name)
                 if (index !== -1) {
                 this.products[index] = response.data.company;
                 } 
@@ -294,22 +308,22 @@ export default {
                 // Mostrar un mensaje de error al usuario
                 
             });
-        },        
+        },         
 
         confirmDeleteProduct(productos) {
-            console.log("Confirm deletee");
+            
             this.product = productos;
             this.deleteProductDialog = true;       
         },
 
         deleteProduct() {
-            console.log("DELETE")
+            
             this.products = this.products.filter(val => val.id !== this.product.id);
             this.deleteProductDialog = false;
 
             console.log(this.product.id);
 
-            axios.delete('/'+ this.$page.props.type+ '/'+ this.product.id)
+            axios.delete('/customers/'+ this.product.id)
                 .then(response => { console.log(response)})
                 .catch(error => { console.log(error.response)})
                 
@@ -317,14 +331,14 @@ export default {
         },
         
         confirmDeleteSelected() {
-            console.log("CONFIRM DELETE SELECTED")
+            
             this.deleteProductsDialog = true;
         },
         
         deleteSelectedProducts() {
             // Envía una solicitud de eliminación para cada producto seleccionado
             this.selectedProducts.forEach(productos => {
-            axios.delete('/' + this.$page.props.type + '/' + productos.id)
+            axios.delete('/customers/' + productos.id)
                 .then(response => {
                 console.log('Producto eliminado:', productos.id);
                 // Elimina el producto de la lista de productos
@@ -340,7 +354,7 @@ export default {
 
 
         handleInfoButtonClick(companyId) {
-            this.$inertia.get('/' + this.$page.props.type + '/' + companyId);
+            this.$inertia.get('/customers/' + companyId);
         }
     }
 }

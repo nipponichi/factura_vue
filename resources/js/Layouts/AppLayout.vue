@@ -56,7 +56,7 @@ const logout = () => {
                                 <NavLink :href="route('invoices.index')" :active="route().current('invoices.*')">
                                     Invoices
                                 </NavLink>
-                            </div>                            
+                            </div>                          
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
                                     My Company

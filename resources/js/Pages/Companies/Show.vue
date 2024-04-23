@@ -82,52 +82,41 @@
                             </div>
                         </div>
                     </div>
-
                     
-                    <div class="flex justify-center items-center h-full">
+                    <div class="flex flex-col justify-center items-center h-full">
 
-    <div class="border-b border-gray-200 dark:border-gray-700">
-    
-        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
-            <li class="me-2">
-                    
-            <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
-                <i class="pi pi-users w-4 h-4 me-2 text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                Customers
-            </NavLink>
-                            
-                <button class="inline-flex items-center justify-center p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group" :class="{ 'border-indigo-500 text-indigo-600': $page.url.startsWith('/customers') }" @click="navigateTo('customers')">
-                    <i class="pi pi-users w-4 h-4 me-2 text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                    Customers
-                </button>
-            </li>
-            <li class="me-2">
-                <button class="inline-flex items-center justify-center p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group" :class="{ 'border-indigo-500 text-indigo-600': $page.url.startsWith('/products') }" @click="navigateTo('products')">
-                    <i class="pi pi-shopping-cart w-4 h-4 me-2 text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                    Products
-                </button>
-            </li>
-            <li class="me-2">
-                <button class="inline-flex items-center justify-center p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group" :class="{ 'border-indigo-500 text-indigo-600': $page.url.startsWith('/invoices') }" @click="navigateTo('invoices')">
-                    <i class="pi pi-file w-4 h-4 me-2 text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                    Invoices
-                </button>
-            </li>
-        </ul>
-    </div>
-
-                        <div>
-                            <table v-if="activeTab === 'customers'">
-                                <h1>Customers Table</h1>
-                                <!-- Aquí iría el contenido de la tabla de clientes -->
+                        <div class="border-b border-gray-200 dark:border-gray-700">
+                            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
+                                <li class="me-2">
+                                    <button @click="changeTab('customers')" :class="{'border-b-2 border-blue-500': activeTab === 'customers'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-users w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                        Customers
+                                    </button>
+                                </li>
+                                <li class="me-2">
+                                    <button @click="changeTab('products')" :class="{'border-b-2 border-blue-500': activeTab === 'products'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-shopping-cart w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                        Products
+                                    </button>
+                                </li>
+                                <li class="me-2">
+                                    <button @click="changeTab('invoices')" :class="{'border-b-2 border-blue-500': activeTab === 'invoices'}" class="inline-flex items-center justify-center p-4 border-transparent rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-file w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                        Invoices
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+            
+                        <div class="flex flex-col items-center justify-center w-full">
+                            <table v-if="activeTab === 'customers'" class="w-full">
+                                <TableCustomers />
                             </table>
-                            <table v-else-if="activeTab === 'products'">
-                                <h1>Products Table</h1>
-                                <!-- Aquí iría el contenido de la tabla de productos -->
+                            <table v-else-if="activeTab === 'products'" class="w-full">
+                                <Tables />
                             </table>
-                            <table v-else-if="activeTab === 'invoices'">
-                                <h1>Invoices Table</h1>
-                                <!-- Aquí iría el contenido de la tabla de facturas -->
+                            <table v-else-if="activeTab === 'invoices'" class="w-full">
+                                <TableInvoice />
                             </table>
                         </div>
 
@@ -140,7 +129,19 @@
 
 <script setup>
     import AppLayout from '@/Layouts/AppLayout.vue';
-    import Tables from '@/Components/Table.vue';
+    import TableCustomers from '@/Components/TableCustomer.vue';
+    import TableInvoice from '@/Components/TableInvoice.vue';
+
+
+    import { ref } from 'vue';
+
+    // Definimos la variable reactive para almacenar la pestaña activa
+    const activeTab = ref('customers');
+
+    // Método para cambiar la pestaña activa
+    const changeTab = (tabName) => {
+        activeTab.value = tabName;
+    };
 </script>
 
 
@@ -150,6 +151,7 @@
 
         data() {
             return {
+                
                 email: ""
             };
         },
@@ -161,22 +163,6 @@
         },
 
         methods: {
-
-            showCustomers() {
-                // Agrega aquí la lógica para mostrar la tabla de clientes
-                this.activeTab = 'customers';
-                
-            },
-            showProducts() {
-                // Agrega aquí la lógica para mostrar la tabla de productos
-                this.activeTab = 'products';
-                console.log('products')
-            },
-            showInvoices() {
-                // Agrega aquí la lógica para mostrar la tabla de facturas
-                this.activeTab = 'invoices';
-                console.log('invoices')
-            }
             
         }
     };

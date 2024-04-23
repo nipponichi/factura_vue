@@ -20,11 +20,11 @@ class CustomerController extends Controller
         $userId = Auth::id();
         
         // Recupera las compañías asociadas al usuario actual
-        $customers = Customer::where('customer_id', $userId)->get();
+        //$customers = Customer::where('customer_id', $userId)->get();
 
-        //$companies = Customer::all();
-        
-        return Inertia::render('Customers/Index', ['company' => $customers, 'type' => 'customers']);
+        $customers = Customer::all();
+        return response()->json(['customers' => $customers]);
+        //return Inertia::render('Customers/Index', ['customers' => $customers, 'type' => 'companies']);
 
     }
 
@@ -97,12 +97,16 @@ class CustomerController extends Controller
     public function update(CustomerRequest $request, string $id)
     {
         try{
-            $customer = Customer::findOrFail($id);
-            $customer->update($request->validated());
-            return response()->json(['message' => 'Customer updated successfully','customer'=> $customer]);
+            
+            $company = Customer::findOrFail($id);
+            //$company->update($request->validated());
+            $company->company_id = '1';
+            $company->name = $request->input('TestCompany');
+            $company->update($request->validated());
+            return response()->json(['message' => 'Company updated successfully','company'=> $company]);
         }catch (Exception $e) {
             // Devuelve una respuesta JSON con un mensaje de error
-            return response()->json(['message' => 'Error al editar el cliente: ', $e->getMessage()], 500);
+            return response()->json(['message' => 'Error al editar la compañía: ', $e->getMessage()], 500);
         }
     }
 
