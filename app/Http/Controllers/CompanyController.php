@@ -2,29 +2,34 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Http\Requests\CompanyRequest;
 use App\Models\Company;
 use Exception;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Auth\Middleware\Authorize;
 
 
 class CompanyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
+    public function __construct()
+    {
+        $this->middleware(['can:read roles']);   
+    }
     
 
     public function index()
     {
         // Obtiene el ID del usuario autenticado
-        //$userId = Auth::id();
+        $userId = Auth::id();
         
+
         // Recupera las compañías asociadas al usuario actual
-        $companies = Company::all();
+        //$companies = Company::all();
+        $companies = Company::where('user_id', $userId)->get();
 
         //$companies = Company::all();
         
@@ -68,7 +73,16 @@ class CompanyController extends Controller
      */
     public function show(string $id)
     {
-        //
+        
+        try {
+            $company = Company::findOrFail($id);
+
+            return Inertia::render('Companies/Show', ['company' => $company]);
+
+        }catch (Exception $e) {
+            
+            return response()->json(['message' => 'Compañía no encontrada ', $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -118,4 +132,17 @@ class CompanyController extends Controller
             return response()->json(['message' => 'Error al eliminiar la compañia: '. $id . $e->getMessage()], 500);
         }
     }
+
+    public function hasCompany()
+    {
+    $user_id = Auth::id();
+
+    // Busca empresas relacionadas con el usuario actual
+    $company = Company::where('user_id', $user_id)->get();
+
+
+    // Si la colección de empresas está vacía, devuelve false, de lo contrario, devuelve true
+    return $company->isEmpty() ? false : true;
+    }
+
 }
