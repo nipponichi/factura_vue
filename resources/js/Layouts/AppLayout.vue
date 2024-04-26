@@ -57,18 +57,18 @@ const logout = () => {
                                     Invoices
                                 </NavLink>
                             </div>                          
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" >
                                 <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
                                     My Company
                                 </NavLink>
                             </div>
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('products.index')" :active="route().current('products.*')">
-                                    Products
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read consulting')">
+                                <NavLink :href="route('admin.index')" :active="route().current('admin.*')">
+                                    Consulting
                                 </NavLink>
-                            </div>                           
+                            </div>                             
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
-                                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                                <NavLink :href="route('admin.index')" :active="route().current('admin.*')">
                                     Admin
                                 </NavLink>
                             </div>                           

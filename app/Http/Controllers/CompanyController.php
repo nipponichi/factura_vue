@@ -2,20 +2,23 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Http\Requests\CompanyRequest;
 use App\Models\Company;
 use Exception;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Auth\Middleware\Authorize;
 
 
 class CompanyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
+    public function __construct()
+    {
+        $this->middleware(['can:read roles']);   
+    }
     
 
     public function index()
@@ -23,6 +26,7 @@ class CompanyController extends Controller
         // Obtiene el ID del usuario autenticado
         $userId = Auth::id();
         
+
         // Recupera las compañías asociadas al usuario actual
         //$companies = Company::all();
         $companies = Company::where('user_id', $userId)->get();

@@ -11,7 +11,6 @@ use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Fortify\Contracts\RegisterResponse;
 use Laravel\Fortify\Contracts\RegisterViewResponse;
 use Laravel\Fortify\Fortify;
-use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -60,32 +59,7 @@ class RegisteredUserController extends Controller
             ]);
         }
 
-        $roleName = '';
-        switch ($request->type) {
-            case 'company':
-                $roleName = 'company'; // Asegúrate de tener este rol creado en tu base de datos
-                break;
-            case 'consulting':
-                $roleName = 'consulting'; // Asegúrate de tener este rol creado en tu base de datos
-                break;
-            case 'freelance':
-                $roleName = 'freelance'; // Asegúrate de tener este rol creado en tu base de datos
-                break;
-        }
-
-        // Crea el usuario
-        $user = $creator->create($request->all());
-
-        // Asigna el rol al usuario recién creado
-        if ($roleName !== '') {
-            $role = Role::where('name', $roleName)->first();
-            if ($role) {
-                $user->assignRole($role);
-            }
-        }
-
-        // Dispara el evento Registered para mantener la compatibilidad con otros componentes de Laravel
-        event(new Registered($user));
+        event(new Registered($user = $creator->create($request->all())));
 
         $this->guard->login($user);
 
