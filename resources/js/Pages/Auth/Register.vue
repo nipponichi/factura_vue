@@ -13,6 +13,7 @@ const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
+    type: '',
     terms: false,
 });
 
@@ -84,6 +85,21 @@ const submit = () => {
                 />
                 <InputError class="mt-2" :message="form.errors.password_confirmation" />
             </div>
+
+            <div>
+                <label>
+                    <input type="radio" name="rol" v-model="form.type" value="company"> Company
+                </label>
+                <label>
+                    <input type="radio" name="rol" v-model="form.type" value="consulting"> Consulting
+                </label>
+                <label>
+                    <input type="radio" name="rol" v-model="form.type" value="freelance"> Freelance
+                </label>
+            </div>
+
+
+
 
             <div v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature" class="mt-4">
                 <InputLabel for="terms">
