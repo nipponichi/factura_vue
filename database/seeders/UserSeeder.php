@@ -29,6 +29,13 @@ class UserSeeder extends Seeder
             'password'=> Hash::make('12345678')
         ]);
         $company -> assignRole('company');
+
+        $consulting = User::create([
+            'name' => 'consulting',
+            'email'=> 'consulting@gmail.com',
+            'password'=> Hash::make('12345678')
+        ]);
+        $consulting -> assignRole('consulting');
     
     }
 }

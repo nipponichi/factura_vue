@@ -13,6 +13,7 @@ const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
+    company_type: '',
     terms: false,
 });
 
@@ -84,6 +85,29 @@ const submit = () => {
                 />
                 <InputError class="mt-2" :message="form.errors.password_confirmation" />
             </div>
+
+
+            <div class="mt-4">
+                <label for="company_type" class="block font-medium text-gray-700">Define your business</label>
+                <div class="mt-2 flex justify-center">
+                    <label class="inline-flex items-center">
+                        <input type="radio" id="sole_proprietorship" v-model="form.company_type" value="sole_proprietorship" class="form-radio text-indigo-600" required>
+                        <span class="ml-2">Freelance</span>
+                    </label>
+                    <label class="inline-flex items-center ml-6">
+                        <input type="radio" id="partnership" v-model="form.company_type" value="partnership" class="form-radio text-indigo-600">
+                        <span class="ml-2">Company</span>
+                    </label>
+                    <label class="inline-flex items-center ml-6">
+                        <input type="radio" id="corporation" v-model="form.company_type" value="corporation" class="form-radio text-indigo-600">
+                        <span class="ml-2">Consulting</span>
+                    </label>
+                </div>
+                <InputError class="mt-2" :message="form.errors.company_type" />
+            </div>
+
+
+            
 
             <div v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature" class="mt-4">
                 <InputLabel for="terms">
