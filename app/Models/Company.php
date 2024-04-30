@@ -22,10 +22,14 @@ class Company extends Model
         'country'
     ];
 
-    // Tiene key user_id foránea
+
     
     public function users(){
         return $this -> belongsTo(User::class);
+    }
+
+    public function details(){
+        return $this -> belongsTo(Company::class);
     }
 
     
