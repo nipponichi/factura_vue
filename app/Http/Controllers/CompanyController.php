@@ -9,7 +9,6 @@ use Exception;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\Middleware\Authorize;
 
 
 class CompanyController extends Controller
@@ -17,18 +16,18 @@ class CompanyController extends Controller
     
     public function __construct()
     {
-        $this->middleware(['can:read roles']);   
+        $this->middleware(['can:create company'])->only('store');  
+        $this->middleware(['can:update company'])->only('update');   
     }
-    
+
 
     public function index()
     {
         // Obtiene el ID del usuario autenticado
         $userId = Auth::id();
-        
 
         // Recupera las compañías asociadas al usuario actual
-        //$companies = Company::all();
+        // $companies = Company::all();
         $companies = Company::where('user_id', $userId)->get();
 
         //$companies = Company::all();
