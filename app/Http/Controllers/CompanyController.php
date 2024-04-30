@@ -16,24 +16,35 @@ class CompanyController extends Controller
     
     public function __construct()
     {
+        $this->middleware(['can:read company'])->only('index'); 
+        $this->middleware(['can:create company'])->only('create'); 
         $this->middleware(['can:create company'])->only('store');  
-        $this->middleware(['can:update company'])->only('update');   
+        $this->middleware(['can:read company'])->only('show'); 
+        $this->middleware(['can:update company'])->only('edit');
+        $this->middleware(['can:update company'])->only('update');
+        $this->middleware(['can:delete company'])->only('destroy');
+        
     }
 
 
     public function index()
     {
-        // Obtiene el ID del usuario autenticado
-        $userId = Auth::id();
-
-        // Recupera las compañías asociadas al usuario actual
-        // $companies = Company::all();
-        $companies = Company::where('user_id', $userId)->get();
-
-        //$companies = Company::all();
+    // Obtiene el ID del usuario autenticado
+    $userId = Auth::id();
+    
+    // Recupera las compañías asociadas al usuario actual con los detalles y el nombre registrado
+    $companies = Company::where('user_id', $userId)
+                    ->join('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
+                    ->join('companies_email_register', 'companies_detail.company_id', '=', 'companies_email_register.company_detail_id')
+                    ->join('companies_phone_register', 'companies_detail.company_id', '=', 'companies_phone_register.company_detail_id')
+                    ->join('companies_address_register', 'companies_detail.company_id', '=', 'companies_address_register.company_detail_id')
+                    ->join('companies_province_register', 'companies_detail.company_id', '=', 'companies_province_register.company_detail_id')
+                    ->join('companies_town_register', 'companies_detail.company_id', '=', 'companies_town_register.company_detail_id')
+                    ->join('companies_post_code_register', 'companies_detail.company_id', '=', 'companies_post_code_register.company_detail_id')
+                    ->join('companies_country_register', 'companies_detail.company_id', '=', 'companies_country_register.company_detail_id')
+                    ->get();
         
-        return Inertia::render('Companies/Index', ['companies' => $companies, 'type' => 'companies']);
-
+    return Inertia::render('Companies/Index', ['companies' => $companies, 'type' => 'companies']);
     }
     
 

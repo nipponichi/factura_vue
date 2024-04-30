@@ -11,34 +11,25 @@ class Company extends Model
     protected $fillable = [
         'name', 
         'taxNumber', 
-        'address1', 
-        'address2', 
+        'address', 
         'email', 
-        'phone1', 
-        'phone2',
+        'phone', 
         'province', 
         'town', 
         'postCode',
         'country'
     ];
 
-
-    
     public function users(){
         return $this -> belongsTo(User::class);
     }
 
-    public function details(){
-        return $this -> belongsTo(Company::class);
-    }
-
-    
-    public function customers() {
-        return $this -> hasMany(Customer::class);
+    public function products() {
+        return $this -> hasMany(Product::class);
     }
 
     public function invoices() {
-        return $this -> hasMany(Invoice::class);
+        return $this ->hasMany(Invoice::class);
     }
 }
 
