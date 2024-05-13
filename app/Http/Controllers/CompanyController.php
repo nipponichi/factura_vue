@@ -6,9 +6,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CompanyRequest;
 use App\Models\Company;
 use Exception;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 
 
 class CompanyController extends Controller
@@ -22,29 +24,50 @@ class CompanyController extends Controller
         $this->middleware(['can:read company'])->only('show'); 
         $this->middleware(['can:update company'])->only('edit');
         $this->middleware(['can:update company'])->only('update');
-        $this->middleware(['can:delete company'])->only('destroy');
-        
+        $this->middleware(['can:delete company'])->only('destroy');     
     }
 
 
-    public function index()
+    public static function index()
     {
-    // Obtiene el ID del usuario autenticado
-    $userId = Auth::id();
-    
-    // Recupera las compañías asociadas al usuario actual con los detalles y el nombre registrado
-    $companies = Company::where('user_id', $userId)
-                    ->join('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
-                    ->join('companies_email_register', 'companies_detail.company_id', '=', 'companies_email_register.company_detail_id')
-                    ->join('companies_phone_register', 'companies_detail.company_id', '=', 'companies_phone_register.company_detail_id')
-                    ->join('companies_address_register', 'companies_detail.company_id', '=', 'companies_address_register.company_detail_id')
-                    ->join('companies_province_register', 'companies_detail.company_id', '=', 'companies_province_register.company_detail_id')
-                    ->join('companies_town_register', 'companies_detail.company_id', '=', 'companies_town_register.company_detail_id')
-                    ->join('companies_post_code_register', 'companies_detail.company_id', '=', 'companies_post_code_register.company_detail_id')
-                    ->join('companies_country_register', 'companies_detail.company_id', '=', 'companies_country_register.company_detail_id')
-                    ->get();
+        // Obtiene el ID del usuario autenticado
+        $userId = Auth::id();
         
-    return Inertia::render('Companies/Index', ['companies' => $companies, 'type' => 'companies']);
+
+
+        // Recupera las compañías asociadas al usuario actual con los detalles y el nombre registrado
+        $companies = Company::select(
+            'companies.id',
+            'companies.taxNumber',
+            'companies_detail.name',
+            'companies_email_register.email',
+            'companies_country_register.country',
+            'companies_town_register.town',
+            'companies_post_code_register.postCode',
+            'companies_province_register.province',
+            'companies_phone_register.phone',
+            'companies_address_register.address'
+        )
+        ->join('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
+        ->join('companies_email_register', 'companies_detail.id', '=', 'companies_email_register.company_detail_id')
+        ->join('companies_addresses as addr_detail', 'companies_detail.company_id', '=', 'addr_detail.id')
+        ->join('companies_town_register', 'addr_detail.company_town_register_id', '=', 'companies_town_register.id')
+        ->join('companies_country_register', 'addr_detail.company_country_register_id', '=', 'companies_country_register.id')
+        ->join('companies_province_register', 'addr_detail.company_province_register_id', '=', 'companies_province_register.id')
+        ->join('companies_post_code_register', 'addr_detail.company_post_code_register_id', '=', 'companies_post_code_register.id')
+        ->join('companies_address_register', 'addr_detail.company_address_register_id', '=', 'companies_address_register.id')
+        ->join('companies_phone_address', 'addr_detail.id', '=', 'companies_phone_address.companies_addresses_id')
+        ->join('companies_phone_register', 'companies_phone_address.companies_phone_register_id', '=', 'companies_phone_register.id')
+        ->where('user_id', $userId)
+        ->where('companies_phone_register.favorite', 1)
+        ->where('companies_email_register.favorite', 1)
+        ->where('addr_detail.favorite', 1)
+        ->get();
+        
+
+        //return response()->json(['message' => 'Error al eliminiar la compañia: '. $companies]);
+        return Inertia::render('Companies/Index', ['companies' => $companies]);
+    
     }
     
 
@@ -63,7 +86,8 @@ class CompanyController extends Controller
     public function store(CompanyRequest $request)
     {
         try {
-            
+
+
             $user_id = Auth::id();
             $company = new Company($request->validated());
             $company->user_id = $user_id;
@@ -82,17 +106,58 @@ class CompanyController extends Controller
      * Display the specified resource.
      */
     public function show(string $id)
-    {
-        
+    {      
         try {
-            $company = Company::findOrFail($id);
 
-            return Inertia::render('Companies/Show', ['company' => $company]);
+            // Obtener el usuario autenticado
+            $userId = Auth::id();
 
-        }catch (Exception $e) {
+            // Verificar si el usuario autenticado es propietario de la empresa
+            $company = Company::where('id', $id)
+                ->where('user_id', $userId)
+                ->first();
+
+            if (!$company) {
+                return Redirect::route('companies.index')->with('error', 'No se encontró la empresa');
+            } 
+            $companies = Company::select(
+                'companies.id',
+
+                'companies.taxNumber',
+                'companies_detail.name',
+                'companies_email_register.email',
+                'companies_country_register.country',
+                'companies_town_register.town',
+                'companies_post_code_register.postCode',
+                'companies_province_register.province',
+                'companies_phone_register.phone',
+                'companies_address_register.address'
+                )
+            ->join('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
+            ->join('companies_email_register', 'companies_detail.id', '=', 'companies_email_register.company_detail_id')
+            ->join('companies_addresses as addr_detail', 'companies_detail.company_id', '=', 'addr_detail.id')
+            ->join('companies_town_register', 'addr_detail.company_town_register_id', '=', 'companies_town_register.id')
+            ->join('companies_country_register', 'addr_detail.company_country_register_id', '=', 'companies_country_register.id')
+            ->join('companies_province_register', 'addr_detail.company_province_register_id', '=', 'companies_province_register.id')
+            ->join('companies_post_code_register', 'addr_detail.company_post_code_register_id', '=', 'companies_post_code_register.id')
+            ->join('companies_address_register', 'addr_detail.company_address_register_id', '=', 'companies_address_register.id')
+            ->join('companies_phone_address', 'addr_detail.id', '=', 'companies_phone_address.companies_addresses_id')
+            ->join('companies_phone_register', 'companies_phone_address.companies_phone_register_id', '=', 'companies_phone_register.id')
+            ->where('companies.id', $id)
+            ->where('companies.user_id', $userId)
+            ->where('companies_phone_register.favorite', 1)
+            ->where('companies_email_register.favorite', 1)
+            ->where('addr_detail.favorite', 1)
+            ->first();
+
+            return Inertia::render('Companies/Show', ['company' => $companies]);
             
+        }catch (Exception $e) {
+                
             return response()->json(['message' => 'Compañía no encontrada ', $e->getMessage()], 500);
         }
+    
+        
     }
 
     /**
@@ -101,12 +166,25 @@ class CompanyController extends Controller
     public function edit(string $id)
     {
         try {
-            $product = Company::findOrFail($id);
-            //return response()->json($product);
-            return response()->json(['product' => $product]);
+
+            $companies = Company::where('companies.id', $id)
+            ->join('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
+            ->join('companies_email_register', 'companies_detail.company_id', '=', 'companies_email_register.company_detail_id')
+            ->join('companies_phone_register', 'companies_detail.company_id', '=', 'companies_phone_register.company_detail_id')
+            ->join('companies_address_register', 'companies_detail.company_id', '=', 'companies_address_register.company_detail_id')
+            ->join('companies_province_register', 'companies_detail.company_id', '=', 'companies_province_register.company_detail_id')
+            ->join('companies_town_register', 'companies_detail.company_id', '=', 'companies_town_register.company_detail_id')
+            ->join('companies_post_code_register', 'companies_detail.company_id', '=', 'companies_post_code_register.company_detail_id')
+            ->join('companies_country_register', 'companies_detail.company_id', '=', 'companies_country_register.company_detail_id')
+            ->first();
+
+            
+
+            return response()->json(['company' => $companies]);
+
         }catch (Exception $e) {
-            // Devuelve una respuesta JSON con un mensaje de error
-            return response()->json(['message' => 'Error al editar la compañía: ', $e->getMessage()], 500);
+                
+            return response()->json(['message' => 'Compañía no encontrada ', $e->getMessage()], 500);
         }
     }
 
@@ -115,15 +193,46 @@ class CompanyController extends Controller
      */
     public function update(CompanyRequest $request, string $id)
     {
-        try{
-            $company = Company::findOrFail($id);
-            $company->update($request->validated());
-            return response()->json(['message' => 'Company updated successfully','company'=> $company]);
-        }catch (Exception $e) {
+        try {
+            // Actualiza la compañía y devuelve el número de filas afectadas
+            $company = Company::where('companies.id', $id)
+                ->join('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
+                ->join('companies_email_register', 'companies_detail.company_id', '=', 'companies_email_register.company_detail_id')
+                ->join('companies_phone_register', 'companies_detail.company_id', '=', 'companies_phone_register.company_detail_id')
+                ->join('companies_address_register', 'companies_detail.company_id', '=', 'companies_address_register.company_detail_id')
+                ->join('companies_province_register', 'companies_detail.company_id', '=', 'companies_province_register.company_detail_id')
+                ->join('companies_town_register', 'companies_detail.company_id', '=', 'companies_town_register.company_detail_id')
+                ->join('companies_post_code_register', 'companies_detail.company_id', '=', 'companies_post_code_register.company_detail_id')
+                ->join('companies_country_register', 'companies_detail.company_id', '=', 'companies_country_register.company_detail_id')
+                ->update([
+                    'companies.taxNumber' => $request->taxNumber,
+                    'companies_detail.name' => $request->taxNumber,
+                    'companies_email_register.email' => $request->taxNumber,
+                    'companies_phone_register.phone' => $request->taxNumber,
+                    '.taxNumber' => $request->taxNumber,
+                    'companies.taxNumber' => $request->taxNumber,
+                    'companies.taxNumber' => $request->taxNumber,
+                    'companies.taxNumber' => $request->taxNumber,
+                    'companies.taxNumber' => $request->taxNumber,
+                    'companies.taxNumber' => $request->taxNumber,
+                    
+                ]);
+
+                if ($company === 0) {
+                    return response()->json([
+                        'message' => 'No se encontró ninguna compañía con el ID proporcionado.'
+                    ], 404);
+                }
+
+    
+        } catch (Exception $e) {
             // Devuelve una respuesta JSON con un mensaje de error
-            return response()->json(['message' => 'Error al editar la compañía: ', $e->getMessage()], 500);
+            return response()->json([
+                'message' => 'Error al editar la compañía: ' . $request->taxNumber . '. ' . $e->getMessage()
+            ], 500);
         }
     }
+    
 
     /**
      * Remove the specified resource from storage.

@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies_country_register', function (Blueprint $table) {
-            $table->id();
-            $table->string('country');
+        Schema::create('companies_phone_address', function (Blueprint $table) {    
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
-        });
+            $table->foreignId('companies_addresses_id')->constrained('companies_addresses');
+            $table->foreignId('companies_phone_register_id')->constrained('companies_phone_register');          
+        });  
     }
 
     /**
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('companies_country_register');
+        Schema::dropIfExists('comapnies_phone_address');
     }
 };

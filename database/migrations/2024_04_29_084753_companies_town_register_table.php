@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('companies_town_register', function (Blueprint $table) {
+            $table->id();
             $table->string('town');
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
-            $table->foreignId('company_detail_id')->constrained('companies_detail');
         });
     }
 
