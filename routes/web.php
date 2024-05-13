@@ -4,7 +4,6 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\OfCustomerController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\RouteController;
 use Illuminate\Support\Facades\Route;
@@ -24,9 +23,6 @@ Route::middleware([
     Route::resource('/customers', CustomerController::class);
     Route::resource('/invoices', InvoiceController::class);
     Route::resource('/products', ProductController::class);
-    Route::resource('/customers/ofCustomers', OfCustomerController::class);
     Route::resource('/admin', AdminController::class);
-    
-
     Route::get('/has-company', [CompanyController::class, 'hasCompany'])->name('companies.hasCompany');
 });

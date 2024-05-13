@@ -55,8 +55,7 @@ class RoleSeeder extends Seeder
         $role_admin->syncPermissions($permissions_admin, $permissions_company,$permissions_consulting);
         $role_company->syncPermissions($permissions_company);
         $role_freelancer->syncPermissions($permissions_company);
-        $role_consulting->syncPermissions($permissions_company, $permissions_company, $permissions_consulting);
-        
+        $role_consulting->syncPermissions($permissions_company,$permissions_consulting);
         
     }
 }

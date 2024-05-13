@@ -2,7 +2,7 @@
     <AppLayout title="Dashboard">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                My company
+                {{ company.name }}
             </h2>
         </template>
         <div class="py-12">
@@ -58,22 +58,14 @@
                                                         </div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Phone 1:</div>
-                                                        <div class=" py-2">{{ company.phone1 }}</div>
+                                                        <div class=" py-2 font-semibold">Phone :</div>
+                                                        <div class=" py-2">{{ company.phone }}</div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Phone 2:</div>
-                                                        <div class="py-2">{{ company.phone2 }}</div>
+                                                        <div class=" py-2 font-semibold">Address :</div>
+                                                        <div class=" py-2">{{ company.address}} </div>
                                                     </div>
-
-                                                    <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Address 1:</div>
-                                                        <div class=" py-2">{{ company.address1}} </div>
-                                                    </div>
-                                                    <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Address 2:</div>
-                                                        <div class=" py-2">{{ company.address2 }} </div>
-                                                    </div>
+                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -105,6 +97,26 @@
                                         Invoices
                                     </button>
                                 </li>
+                                <li class="me-2">
+                                    <button @click="changeTab('invoices')" :class="{'border-b-2 border-blue-500': activeTab === 'invoices'}" class="inline-flex items-center justify-center p-4 border-transparent rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-file w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                        Phone
+                                    </button>
+                                </li>
+                                <li class="me-2">
+                                    <button @click="changeTab('invoices')" :class="{'border-b-2 border-blue-500': activeTab === 'invoices'}" class="inline-flex items-center justify-center p-4 border-transparent rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-file w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                        Email
+                                    </button>
+                                </li>
+                                <li class="me-2">
+                                    <button @click="changeTab('invoices')" :class="{'border-b-2 border-blue-500': activeTab === 'invoices'}" class="inline-flex items-center justify-center p-4 border-transparent rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-file w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                        Address
+                                    </button>
+                                </li>
+                                
+
                             </ul>
                         </div>
             
@@ -131,10 +143,10 @@
     import AppLayout from '@/Layouts/AppLayout.vue';
     import TableCustomers from '@/Components/TableCustomer.vue';
     import TableInvoice from '@/Components/TableInvoice.vue';
-
+    
 
     import { ref } from 'vue';
-
+    
     // Definimos la variable reactive para almacenar la pestaña activa
     const activeTab = ref('customers');
 
@@ -148,7 +160,6 @@
 <script>
     export default {
         props: ["company"],
-
         data() {
             return {
                 
@@ -163,8 +174,10 @@
         },
 
         methods: {
-            
-        }
+
+        },
     };
+
+    
 </script>
 
