@@ -32,7 +32,8 @@ class CustomerRequest extends FormRequest
             'province' => 'string',
             'town' => 'string',
             'postCode' => 'string',
-            'country' => 'string'
+            'country' => 'string',
+            'companyID' => 'string'
         ];
     }
 }

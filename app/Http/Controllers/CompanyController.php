@@ -38,26 +38,27 @@ class CompanyController extends Controller
         // Recupera las compañías asociadas al usuario actual con los detalles y el nombre registrado
         $companies = Company::select(
             'companies.id',
+            'companies.dt_end',
             'companies.taxNumber',
             'companies_detail.name',
             'companies_email_register.email',
+            'companies_phone_register.phone',
             'companies_country_register.country',
             'companies_town_register.town',
             'companies_post_code_register.postCode',
-            'companies_province_register.province',
-            'companies_phone_register.phone',
+            'companies_province_register.province',       
             'companies_address_register.address'
         )
         ->join('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
         ->join('companies_email_register', 'companies_detail.id', '=', 'companies_email_register.company_detail_id')
+        ->join('companies_phone_register', 'companies_detail.id', '=', 'companies_phone_register.company_detail_id')
         ->join('companies_addresses as addr_detail', 'companies_detail.company_id', '=', 'addr_detail.id')
         ->join('companies_town_register', 'addr_detail.company_town_register_id', '=', 'companies_town_register.id')
         ->join('companies_country_register', 'addr_detail.company_country_register_id', '=', 'companies_country_register.id')
         ->join('companies_province_register', 'addr_detail.company_province_register_id', '=', 'companies_province_register.id')
         ->join('companies_post_code_register', 'addr_detail.company_post_code_register_id', '=', 'companies_post_code_register.id')
         ->join('companies_address_register', 'addr_detail.company_address_register_id', '=', 'companies_address_register.id')
-        ->join('companies_phone_address', 'addr_detail.id', '=', 'companies_phone_address.companies_addresses_id')
-        ->join('companies_phone_register', 'companies_phone_address.companies_phone_register_id', '=', 'companies_phone_register.id')
+        ->whereNull('companies.dt_end')
         ->where('user_id', $userId)
         ->where('companies_phone_register.favorite', 1)
         ->where('companies_email_register.favorite', 1)
@@ -122,7 +123,6 @@ class CompanyController extends Controller
             } 
             $companies = Company::select(
                 'companies.id',
-
                 'companies.taxNumber',
                 'companies_detail.name',
                 'companies_email_register.email',
@@ -135,14 +135,13 @@ class CompanyController extends Controller
                 )
             ->join('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
             ->join('companies_email_register', 'companies_detail.id', '=', 'companies_email_register.company_detail_id')
+            ->join('companies_phone_register', 'companies_detail.id', '=', 'companies_phone_register.company_detail_id')
             ->join('companies_addresses as addr_detail', 'companies_detail.company_id', '=', 'addr_detail.id')
             ->join('companies_town_register', 'addr_detail.company_town_register_id', '=', 'companies_town_register.id')
             ->join('companies_country_register', 'addr_detail.company_country_register_id', '=', 'companies_country_register.id')
             ->join('companies_province_register', 'addr_detail.company_province_register_id', '=', 'companies_province_register.id')
             ->join('companies_post_code_register', 'addr_detail.company_post_code_register_id', '=', 'companies_post_code_register.id')
             ->join('companies_address_register', 'addr_detail.company_address_register_id', '=', 'companies_address_register.id')
-            ->join('companies_phone_address', 'addr_detail.id', '=', 'companies_phone_address.companies_addresses_id')
-            ->join('companies_phone_register', 'companies_phone_address.companies_phone_register_id', '=', 'companies_phone_register.id')
             ->where('companies.id', $id)
             ->where('companies.user_id', $userId)
             ->where('companies_phone_register.favorite', 1)
@@ -250,6 +249,7 @@ class CompanyController extends Controller
             
             return response()->json(['message' => 'Error al eliminiar la compañia: '. $id . $e->getMessage()], 500);
         }
+        
     }
 
     public function hasCompany()
