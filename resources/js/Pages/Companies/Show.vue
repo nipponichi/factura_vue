@@ -98,8 +98,8 @@
                                     </button>
                                 </li>
                                 <li class="me-2">
-                                    <button @click="changeTab('invoices')" :class="{'border-b-2 border-blue-500': activeTab === 'invoices'}" class="inline-flex items-center justify-center p-4 border-transparent rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
-                                        <i class="pi pi-file w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                    <button @click="changeTab('phone')" :class="{'border-b-2 border-blue-500': activeTab === 'phone'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-phone w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
                                         Phone
                                     </button>
                                 </li>
@@ -130,6 +130,9 @@
                             <table v-else-if="activeTab === 'invoices'" class="w-full">
                                 <TableInvoice />
                             </table>
+                            <table v-else-if="activeTab === 'phone'" class="w-full">
+                                <TablePhone />
+                            </table>
                         </div>
 
                     </div>
@@ -143,6 +146,7 @@
     import AppLayout from '@/Layouts/AppLayout.vue';
     import TableCustomers from '@/Components/TableCustomer.vue';
     import TableInvoice from '@/Components/TableInvoice.vue';
+    import TablePhone from '@/Components/TablePhone.vue';
     
 
     import { ref } from 'vue';

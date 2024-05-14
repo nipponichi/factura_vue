@@ -11,6 +11,8 @@ class Phone extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'phone'
+        'phone',
+        'favorite',
+        'isMobile'
     ];
 }

@@ -37,15 +37,18 @@ class CompanySeeder extends Seeder
         'company_detail_id' => $companyDetailId
     ]);
 
-    $companyPhoneRegisterId1 = DB::table('companies_phone_register')->insert([
+    DB::table('companies_phone_register')->insert([
         'phone' => '696896985',
         'dt_start' => now(),
+        'isMobile' =>true,
+        'company_detail_id' => 1,
     ]);
 
-    $companyPhoneRegisterId2 = DB::table('companies_phone_register')->insert([
+    DB::table('companies_phone_register')->insert([
         'phone' => '966744040',
         'favorite' =>true,
         'dt_start' => now(),
+        'company_detail_id' => 1,
     ]);
     
     $companyAddressRegisterId = DB::table('companies_address_register')->insert([
@@ -72,7 +75,7 @@ class CompanySeeder extends Seeder
         'dt_start' => now(),
         
     ]);
-    $companyAddressesId = DB::table('companies_addresses')->insert([
+    DB::table('companies_addresses')->insert([
         'company_detail_id' => $companyDetailId,
         'company_address_register_id' => $companyAddressRegisterId,
         'company_province_register_id' => $companyProvinceRegisterId,
@@ -83,17 +86,6 @@ class CompanySeeder extends Seeder
         'dt_start' => now(),
     ]);
 
-    DB::table('companies_phone_address')->insert([
-        'companies_addresses_id' => $companyAddressesId,
-        'companies_phone_register_id' => $companyPhoneRegisterId1,
-        'dt_start' => now(),
-    ]);
-    
-    DB::table('companies_phone_address')->insert([
-        'companies_addresses_id' => $companyAddressesId,
-        'companies_phone_register_id' => 2,
-        'dt_start' => now(),
-    ]);
 
 
 
@@ -124,12 +116,15 @@ class CompanySeeder extends Seeder
     DB::table('companies_phone_register')->insert([
         'phone' => '676812295',
         'favorite' =>true,
-        'dt_start' => now()
+        'isMobile' =>true,
+        'dt_start' => now(),
+        'company_detail_id' => 2,
     ]);
 
     DB::table('companies_phone_register')->insert([
         'phone' => '968516060',
         'dt_start' => now(),
+        'company_detail_id' => 2,
     ]);
     
     DB::table('companies_address_register')->insert([
@@ -167,17 +162,6 @@ class CompanySeeder extends Seeder
         'dt_start' => now(),
     ]);
 
-    DB::table('companies_phone_address')->insert([
-        'companies_addresses_id' => 2,
-        'companies_phone_register_id' => 3,
-        'dt_start' => now(),
-    ]);
-
-    DB::table('companies_phone_address')->insert([
-        'companies_addresses_id' => 2,
-        'companies_phone_register_id' => 4,
-        'dt_start' => now(),
-    ]);
 }
 
 }

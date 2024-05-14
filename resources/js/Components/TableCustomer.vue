@@ -61,7 +61,6 @@
                 
                 <div class="mb-6">
 
-<!--
                     <div>
                         <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
                         <input type="text" id="address1" v-model="company.address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Address" required />
@@ -70,7 +69,7 @@
                 <div class="grid gap-3 mb-6 md:grid-cols-2"> 
                     
                     <div>
-                        <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">TownCOMPANY</label>
+                        <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Town</label>
                         <input type="text" id="town" v-model="company.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Town" required />
                     </div>  
                     <div>
@@ -84,16 +83,16 @@
                     <div>
                         <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
                         <input type="text" id="country" v-model="company.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Country" required />
-                    </div> -->
+                    </div>
                     <div>
                         <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email address</label>
                         <input type="email" id="email" v-model="company.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="info@mycompany.com" required />
                     </div>    
-                 <!--   <div>
+                    <div>
                         <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
                         <input type="tel" id="phone" v-model="company.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Phone" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
                     </div>
--->
+
                     
                 </div>
                 
@@ -174,7 +173,7 @@ import axios from 'axios';
 
 export default {
     data() {
-        console.log("PRIMER PASO");
+        console.log("PRIMERdd PASO");
         return {
             companies: null, 
             companyDialog: false, 
@@ -189,7 +188,7 @@ export default {
                 postCode: '',
                 town: '',
                 province: '',
-                country: ''
+                country: '',
             },
             selectedCompanies: [], 
             filters: {}, 
@@ -204,17 +203,43 @@ export default {
     },
     mounted() {
         
-        this.companies = this.$page.props.companies;
+        let myCompanyId = window.location.pathname.split('/').pop();
+        console.log("id: " + myCompanyId);
+        axios.get('/customers/' + myCompanyId)
+        .then(response => {
+            // Asigna los datos de los clientes a la propiedad 'companies'
+            this.companies = response.data[0];
+            console.log(this.companies);
+            // Itera sobre todos los elementos del array 'companies'
+            this.companies.forEach((company, index) => {
+                console.log(`Company ${index + 1}:`, company);
+            });
+        })
+        .catch(error => {
+            console.error('Error al obtener los datos de los clientes:', error);
+        });
+        /* this.companies = this.$page.props.customers;
+        console.log(this.companies);*/
     },
 
     
     methods: {
         openNew() {
-            console.log("OPEN NEW-------------------")
-            this.company = {};
-            this.submitted = false;
-            this.companyDialog = true;
-        },
+        this.company = {
+            name: '',
+            taxNumber: '',
+            email: '',
+            phone: '',
+            address: '',
+            postCode: '',
+            town: '',
+            province: '',
+            country: '',
+            companyID: window.location.pathname.split('/').pop(),
+        };
+        this.submitted = false;
+        this.companyDialog = true;
+    },
         hideDialog() {
             console.log("HIDE")
             this.companyDialog = false;
@@ -225,7 +250,7 @@ export default {
             if (!this.company.id) {
                 
                 // Realiza la solicitud para guardar la compañía
-                axios.post('/customers', this.company)
+                axios.post('/customer', this.company)
                 .then(response => {
                     // La solicitud se completó con éxito, puedes hacer lo que necesites con la respuesta, como imprimirlo en la consola
                     console.log(response);
@@ -233,12 +258,27 @@ export default {
                     // Cierra el diálogo de compañía
                     this.companyDialog = false;
 
-                    this.companies.push(response.data.company)
+                    let myCompanyId = window.location.pathname.split('/').pop();
+                    
+                    //this.companies.push(response.data.company);
+                    axios.get('/customers/' + myCompanyId)
+                    .then(response => {
+                        // Asigna los datos de los clientes a la propiedad 'companies'
+                        this.companies = response.data[0];
+                        console.log(this.companies);
+                        // Itera sobre todos los elementos del array 'companies'
+                        this.companies.forEach((company, index) => {
+                            console.log(`Company ${index + 1}:`, company);
+                        });
+                    })
+
+                    console.log(response.data.company);
                 
                 })
                 .catch(error => {
                     // Si hay algún error en la solicitud, puedes manejarlo aquí
                     console.log(error.response);
+                    console.log(response.data.name);
                 });   
 
             }else {
@@ -252,7 +292,7 @@ export default {
         editCompany(slotCompany) {
 
 
-            axios.get('/customers/' + slotCompany.id + '/edit').then(response => {
+            axios.get('/customer/' + slotCompany.id + '/edit').then(response => {
 
 
                 this.company = response.data.company;
@@ -269,11 +309,8 @@ export default {
         updateCompany() {
 
             console.log( "Updatessss: " + JSON.stringify(this.company))
-            
 
-
-
-            axios.put('/companies/' + this.company.id, this.company)
+            axios.put('/customer/' + this.company.id, this.company)
             .then(response => {
                 
                 // Busca el índice del objeto en la lista actual
@@ -305,7 +342,7 @@ export default {
 
             console.log(this.company.id);
 
-            axios.delete('/companies/'+ this.company.id)
+            axios.delete('/customer/'+ this.company.id)
                 .then(response => { console.log(response)})
                 .catch(error => { console.log(error.response)})
                 
@@ -320,7 +357,7 @@ export default {
         deleteSelectedCompanies() {
             // Envía una solicitud de eliminación para cada compañia seleccionado
             this.selectedCompanies.forEach(company => {
-            axios.delete('/companies/' + company.id)
+            axios.delete('/customer/' + company.id)
                 .then(response => {
                 console.log('Compañía eliminada con ID:', company.id);
                 
@@ -337,7 +374,7 @@ export default {
 
 
         handleInfoButtonClick(companyId) {
-            this.$inertia.get('/companies/' + companyId);
+            this.$inertia.get('/customer/' + companyId);
         }
     }
 }

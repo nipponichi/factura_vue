@@ -17,6 +17,8 @@ return new class extends Migration
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
             $table->boolean('favorite')->default (false);
+            $table->boolean('isMobile')->default (false);
+            $table->foreignId('company_detail_id')->constrained('companies_detail');
         });
     }
 
