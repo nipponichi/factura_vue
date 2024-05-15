@@ -33,8 +33,8 @@
                 
                 <Column :exportable="false" class="dateTable">
                     <template #body="slotProps">
-                        <Button v-if="slotProps.data.favorite" icon="pi pi-star-fill" outlined rounded class="mr-2 info-button" @click="editMyPhone(slotProps.data)" />
-                        <Button v-else icon="pi pi-star" outlined rounded class="mr-2 info-button" @click="handleInfoButtonClick(slotProps.data.id)" />
+                        <Button v-if="slotProps.data.favorite" icon="pi pi-star-fill" outlined rounded class="mr-2 info-button" @click="makeFavorite(slotProps.data.id)" />
+                        <Button v-else icon="pi pi-star" outlined rounded class="mr-2 info-button" @click="makeFavorite(slotProps.data.id)" />
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editMyPhone(slotProps.data)" />
                         <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeletePhone(slotProps.data)" />
                     </template>
@@ -206,6 +206,29 @@ export default {
                 console.error('Error al actualizar la compañía:', error);
                 this.phoneDialog = false; 
                 // Mostrar un mensaje de error al usuario
+                
+            });
+        },
+
+        makeFavorite(slotProps) {
+            axios.put('/phones/' + slotProps)
+            .then(response => {
+                console.log("id favorito "+response.data.id)
+                let myCompanyId = window.location.pathname.split('/').pop();
+                axios.get('/phones/' + myCompanyId)
+                .then(response => {
+                this.phones = response.data.phones;                
+            })
+            .catch(error => {
+                console.error('Error fetching phone data:', error);
+            });
+                
+                    
+                })
+            .catch(error => {
+                console.error('Error al seleccionar un teléfono', error);
+                
+              
                 
             });
         },
