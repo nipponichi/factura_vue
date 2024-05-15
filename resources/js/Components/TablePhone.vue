@@ -154,34 +154,25 @@ export default {
 
 
         saveMyPhone() {
-            console.log("SAVE: " + this.myPhone.id)
+
             if (!this.myPhone.id) {
-                console.log("myphonephone " + this.myPhone.phone)
                 axios.post('/phone', this.myPhone)
                 .then(response => {
-                    this.phoneDialog = false;  
-                    let myCompanyId = window.location.pathname.split('/').pop();
-                    axios.get('/phones/' + myCompanyId)
-                        .then(response => {
-                            this.phones = response.data.phones;
-                        })
-                        .catch(error => {
-                            console.error('Error fetching phone data:', error);
-                        });
+                    this.phones.push(response.data.phone);
+                    console.log("Responde phone " +response.data.phone.phone)
+                    this.phoneDialog = false;
                         
                 })
                 .catch(error => {
                     console.error('Error saving phone data:', error.response);
+                    this.phoneDialog = false;
                 });
 
-            }else {
-                
+            }else {               
                 this.updateMyPhone();
-                
             }
         },
 
-    
         editMyPhone(slotProps) {
             axios.get('/phone/' + slotProps.id + '/edit').then(response => {
                 this.myPhone.phone = response.data.phones[0].phone;
@@ -194,8 +185,6 @@ export default {
 
 
         },
-
-
 
         updateMyPhone() {
             
@@ -221,8 +210,6 @@ export default {
             });
         },
         
-        
-
         confirmDeletePhone(phone) {
             this.myPhone = phone;
             this.deletePhoneDialog = true;       
