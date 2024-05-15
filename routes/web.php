@@ -23,6 +23,7 @@ Route::middleware([
     Route::resource('/companies', CompanyController::class);
     Route::resource('/customer', CustomerController::class);
     Route::get('/customers/{id}', [CustomerController::class, 'index']);
+    Route::put('/phones/{id}', [PhoneController::class, 'makeFavorite']);
     Route::get('/phones/{id}', [PhoneController::class, 'index']);
     Route::resource('/phone', PhoneController::class);
     Route::resource('/invoices', InvoiceController::class);

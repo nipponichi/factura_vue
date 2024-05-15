@@ -16,6 +16,7 @@ class PhoneController extends Controller
         $this->middleware(['can:create company'])->only('store');
         $this->middleware(['can:read company'])->only('show');
         $this->middleware(['can:update company'])->only('edit');
+        $this->middleware(['can:update company'])->only('makeFavorite');
         $this->middleware(['can:update company'])->only('update');
         $this->middleware(['can:delete company'])->only('destroy');
     }
@@ -137,6 +138,7 @@ class PhoneController extends Controller
 
     public function destroy($id)
     {
+        DB::beginTransaction();
         try {
             $companyResult = DB::table('companies_phone_register')
                 ->select('company_detail_id')
@@ -168,7 +170,7 @@ class PhoneController extends Controller
             }
 
             if ($companyPhone) {
-                return response()->json(['message' => 'No puedes eliminar un teléfono marcado como favorito.','favorito'=> $companyFav ], 400);
+                return response()->json(['message' => 'No puedes eliminar un teléfono marcado como favorito.'], 400);
             }
 
             DB::table('companies_phone_register')
@@ -177,11 +179,47 @@ class PhoneController extends Controller
                 'dt_end' => now(),
             ]);
 
-            return response()->json(['message' => 'Se ha eliminado el teléfono con éxito', 'favorito'=> $companyFav ]);
+            DB::commit();
+            return response()->json(['message' => 'Se ha eliminado el teléfono con éxito']);
         } catch (Exception $e) {
+            DB::rollback();
             return response()->json(['message' => 'Error al eliminar el teléfono: '.$e->getMessage()], 500);
         }
     }
+
+    public function makeFavorite($id) {
+        try {
+
+            $companyResult = DB::table('companies_phone_register')
+            ->select('company_detail_id')
+            ->where('id', $id)
+            ->whereNull('dt_end')
+            ->first(); 
+
+            if ($companyResult) {
+                $companyId = $companyResult->company_detail_id;
+            }
+
+            DB::table('companies_phone_register')
+            ->where('company_detail_id', $companyId)
+            ->update([
+                'favorite' => 0,
+            ]);
+
+            DB::table('companies_phone_register')
+            ->where('id', $id)
+            ->update([
+                'favorite' => 1,
+            ]);
+
+           
+    
+            return response()->json(['message' => 'make favorite',], 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Error al seleccionar teléfono favorito: ', 'id'=> $$companyId .$e->getMessage()], 500);
+        }
+    }
+
 
 
 
