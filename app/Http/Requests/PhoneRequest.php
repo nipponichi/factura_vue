@@ -22,6 +22,7 @@ class PhoneRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'id' => 'int',
             'phone' => 'string|max:255',
             'favorite' => 'boolean',
             'CompanyID' => 'string',

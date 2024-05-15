@@ -8,7 +8,7 @@
                 </template>
             </Toolbar>
 
-            <DataTable ref="dt" :value="phones" v-model:selection="selectedPhones" dataKey="id" 
+            <DataTable ref="dt" :value="phones" v-model:selection="selectedPhones" dataKey="id" @row-select="onRowSelect"
                 :paginator="true" :rows="10" :filters="filters"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} companies">
@@ -33,9 +33,9 @@
                 
                 <Column :exportable="false" class="dateTable">
                     <template #body="slotProps">
-                        <Button icon="pi pi-star" outlined rounded class="mr-2 info-button" @click="handleInfoButtonClick(slotProps.data.id)" />
-                        <Button icon="pi pi-star-fill" outlined rounded class="mr-2 edit-button" @click="editMyPhone(slotProps.data)" />
-                        <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editPhone(slotProps.data)" />
+                        <Button v-if="slotProps.data.favorite" icon="pi pi-star-fill" outlined rounded class="mr-2 info-button" @click="editMyPhone(slotProps.data)" />
+                        <Button v-else icon="pi pi-star" outlined rounded class="mr-2 info-button" @click="handleInfoButtonClick(slotProps.data.id)" />
+                        <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editMyPhone(slotProps.data)" />
                         <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeletePhone(slotProps.data)" />
                     </template>
                 </Column>
@@ -43,29 +43,29 @@
         </div>
 
         <!-- MODAL -->
-        <Dialog v-model:visible="phoneDialog" :header="myPhone.id ? 'Modify phone' : 'Create phone'" id="titleCompany" :modal="true" class="p-fluid">
-            
-            <form style="width: 800px;" @submit.prevent="saveMyPhone">
-                <div class="grid gap-3 mb-6 md:grid-cols-1">
+            <template>
+                <Dialog v-model:visible="phoneDialog" :header="myPhone.id ? 'Update phone' : 'Create phone'" id="titlePhone" :modal="true" class="p-fluid">
+                <form style="width: 800px;" @submit.prevent="saveMyPhone">
+                    <div class="grid gap-3 mb-6 md:grid-cols-1">
                     <div>
                         <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
                         <input type="tel" id="phone" v-model="myPhone.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Phone" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
                     </div>
                     <div class="flex items-center">
-                        <input id="link-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Bookmark this phone number as a favorite.</label>
+                        <input id="link-checkbox" type="checkbox" v-model="myPhone.favorite" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Mark this phone number as a favorite.</label>
                     </div>
-                </div>
-
-                
-                <div class="grid gap-3 md:grid-cols-1 justify-items-end">
+                    </div>
+                    <div class="grid gap-3 md:grid-cols-1 justify-items-end">
                     <div>
-                        <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" text @click="hideDialog">Close</button>
-                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ myPhone.id ? 'Modify' : 'Save' }}</button>
-                    </div>    
-                </div>
-            </form>
-        </Dialog>
+                        <button type="button" class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog">Close</button>
+                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ myPhone.id ? 'Update' : 'Save' }}</button>
+                    </div>
+                    </div>
+                </form>
+                </Dialog>
+            </template>
+            
 
         <!-- MODAL DELETE SIMPLE -->
         <Dialog v-model:visible="deletePhoneDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
@@ -87,7 +87,7 @@
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deletePhonesDialog = false"/>
-                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedCompanies" />
+                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedPhones" />
             </template>
         </Dialog>
 
@@ -109,8 +109,8 @@ export default {
             myPhone: { 
                 id: '',             
                 phone: '',
-                favorite: '',
-                isMobile: '',
+                favorite: 0,
+                isMobile: 0,
                 companyID: window.location.pathname.split('/').pop(),
             },
             selectedPhones: [], 
@@ -128,12 +128,17 @@ export default {
         axios.get('/phones/' + myCompanyId)
             .then(response => {
                 this.phones = response.data.phones;
+                
             })
             .catch(error => {
                 console.error('Error fetching phone data:', error);
             });
     },
     methods: {
+        onRowSelect(event) {
+        // event.data contiene el objeto phone seleccionado
+        this.selectedPhone = event.data;
+    },
         openNew() {
             this.myPhone = {
                 phone: '',
@@ -146,99 +151,134 @@ export default {
             this.phoneDialog = false;
             this.submitted = false;
         },
-        saveMyPhone() {
-            if (!this.myPhone.id) {
-                axios.post('/phone', this.myPhone)
-                    .then(response => {
-                        this.phoneDialog = false;
 
+
+        saveMyPhone() {
+            console.log("SAVE: " + this.myPhone.id)
+            if (!this.myPhone.id) {
+                console.log("myphonephone " + this.myPhone.phone)
+                axios.post('/phone', this.myPhone)
+                .then(response => {
+                    this.phoneDialog = false;  
+                    let myCompanyId = window.location.pathname.split('/').pop();
+                    axios.get('/phones/' + myCompanyId)
+                        .then(response => {
+                            this.phones = response.data.phones;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching phone data:', error);
+                        });
                         
-                        let myCompanyId = window.location.pathname.split('/').pop();
-                        axios.get('/phones/' + myCompanyId)
-                            .then(response => {
-                                this.phones = response.data.phones;
-                            })
-                            .catch(error => {
-                                console.error('Error fetching phone data:', error);
-                            });
-                            
-                    })
-                    .catch(error => {
-                        console.error('Error saving phone data:', error.response);
-                    });   
-            } else {
+                })
+                .catch(error => {
+                    console.error('Error saving phone data:', error.response);
+                });
+
+            }else {
+                
                 this.updateMyPhone();
+                
             }
         },
-        editMyPhone(slotPhone) {
-            axios.get('/customer/' + slotPhone.id + '/edit')
-                .then(response => {
-                    this.myPhone = response.data.company;
-                    this.phoneDialog = true;
-                })
-                .catch(error => {
-                    console.error('Error fetching phone data for editing:', error);
-                });
+
+    
+        editMyPhone(slotProps) {
+            axios.get('/phone/' + slotProps.id + '/edit').then(response => {
+                this.myPhone.phone = response.data.phones[0].phone;
+                this.myPhone.id = response.data.phones[0].id;
+                this.phoneDialog = true;
+            })
+            .catch(error => {
+                console.error('Error al obtener los datos del producto para editar:', error);
+            });
+
+
         },
+
+
+
         updateMyPhone() {
-            axios.put('/customer/' + this.myPhone.id, this.myPhone)
-                .then(response => {
-                    const index = this.phones.findIndex(company => company.id === this.myPhone.id);
-                    if (index !== -1) {
-                        this.phones[index] = response.data.company;
-                    } 
-                    this.phoneDialog = false; 
-                })
-                .catch(error => {
-                    console.error('Error updating phone data:', error);
-                });
-        },        
+            
+            console.log("Update: " + this.myPhone.id)
+
+            axios.put('/phone/' + this.myPhone.id, this.myPhone)
+            .then(response => {
+                
+                // Busca el índice del objeto en la lista actual
+                const index = this.phones.findIndex(phone => phone.id === this.myPhone.id);
+
+                // Actualiza los valores del objeto existente en la lista
+                if (index !== -1) {
+                this.phones[index] = response.data.phone;
+                } 
+                this.phoneDialog = false; 
+            })
+            .catch(error => {
+                console.error('Error al actualizar la compañía:', error);
+                this.phoneDialog = false; 
+                // Mostrar un mensaje de error al usuario
+                
+            });
+        },
+        
+        
+
         confirmDeletePhone(phone) {
             this.myPhone = phone;
             this.deletePhoneDialog = true;       
         },
         deleteMyPhone() {
             const phoneId = this.myPhone.id;
-            console.log(this.myPhone.id)
-            // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
-            this.phones = this.phones.filter(val => val.id !== phoneId);
-            this.deletePhoneDialog = false;
+
             // Realizar la solicitud de eliminación al servidor
-            axios.delete(`/phone/${phoneId}`)
-            .then(response => {
-                console.log(response);
-                // Limpiar el objeto myPhone después de la eliminación exitosa
-                this.myPhone = {};
-            })
-            .catch(error => {
-                console.error(error.response);
-                // En caso de error, puedes manejarlo aquí
-                // Restaurar el teléfono eliminado a la lista (si es necesario)
-                // this.phones.push(this.myPhone);
-            });
+            axios.delete('/phone/' + this.myPhone.id)
+                .then(response => {
+                    console.log(response);
+                    
+                    // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
+                    this.phones = this.phones.filter(val => val.id !== phoneId);
+
+                    // Limpiar el objeto myPhone después de la eliminación exitosa
+                    this.myPhone = {};
+
+                    // Cerrar el diálogo de eliminación de teléfono
+                    this.deletePhoneDialog = false;
+                })
+                .catch(error => {
+                    if (error.response || error.response.status === 400) {
+                        // Si se recibe un error 400, no hacer nada, solo imprimir un mensaje de advertencia
+                        console.warn('Error 400: No se pudo eliminar el teléfono con ID:', phoneId);
+                        this.deletePhoneDialog = false;
+                    }
+                });
         },
         
         confirmDeleteSelected() {
             console.log("CONFIRM DELETE SELECTED")
-            this.deleteCompaniesDialog = true;
+            this.deletePhonesDialog = true;
         },
         
-        deleteSelectedCompanies() {
-            // Envía una solicitud de eliminación para cada compañia seleccionado
-            this.selectedCompanies.forEach(company => {
-            axios.delete('/customer/' + company.id)
-                .then(response => {
-                console.log('Compañía eliminada con ID:', company.id);
-                
-                // Elimina el compañia de la lista de company
-                this.companies = this.companies.filter(p => p.id !== company.id);
-                })
-                .catch(error => {
-                console.error('Error al eliminar la compañia:', error);
-                });
+        deleteSelectedPhones() {
+            // Envía una solicitud de eliminación para cada compañía seleccionada
+            this.selectedPhones.forEach(phone => {
+                axios.delete('/phone/' + phone.id)
+                    .then(response => {
+                        console.log('Compañía eliminada con ID:', phone.id);
+                        
+                        // Solo elimina la compañía de la lista si la solicitud DELETE tiene éxito
+                        this.phones = this.phones.filter(p => p.id !== phone.id);
+                        
+
+                    })
+                    .catch(error => {
+                        if (error.response || error.response.status === 400) {
+                            // Si se recibe un error 400, no hacer nada, solo imprimir un mensaje de advertencia
+                            console.warn('Error 400: No se pudo eliminar la compañía con ID:', phone.id);
+                        }
+                    });
             });
-            this.selectedCompanies = [];
-            this.deleteCompaniesDialog = false;
+            this.selectedPhones = [];
+            this.deletePhonesDialog = false;
         },
 
         handleInfoButtonClick(companyId) {
@@ -289,7 +329,7 @@ export default {
     }
 
     .edit-button {
-        color:#FFB500;
+        color:rgb(34, 197, 94);
         border: 1px solid;
     }
 
