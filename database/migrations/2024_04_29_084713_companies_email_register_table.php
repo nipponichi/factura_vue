@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('companies_email_register', function (Blueprint $table) {
+            $table->id();
             $table->string('email');
             $table->boolean('favorite')->default (false);
             $table->dateTime('dt_start')->useCurrent();

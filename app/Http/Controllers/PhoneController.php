@@ -17,11 +17,12 @@ class PhoneController extends Controller
         $this->middleware(['can:read company'])->only('show');
         $this->middleware(['can:update company'])->only('edit');
         $this->middleware(['can:update company'])->only('makeFavorite');
+        $this->middleware(['can:update company'])->only('favoriteTrue');
         $this->middleware(['can:update company'])->only('update');
         $this->middleware(['can:delete company'])->only('destroy');
     }
 
-    public static function index(string $companyId)
+    public static function index($companyId)
     {
         try {
             $phones = DB::table('companies_phone_register')
@@ -39,18 +40,9 @@ class PhoneController extends Controller
     }
 
 
-    public function edit(string $phoneId)
+    public function edit()
     {
-        try { 
-            $phones = DB::table('companies_phone_register')
-                ->select('id','phone')
-                ->where('id', $phoneId)
-                ->whereNull('dt_end')
-                ->get();
-            return response()->json(['message' => 'edit', 'phones' => $phones, 'id' => $phoneId], 200);
-        } catch (Exception $e) {
-            return response()->json(['message' => 'Error edit ', 'phones' => $phoneId . $e->getMessage()], 500);
-        }
+
     }
 
     public function update ($phoneId, PhoneRequest $request)
@@ -67,20 +59,11 @@ class PhoneController extends Controller
                 $companyId = $companyResult->company_detail_id;
             }
 
-            $companyFav = DB::table('companies_phone_register')
-            ->select('favorite')
-            ->where('id', $phoneId)
-            ->whereNull('dt_end')
-            ->first();
-            
-            if ($companyFav) {
-                $phoneCheckedFav = $companyFav->favorite;
-            }
 
             $newPhoneId = DB::table('companies_phone_register')->insertGetId([
                 'phone' => $request->phone,
                 'dt_start' => now(),
-                'favorite' => $phoneCheckedFav,
+                'favorite' => $request->favorite,
                 'isMobile' => 1,
                 'company_detail_id' => $companyId,
             ]);
@@ -110,13 +93,19 @@ class PhoneController extends Controller
         DB::beginTransaction();
 
         try {
+
+            
             // Insertar en la tabla companies
             $newPhoneId = DB::table('companies_phone_register')->insertGetId([
                 'phone' => $request->phone,
                 'dt_start' => now(),
-                'favorite' => 0,
+                'favorite' => $request->favorite,
                 'company_detail_id' => $request->companyID,
             ]);
+
+            if ($request->favorite === true) {
+                $this->favoriteTrue($newPhoneId);
+            }
 
             $phone = DB::table('companies_phone_register')
             ->select('phone','isMobile','id','company_detail_id', 'favorite')
@@ -131,7 +120,7 @@ class PhoneController extends Controller
             // Confirma la transacción si todas las operaciones son exitosas
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error al crear la compañía: ', $e->getMessage()], 500);
+            return response()->json(['message' => 'Error al crear el teléfono: ', $e->getMessage()], 500);
         }
 
     }
@@ -189,35 +178,37 @@ class PhoneController extends Controller
 
     public function makeFavorite($id) {
         try {
-
-            $companyResult = DB::table('companies_phone_register')
-            ->select('company_detail_id')
-            ->where('id', $id)
-            ->whereNull('dt_end')
-            ->first(); 
-
-            if ($companyResult) {
-                $companyId = $companyResult->company_detail_id;
-            }
-
-            DB::table('companies_phone_register')
-            ->where('company_detail_id', $companyId)
-            ->update([
-                'favorite' => 0,
-            ]);
-
-            DB::table('companies_phone_register')
-            ->where('id', $id)
-            ->update([
-                'favorite' => 1,
-            ]);
-
-           
-    
+            
+            $this->favoriteTrue($id);
+            
             return response()->json(['message' => 'make favorite',], 200);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Error al seleccionar teléfono favorito: ', 'id'=> $$companyId .$e->getMessage()], 500);
+            return response()->json(['message' => 'Error al seleccionar teléfono favorito '.$e->getMessage()], 500);
         }
+    }
+
+    public function favoriteTrue($id){
+        $companyResult = DB::table('companies_phone_register')
+        ->select('company_detail_id')
+        ->where('id', $id)
+        ->whereNull('dt_end')
+        ->first(); 
+
+        if ($companyResult) {
+            $companyId = $companyResult->company_detail_id;
+        }
+
+        DB::table('companies_phone_register')
+        ->where('company_detail_id', $companyId)
+        ->update([
+            'favorite' => 0,
+        ]);
+
+        DB::table('companies_phone_register')
+        ->where('id', $id)
+        ->update([
+            'favorite' => 1,
+        ]);
     }
 
 

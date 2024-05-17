@@ -1,15 +1,13 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import Admin from '@/Components/ViewAdmin.vue';
 
 
 </script>
-
 <template>
-    <AppLayout title="Dashboard">
+    <AppLayout title="Users Admin">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                Admin
+                Users Admin
             </h2>
         </template>
         <div class="py-12">

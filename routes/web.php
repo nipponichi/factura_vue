@@ -1,11 +1,16 @@
 <?php
 
+use App\Http\Controllers\AdminCompaniesController;
+use App\Http\Controllers\AdminProductsController;
+use App\Http\Controllers\AdminInvoicesController;
+use App\Http\Controllers\AdminUsersController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PhoneController;
+use App\Http\Controllers\EmailController;
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\RouteController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,8 +31,20 @@ Route::middleware([
     Route::put('/phones/{id}', [PhoneController::class, 'makeFavorite']);
     Route::get('/phones/{id}', [PhoneController::class, 'index']);
     Route::resource('/phone', PhoneController::class);
+    Route::put('/emails/{id}', [EmailController::class, 'makeFavorite']);
+    Route::get('/emails/{id}', [EmailController::class, 'index']);
+    Route::resource('/email', EmailController::class);
+    Route::put('/addresses/{id}', [AddressController::class, 'makeFavorite']);
+    Route::get('/addresses/{id}', [AddressController::class, 'index']);
+    Route::resource('/address', AddressController::class);
     Route::resource('/invoices', InvoiceController::class);
     Route::resource('/products', ProductController::class);
-    Route::resource('/admin', AdminController::class);
     Route::get('/has-company', [CompanyController::class, 'hasCompany'])->name('companies.hasCompany');
+
+    // Admin
+    Route::resource('/admin-companies', AdminCompaniesController::class);
+    Route::resource('/admin-products', AdminProductsController::class);
+    Route::resource('/admin-invoices', AdminInvoicesController::class);
+    Route::resource('/admin-users', AdminUsersController::class);
+    
 });

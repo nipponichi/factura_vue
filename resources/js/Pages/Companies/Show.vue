@@ -104,14 +104,14 @@
                                     </button>
                                 </li>
                                 <li class="me-2">
-                                    <button @click="changeTab('invoices')" :class="{'border-b-2 border-blue-500': activeTab === 'invoices'}" class="inline-flex items-center justify-center p-4 border-transparent rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
-                                        <i class="pi pi-file w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                    <button @click="changeTab('email')" :class="{'border-b-2 border-blue-500': activeTab === 'email'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-envelope w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
                                         Email
                                     </button>
                                 </li>
                                 <li class="me-2">
-                                    <button @click="changeTab('invoices')" :class="{'border-b-2 border-blue-500': activeTab === 'invoices'}" class="inline-flex items-center justify-center p-4 border-transparent rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
-                                        <i class="pi pi-file w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                    <button @click="changeTab('address')" :class="{'border-b-2 border-blue-500': activeTab === 'address'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-home w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
                                         Address
                                     </button>
                                 </li>
@@ -133,6 +133,12 @@
                             <table v-else-if="activeTab === 'phone'" class="w-full">
                                 <TablePhone />
                             </table>
+                            <table v-else-if="activeTab === 'email'" class="w-full">
+                                <TableEmail />
+                            </table>
+                            <table v-else-if="activeTab === 'address'" class="w-full">
+                                <TableAddress />
+                            </table>
                         </div>
 
                     </div>
@@ -144,9 +150,11 @@
 
 <script setup>
     import AppLayout from '@/Layouts/AppLayout.vue';
-    import TableCustomers from '@/Components/TableCustomer.vue';
-    import TableInvoice from '@/Components/TableInvoice.vue';
-    import TablePhone from '@/Components/TablePhone.vue';
+    import TableCustomers from '@/Pages/Companies/Partials/TableCustomer.vue';
+    import TableInvoice from '@/Pages/Companies/Partials/TableInvoice.vue';
+    import TablePhone from '@/Pages/Companies/Partials/TablePhone.vue';
+    import TableEmail from '@/Pages/Companies/Partials/TableEmail.vue';
+    import TableAddress from '@/Pages/Companies/Partials/TableAddress.vue';
     
 
     import { ref } from 'vue';

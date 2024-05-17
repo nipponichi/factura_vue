@@ -4,17 +4,17 @@
             <Toolbar class="mb-4 border border-slate-200 ...">
                 <template #start>
                     <Button label="New" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
-                    <Button label="Delete" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedPhones || !selectedPhones.length" />
+                    <Button label="Delete" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedEmails || !selectedEmails.length" />
                 </template>
             </Toolbar>
 
-            <DataTable ref="dt" :value="phones" v-model:selection="selectedPhones" dataKey="id" @row-select="onRowSelect"
+            <DataTable ref="dt" :value="emails" v-model:selection="selectedEmails" dataKey="id" @row-select="onRowSelect"
                 :paginator="true" :rows="10" :filters="filters"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} companies">
                 <template #header>
                     <div class="flex justify-between items-center mt-2">
-                        <h4>Manage Phones</h4>
+                        <h4>Manage Emails</h4>
                         <div class="relative rounded-md shadow-sm w-1/4">
                             <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm" v-model="filters['global'].value" placeholder="Search...">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3">
@@ -27,39 +27,52 @@
                     
                 </template>
 
-                <Column selectionMode="multiple" :exportable="false" class="datetable checkbox" ></Column>
+                <Column selectionMode="multiple" :exportable="false" class="datetable checkbox w-16" ></Column>
                 
-                <Column field="phone" header="Phone" sortable class="dateTable"></Column>
+                <Column field="email" header="Email" sortable class="dateTable"></Column>
                 
-                <Column :exportable="false" class="dateTable">
+                <Column :exportable="false"  header="Favourite" class="dateTable w-24 text-center">
+            
                     <template #body="slotProps">
-                        <Button v-if="slotProps.data.favorite" icon="pi pi-star-fill" outlined rounded class="mr-2 info-button" @click="makeFavorite(slotProps.data.id)" />
-                        <Button v-else icon="pi pi-star" outlined rounded class="mr-2 info-button" @click="makeFavorite(slotProps.data.id)" />
-                        <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editMyPhone(slotProps.data)" />
-                        <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeletePhone(slotProps.data)" />
+                        <Button v-if="slotProps.data.favorite" icon="pi pi-star-fill"  class="mr-2 info-button" @click="makeFavorite(slotProps.data)" />
+                        <Button v-else icon="pi pi-star" class="mr-2 info-button" @click="makeFavorite(slotProps.data)" />
                     </template>
                 </Column>
+
+                
+                
+                <div class="utility-button">
+                    <Column :exportable="false" header="Utilities" class="headerUtil dateTable w-24">
+                        <template #body="slotProps">
+                            <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editMyEmail(slotProps.data)" />
+                            <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteEmail(slotProps.data)" />
+                        </template>
+                    </Column>
+                </div>
+
+    
+                
             </DataTable>
         </div>
 
         <!-- MODAL -->
             <template>
-                <Dialog v-model:visible="phoneDialog" :header="myPhone.id ? 'Update phone' : 'Create phone'" id="titlePhone" :modal="true" class="p-fluid">
-                <form style="width: 800px;" @submit.prevent="saveMyPhone">
+                <Dialog v-model:visible="emailDialog" :header="myEmail.id ? 'Update email' : 'Create email'" id="titleEmail" :modal="true" class="p-fluid">
+                <form style="width: 800px;" @submit.prevent="saveMyEmail">
                     <div class="grid gap-3 mb-6 md:grid-cols-1">
-                    <div>
-                        <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
-                        <input type="tel" id="phone" v-model="myPhone.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Phone" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
-                    </div>
-                    <div class="flex items-center">
-                        <input id="link-checkbox" type="checkbox" v-model="myPhone.favorite" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Mark this phone number as a favorite.</label>
+                        <div>
+                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email address</label>
+                            <input type="email" id="email" v-model="myEmail.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="info@mycompany.com" required />
+                        </div>  
+                    <div v-if="!myEmail.id" class="flex items-center">
+                        <input id="link-checkbox" type="checkbox" v-model="myEmail.favorite" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Mark this email as a favorite.</label>
                     </div>
                     </div>
                     <div class="grid gap-3 md:grid-cols-1 justify-items-end">
                     <div>
                         <button type="button" class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog">Close</button>
-                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ myPhone.id ? 'Update' : 'Save' }}</button>
+                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ myEmail.id ? 'Update' : 'Save' }}</button>
                     </div>
                     </div>
                 </form>
@@ -68,26 +81,26 @@
             
 
         <!-- MODAL DELETE SIMPLE -->
-        <Dialog v-model:visible="deletePhoneDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deleteEmailDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="myPhone">Are you sure you want to delete <b>{{myPhone.phone}}</b>?</span>
+                <span v-if="myEmail">Are you sure you want to delete <b>{{myEmail.email}}</b>?</span>
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deletePhoneDialog = false"/>
-                <Button label="Yes" icon="pi pi-check" text @click="deleteMyPhone" />
+                <Button label="No" icon="pi pi-times" text @click="deleteEmailDialog = false"/>
+                <Button label="Yes" icon="pi pi-check" text @click="deleteMyEmail" />
             </template>
         </Dialog>
 
         <!-- MODAL DELETE MULTIPLE -->
-        <Dialog v-model:visible="deletePhonesDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deleteEmailsDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="myPhone">Are you sure you want to delete the selected phones?</span>
+                <span v-if="myEmail">Are you sure you want to delete the selected emails?</span>
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deletePhonesDialog = false"/>
-                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedPhones" />
+                <Button label="No" icon="pi pi-times" text @click="deleteEmailsDialog = false"/>
+                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedEmails" />
             </template>
         </Dialog>
 
@@ -102,18 +115,17 @@ import axios from 'axios';
 export default {
     data() {
         return {
-            phones: null, 
-            phoneDialog: false, 
-            deletePhoneDialog: false, 
-            deletePhonesDialog: false, 
-            myPhone: { 
+            emails: null, 
+            emailDialog: false, 
+            deleteEmailDialog: false, 
+            deleteEmailsDialog: false, 
+            myEmail: { 
                 id: '',             
-                phone: '',
-                favorite: 0,
-                isMobile: 0,
+                email: '',
+                favorite: '',
                 companyID: window.location.pathname.split('/').pop(),
             },
-            selectedPhones: [], 
+            selectedEmails: [], 
             filters: {}, 
             submitted: false,
         };
@@ -124,176 +136,161 @@ export default {
         }
     },
     mounted() {
-        let myCompanyId = window.location.pathname.split('/').pop();
-        axios.get('/phones/' + myCompanyId)
+        
+        this.fetchEmails();
+            
+    },
+    methods: {
+        fetchEmails() {
+            let myCompanyId = window.location.pathname.split('/').pop();
+        axios.get('/emails/' + myCompanyId)
             .then(response => {
-                this.phones = response.data.phones;
+                this.emails = response.data.emails;
                 
             })
             .catch(error => {
-                console.error('Error fetching phone data:', error);
+                console.error('Error fetching emails data:', error);
             });
     },
-    methods: {
-        onRowSelect(event) {
-        // event.data contiene el objeto phone seleccionado
-        this.selectedPhone = event.data;
-    },
         openNew() {
-            this.myPhone = {
-                phone: '',
+            this.myEmail = {
+                email: '',
                 companyID: window.location.pathname.split('/').pop(),
             };
             this.submitted = false;
-            this.phoneDialog = true;
+            this.emailDialog = true;
         },
         hideDialog() {
-            this.phoneDialog = false;
+            this.emailDialog = false;
             this.submitted = false;
         },
 
 
-        saveMyPhone() {
-
-            if (!this.myPhone.id) {
-                axios.post('/phone', this.myPhone)
+        saveMyEmail() {
+            console.log("companyId: "+ this.myEmail.companyID)
+            if(this.myEmail.favorite == null) {
+                this.myEmail.favorite = false
+            }
+            this.myEmail.isMobile = 0;
+            if (!this.myEmail.id) {
+                axios.post('/email', this.myEmail)
                 .then(response => {
-                    this.phones.push(response.data.phone);
-                    console.log("Responde phone " +response.data.phone.phone)
-                    this.phoneDialog = false;
+                    
+                    this.fetchEmails();
+                    
+                    this.emailDialog = false;
                         
                 })
                 .catch(error => {
-                    console.error('Error saving phone data:', error.response);
-                    this.phoneDialog = false;
+                    console.error('Error saving email data:', error.response);
+                    this.emailDialog = false;
                 });
 
             }else {               
-                this.updateMyPhone();
+                this.updateMyEmail();
             }
         },
 
-        editMyPhone(slotProps) {
-            axios.get('/phone/' + slotProps.id + '/edit').then(response => {
-                this.myPhone.phone = response.data.phones[0].phone;
-                this.myPhone.id = response.data.phones[0].id;
-                this.phoneDialog = true;
-            })
-            .catch(error => {
-                console.error('Error al obtener los datos del producto para editar:', error);
-            });
-
-
+        editMyEmail(slotProps) {
+            console.log('edit: ' + slotProps.favorite)
+            
+                this.myEmail.email = slotProps.email;
+                this.myEmail.id = slotProps.id;
+                this.myEmail.favorite = slotProps.favorite;
+                this.emailDialog = true;
         },
 
-        updateMyPhone() {
-            
-            console.log("Update: " + this.myPhone.id)
+        updateMyEmail() {
+            console.log("Update: " + this.myEmail.favorite)
 
-            axios.put('/phone/' + this.myPhone.id, this.myPhone)
+            axios.put('/email/' + this.myEmail.id, this.myEmail)
             .then(response => {
-                
-                // Busca el índice del objeto en la lista actual
-                const index = this.phones.findIndex(phone => phone.id === this.myPhone.id);
-
-                // Actualiza los valores del objeto existente en la lista
-                if (index !== -1) {
-                this.phones[index] = response.data.phone;
-                } 
-                this.phoneDialog = false; 
+                this.fetchEmails();
+                this.emailDialog = false;
             })
             .catch(error => {
                 console.error('Error al actualizar la compañía:', error);
-                this.phoneDialog = false; 
+                this.emailDialog = false; 
                 // Mostrar un mensaje de error al usuario
                 
             });
         },
 
         makeFavorite(slotProps) {
-            axios.put('/phones/' + slotProps)
+
+            if (slotProps.favorite) {
+                return alert("El telefono ya está seleccionado como favorito")
+            }
+
+            axios.put('/emails/' + slotProps.id)
             .then(response => {
-                console.log("id favorito "+response.data.id)
-                let myCompanyId = window.location.pathname.split('/').pop();
-                axios.get('/phones/' + myCompanyId)
-                .then(response => {
-                this.phones = response.data.phones;                
-            })
+                this.emailDialog = false;
+                this.fetchEmails();             
+            })         
             .catch(error => {
-                console.error('Error fetching phone data:', error);
-            });
-                
-                    
-                })
-            .catch(error => {
-                console.error('Error al seleccionar un teléfono', error);
-                
-              
-                
+                console.error('Error al seleccionar un email', error);
+                this.emailDialog = false;
             });
         },
         
-        confirmDeletePhone(phone) {
-            this.myPhone = phone;
-            this.deletePhoneDialog = true;       
+        confirmDeleteEmail(email) {
+            this.myEmail = email;
+            this.deleteEmailDialog = true;       
         },
-        deleteMyPhone() {
-            const phoneId = this.myPhone.id;
+        deleteMyEmail() {
+            const emailId = this.myEmail.id;
 
             // Realizar la solicitud de eliminación al servidor
-            axios.delete('/phone/' + this.myPhone.id)
+            axios.delete('/email/' + this.myEmail.id)
                 .then(response => {
                     console.log(response);
                     
                     // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
-                    this.phones = this.phones.filter(val => val.id !== phoneId);
+                    this.emails = this.emails.filter(val => val.id !== emailId);
 
-                    // Limpiar el objeto myPhone después de la eliminación exitosa
-                    this.myPhone = {};
+                    // Limpiar el objeto myEmail después de la eliminación exitosa
+                    this.myEmail = {};
 
                     // Cerrar el diálogo de eliminación de teléfono
-                    this.deletePhoneDialog = false;
+                    this.deleteEmailDialog = false;
                 })
                 .catch(error => {
                     if (error.response || error.response.status === 400) {
                         // Si se recibe un error 400, no hacer nada, solo imprimir un mensaje de advertencia
-                        console.warn('Error 400: No se pudo eliminar el teléfono con ID:', phoneId);
-                        this.deletePhoneDialog = false;
+                        console.warn('Error 400: No se pudo eliminar el email con ID:', emailId);
+                        this.deleteEmailDialog = false;
                     }
                 });
         },
         
         confirmDeleteSelected() {
             console.log("CONFIRM DELETE SELECTED")
-            this.deletePhonesDialog = true;
+            this.deleteEmailsDialog = true;
         },
         
-        deleteSelectedPhones() {
+        deleteSelectedEmails() {
             // Envía una solicitud de eliminación para cada compañía seleccionada
-            this.selectedPhones.forEach(phone => {
-                axios.delete('/phone/' + phone.id)
+            this.selectedEmails.forEach(email => {
+                axios.delete('/email/' + email.id)
                     .then(response => {
-                        console.log('Compañía eliminada con ID:', phone.id);
+                        console.log('Compañía eliminada con ID:', email.id);
                         
                         // Solo elimina la compañía de la lista si la solicitud DELETE tiene éxito
-                        this.phones = this.phones.filter(p => p.id !== phone.id);
+                        this.emails = this.emails.filter(p => p.id !== email.id);
                         
 
                     })
                     .catch(error => {
                         if (error.response || error.response.status === 400) {
                             // Si se recibe un error 400, no hacer nada, solo imprimir un mensaje de advertencia
-                            console.warn('Error 400: No se pudo eliminar la compañía con ID:', phone.id);
+                            console.warn('Error 400: No se pudo eliminar la compañía con ID:', email.id);
                         }
                     });
             });
-            this.selectedPhones = [];
-            this.deletePhonesDialog = false;
+            this.selectedEmails = [];
+            this.deleteEmailsDialog = false;
         },
 
-        handleInfoButtonClick(companyId) {
-            this.$inertia.get('/customer/' + companyId);
-        }
     }
 }
 </script>
@@ -305,7 +302,6 @@ export default {
         background-color: rgba(246, 246, 246, 0.609);
         border-top: #E2E8F0 1px solid;
         border-bottom: #E2E8F0 1px solid;
-        
     }
 
     .success-button {
@@ -328,19 +324,27 @@ export default {
     }
 
     .info-button {
-        color:#FFB500;
-        border: 1px solid;
+        color: #FFB500;
+        border: none;
+        margin-right: 55px;
+        box-shadow: none !important;
+        
     }
-
+    
+    .info-button .pi {
+        font-size: 26px;
+    }
+    
     .info-button:hover {
-        background-color:rgba(0, 4, 252,0.1);
-        transition-duration: 0.5s;
-        padding:7px;
+        background: #ffffff;
+        transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        transform: scale(1.2);
     }
-
+    
     .edit-button {
         color:rgb(34, 197, 94);
         border: 1px solid;
+        margin-right: 5px;
     }
 
     .edit-button:hover {
@@ -352,6 +356,7 @@ export default {
     .simpleDelete-button {
         color:rgb(239, 68, 68);
         border: 1px solid;
+        
     }
 
     .simpleDelete-button:hover {
