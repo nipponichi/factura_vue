@@ -46,5 +46,6 @@ Route::middleware([
     Route::resource('/admin-products', AdminProductsController::class);
     Route::resource('/admin-invoices', AdminInvoicesController::class);
     Route::resource('/admin-users', AdminUsersController::class);
+    Route::get('/recargar-users', [AdminUsersController::class, 'recargar']);
     
 });
