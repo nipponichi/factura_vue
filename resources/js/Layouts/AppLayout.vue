@@ -47,17 +47,12 @@ const logout = () => {
                             </div>
 
                             <!-- Navigation Links -->
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read company')">
+                                <NavLink :href="route('dashboard')" :active="route().current('dashboard') ">
                                     Dashboard
                                 </NavLink>
-                            </div>
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('invoices.index')" :active="route().current('invoices.*')">
-                                    Invoices
-                                </NavLink>
-                            </div>                          
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" >
+                            </div>                       
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read company')" >
                                 <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
                                     My Company
                                 </NavLink>
@@ -66,12 +61,30 @@ const logout = () => {
                                 <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
                                     Consulting
                                 </NavLink>
-                            </div>                             
+                            </div>
+
+
+                            <!-- NAVIGATION ADMIN -->
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
-                                <NavLink :href="route('admin.index')" :active="route().current('admin.*')">
-                                    Admin
+                                <NavLink :href="route('admin-users.index')" :active="route().current('admin-users.*')">
+                                    Users
                                 </NavLink>
-                            </div>                           
+                            </div>    
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
+                                <NavLink :href="route('admin-companies.index')" :active="route().current('admin-companies.*')">
+                                    Companies
+                                </NavLink>
+                            </div>
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
+                                <NavLink :href="route('admin-invoices.index')" :active="route().current('admin-invoices.*')">
+                                    Invoices
+                                </NavLink>
+                            </div> 
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
+                                <NavLink :href="route('admin-products.index')" :active="route().current('admin-produtcs.*')">
+                                    Products
+                                </NavLink>
+                            </div>                                           
                         </div>
                         
                         <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -214,31 +227,51 @@ const logout = () => {
 
                 <!-- Responsive Navigation Menu -->
                 <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}" class="sm:hidden">
-                    <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read company')">
+                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')" >
                             Dashboard
                         </ResponsiveNavLink>
                     </div>
-                    <div class="pt-2 pb-3 space-y-1">
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read company')">
                         <ResponsiveNavLink :href="route('invoices.index')" :active="route().current('invoices.*')">
                             Invoices
                         </ResponsiveNavLink>
                     </div>
-                    <div class="pt-2 pb-3 space-y-1">
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read company')">
                         <ResponsiveNavLink :href="route('companies.index')" :active="route().current('companies.*')">
                             My Company
                         </ResponsiveNavLink>
                     </div>
-                    <div class="pt-2 pb-3 space-y-1">
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read consulting')">
                         <ResponsiveNavLink :href="route('products.index')" :active="route().current('products.*')">
-                            Products
+                            My Consulting
+                        </ResponsiveNavLink>
+                    </div>
+
+
+                    <!-- NAVIGATION ADMIN -->
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
+                        <ResponsiveNavLink :href="route('admin-users.index')" :active="route().current('admin-user.*')">
+                            Users
                         </ResponsiveNavLink>
                     </div>
                     <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
-                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                            Admin
+                        <ResponsiveNavLink :href="route('admin-companies.index')" :active="route().current('admin-companies.*')">
+                            Companies
                         </ResponsiveNavLink>
                     </div>
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
+                        <ResponsiveNavLink :href="route('admin-invoices.index')" :active="route().current('admin-invoice.*')">
+                            Invoices
+                        </ResponsiveNavLink>
+                    </div>
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
+                        <ResponsiveNavLink :href="route('admin-products.index')" :active="route().current('admin-products.*')">
+                            Products
+                        </ResponsiveNavLink>
+                    </div>
+                    
+                    
                     <!-- Responsive Settings Options -->
                     <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
                         <div class="flex items-center px-4">

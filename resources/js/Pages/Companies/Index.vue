@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import Tables from '@/Components/TableCompany.vue';
+import Tables from '@/Pages/Companies/Partials/TableCompany.vue';
 import NewCompany from '@/Components/NewCompany.vue';
 
 

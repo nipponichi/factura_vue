@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-class AdminController extends Controller
+class AdminUsersController extends Controller
 {
 
     public function __construct()
@@ -17,13 +18,12 @@ class AdminController extends Controller
             return $next($request);
         });   
     }
-    
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Inertia::render('Admin/Index');
+        return Inertia::render('Auth/Register');
     }
 
     /**

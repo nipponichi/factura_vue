@@ -73,8 +73,6 @@
 <script>
 import { FilterMatchMode } from 'primevue/api';
 
-import axios from 'axios';
-
 export default {
     data() {
         console.log("PRIMER PASO");
