@@ -69,23 +69,6 @@ class RegisteredUserController extends Controller
         'company_type' => 'required|in:freelancer,company,consulting',
     ])->validate();
 
-    // Determinar el rol según el tipo de empresa seleccionado
-    $roleName = '';
-    switch ($request->company_type) {
-        case 'freelancer':
-            $roleName = 'freelancer';
-            break;
-        case 'company':
-            $roleName = 'company';
-            break;
-        case 'consulting':
-            $roleName = 'consulting';
-            break;
-    }
-
-    // Busca el rol correspondiente en la base de datos
-    $role = Role::where('name', $roleName)->first();
-
     // Crea el nuevo usuario sin el campo company_type
     $userData = $request->except('company_type');
 
@@ -96,9 +79,9 @@ class RegisteredUserController extends Controller
     $user = $creator->create($userData);
 
     // Asigna el rol al usuario si se encontró
-    if ($role) {
-        $user->assignRole($role);
-    }
+    
+    $user->assignRole($request->company_type);
+    
 
     // Dispara el evento Registered y loguea al usuario
     event(new Registered($user));
