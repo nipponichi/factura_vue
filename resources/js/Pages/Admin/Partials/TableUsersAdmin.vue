@@ -47,65 +47,64 @@
                 
                 <Column :exportable="false" header="Utility" class="dateTable">
                     <template #body="slotProps">
-                        <Button icon="pi pi-eye" outlined rounded class="mr-2 info-button" @click="handleInfoButtonClick(slotProps.data.id)" />
+                        <!--<Button icon="pi pi-eye" outlined rounded class="mr-2 info-button" @click="handleInfoButtonClick(slotProps.data.id)" />-->
+                        <Button icon="pi pi-key" outlined rounded class="mr-2 pass-button" @click="editPass(slotProps.data)" />
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editUser(slotProps.data)" />
                     </template>
                 </Column>
             </DataTable>
         </div>
 
+
         <!-- MODAL -->
-        <Dialog v-model:visible="userDialog" :header="myUser.id ? 'Modify company' : 'Create company'" id="titleCompany" :modal="true" class="p-fluid">
+
+        <Dialog v-model:visible="userDialog" :header="myUser.id ? 'Modify user' : 'Create user'" id="titleCompany" :modal="true" class="p-fluid">
             
             <form style="width: 800px;" @submit.prevent="saveUser">
                 <div class="grid gap-3 mb-6 md:grid-cols-2">
                     <div>
-                        <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company name</label>
-                        <input type="text" id="name" v-model="myUser.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Company name" required />
+                        <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+                        <input type="text" id="username" v-model="myUser.username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Username" required />
                     </div>
-                    <div>
-                        <label for="taxNumber" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tax number</label>
-                        <input type="text" id="taxNumber" v-model="myUser.taxNumber" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Tax number" required />
-                    </div>
-                </div>
-                <div class="mb-6">
-                    <div>
-                        <label for="address1" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address 1</label>
-                        <input type="text" id="address1" v-model="myUser.address1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Address" required />
-                    </div>
-                </div>
-                <div class="grid gap-3 mb-6 md:grid-cols-2">  
-                    <div>
-                        <label for="address2" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address 2</label>
-                        <input type="text" id="address2" v-model="myUser.address2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Address line 2" />
-                    </div>
-                    <div>
-                        <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Town</label>
-                        <input type="text" id="town" v-model="myUser.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Town" required />
-                    </div>  
-                    <div>
-                        <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Province</label>
-                        <input type="text" id="province" v-model="myUser.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Province" required />
-                    </div>  
-                    <div>
-                        <label for="postCode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Post code</label>
-                        <input type="text" id="postCode" v-model="myUser.postCode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Post code" pattern="^\d+$" required />
-                    </div>
-                    <div>
-                        <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
-                        <input type="text" id="country" v-model="myUser.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Country" required />
-                    </div> 
                     <div>
                         <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email address</label>
-                        <input type="email" id="email" v-model="myUser.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="info@mycompany.com" required />
-                    </div>    
-                    <div>
-                        <label for="phone1" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
-                        <input type="tel" id="phone1" v-model="myUser.phone1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Phone" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
+                        <input type="email" id="email" v-model="myUser.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="info@user.com" required />
+                    </div>  
+                </div>
+
+                <div class="grid gap-3 mb-6 md:grid-cols-2">
+                    <div v-if="!myUser.id"> <!-- Mostrar solo si no se está modificando -->
+                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                        <input type="password" id="password" v-model="myUser.password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="password" required/>
                     </div>
-                    <div>
-                        <label for="phone2" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mobile phone</label>
-                        <input type="tel" id="phone2" v-model="myUser.phone2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Mobile phone" pattern="^\+\d{1,3}\s?\d{1,14}$" />
+                    <div v-if="!myUser.id"> <!-- Mostrar solo si no se está modificando -->
+                        <label for="confirmPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
+                        <input type="password" id="confirmPassword" v-model="myUser.confirmPassword" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="password" required />
+                    </div>  
+                </div>
+
+                <div class="grid gap-3 mb-6 md:grid-cols-2">  
+                            
+                    <div class="mt-4">
+                        <label for="role_type" class="block font-medium text-gray-700">Define the role</label>
+                        <div class="mt-2 ml-12 flex justify-center">
+                            <label class="inline-flex items-center">
+                                <input type="radio" id="sole_proprietorship" v-model="myUser.role_type" value="freelancer" class="form-radio text-indigo-600" required>
+                                <span class="ml-2">Freelance</span>
+                            </label>
+                            <label class="inline-flex items-center ml-6">
+                                <input type="radio" id="partnership" v-model="myUser.role_type" value="company" class="form-radio text-indigo-600">
+                                <span class="ml-2">Company</span>
+                            </label>
+                            <label class="inline-flex items-center ml-6">
+                                <input type="radio" id="corporation" v-model="myUser.role_type" value="consulting" class="form-radio text-indigo-600">
+                                <span class="ml-2">Consulting</span>
+                            </label>
+                            <label class="inline-flex items-center ml-6">
+                                <input type="radio" id="corporation" v-model="myUser.role_type" value="admin" class="form-radio text-indigo-600">
+                                <span class="ml-2">Admin</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <div class="grid gap-3 md:grid-cols-1 justify-items-end">
@@ -117,11 +116,37 @@
             </form>
         </Dialog>
 
+        <!-- MODAL RESET PASSWORD -->
+
+        <Dialog v-model:visible="resetPassDialog" :header="'Reset Password: ' + myUser.username" id="titleCompany" :modal="true" class="p-fluid">
+            <form style="width: 800px;" @submit.prevent="resetPassUser">
+                
+                <div class="grid gap-3 mb-6 md:grid-cols-2">
+                    <div v-if="myUser.id"> <!-- Mostrar solo si se está modificando -->
+                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                        <input type="password" id="password" v-model="myUser.password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="password"/>
+                    </div>
+                    <div v-if="myUser.id"> <!-- Mostrar solo si se está modificando -->
+                        <label for="confirmPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
+                        <input type="password" id="confirmPassword" v-model="myUser.confirmPassword" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="password" />
+                    </div>  
+                </div>
+
+                <div class="grid gap-3 md:grid-cols-1 justify-items-end">
+                    <div>
+                        <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" text @click="hideDialog">Close</button>
+                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ myUser.id ? 'Modify' : 'Save' }}</button>
+                    </div>    
+                </div>
+            </form>
+        </Dialog>
+
+
         <!-- MODAL DELETE SIMPLE -->
         <Dialog v-model:visible="deleteUserDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="users">Are you sure you want to change company state<b>{{users.name}}</b>?</span>
+                <span v-if="users">Are you sure you want to change company state<b>{{users.username}}</b>?</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteUserDialog = false"/>
@@ -181,6 +206,7 @@
 <script>
 import { FilterMatchMode } from 'primevue/api';
 
+
 import axios from 'axios';
 
 console.log("Inicio");
@@ -189,23 +215,18 @@ export default {
     data() {
         console.log("PRIMER PASO");
         return {
-            users: null, // Aquí almacenarás los myUser recuperados de alguna fuente, como una API
-            userDialog: false, // Controla la visibilidad del diálogo de creación/edición de producto
-            deleteUserDialog: false, // Controla la visibilidad del diálogo de borrado de producto individual
+            users: null, 
+            userDialog: false, 
+            deleteUserDialog: false, 
             deleteUsersDialog: false,
-             // Controla la visibilidad del diálogo de borrado de myUser en grupo
-            myUser: { // Aquí almacenas los datos del producto que se va a crear/editar
-                name: '',
-                taxNumber: '',
+            resetPassDialog: false,
+
+            myUser: { 
+                username: '',
                 email: '',
-                phone1: '',
-                phone2: '',
-                address1: '',
-                address2: '',
-                postCode: '',
-                town: '',
-                province: '',
-                country: ''
+                password: '',
+                confirmPassword: '',
+                role_type: ''
             },
             
             selectedAdminUsers: [], // Almacena los myUser seleccionados para borrado en grupo
@@ -230,7 +251,7 @@ export default {
 
         fecthUsers() {
             
-            axios.get('/recargar-users')
+            axios.get('/admin-reload-users')
                 .then(response => {
                     this.users = response.data.users;
                     
@@ -240,103 +261,95 @@ export default {
                 });
         },
 
-        updateUser(id, updatedData) {
-            // Encuentra el índice del usuario que quieres actualizar
-            const index = this.users.findIndex(user => user.id === id);
-            if (index !== -1) {
-                // Si updatedData es nulo, actualiza el campo deseado a null
-                if (updatedData === null) {
-                    this.$set(this.users, index, { ...this.users[index], dt_end: null });
-                } else {
-                    // Actualiza los datos del usuario directamente
-                    this.$set(this.users, index, { ...this.users[index], ...updatedData });
-                }
-            }
-        },
-
-
         openNew() {
-            console.log("")
             this.myUser = {};
             this.submitted = false;
             this.userDialog = true;
         },
         hideDialog() {
-            console.log("HIDE")
             this.userDialog = false;
             this.submitted = false;
+            this.resetPassDialog = false;
         },
         
         saveUser() {
-            if (!this.myUser.id) {
-                
-                // Realiza la solicitud para guardar el producto
-                axios.post('/'+ this.$page.props.type, this.myUser)
-                .then(response => {
-                    // La solicitud se completó con éxito, puedes hacer lo que necesites con la respuesta, como imprimirlo en la consola
-                    console.log(response);
+            console.log(this.myUser)
+            if(this.checkPassword()){
+                if (!this.myUser.id) {
+                    // Realiza la solicitud para guardar el producto
+                    axios.post('/admin-users', this.myUser)
+                    .then(response => {
 
-                    // Cierra el diálogo de producto
-                    this.userDialog = false;
+                        console.log(response);
 
-                    this.users.push(response.data.company)
-                
-                })
-                .catch(error => {
-                    // Si hay algún error en la solicitud, puedes manejarlo aquí
-                    console.log(error.response);
-                });   
+                        // Cierra el diálogo de producto
+                        this.userDialog = false;
 
-            }else {
+                        this.fecthUsers();
                 
-                this.updateUser();
-                
-            }
+                    })
+                    .catch(error => {
+                        // Si hay algún error en la solicitud, puedes manejarlo aquí
+                        console.log(error.response);
+                    });   
+
+                    }else {
+                    
+                        this.updateUser();   
+                    }
+                }else{
+                    alert("Fulfill the form")
+                }
+            
+
         },
 
-
-        editUser(slotProduct) {
-
-
-            axios.get('/' + this.$page.props.type + '/' + slotProduct.id + '/edit').then(response => {
-
-
-                this.myUser = response.data.product;
-                this.userDialog = true;
-
-            })
-            .catch(error => {
-                console.error('Error al obtener los datos del producto para editar:', error);
-            });
-            
-            
+        editUser(slotProps) {
+            this.myUser.username = slotProps.userName;
+            this.myUser.email = slotProps.email;
+            this.myUser.role_type = slotProps.roleName;
+            this.myUser.id = slotProps.id;
+        
+            this.userDialog = true;     
         },
 
         updateUser() {
 
-            console.log("Update" + this.myUser.name)
-
-
-
-            axios.put('/' + this.$page.props.type + '/' + this.myUser.id, this.myUser)
-            .then(response => {
-                
-                // Busca el índice del objeto en la lista actual
-                const index = this.users.findIndex(producto => producto.id === this.myUser.id);
-
-                // Actualiza los valores del objeto existente en la lista
-                if (index !== -1) {
-                this.users[index] = response.data.company;
-                } 
+            axios.put('/admin-users/' + this.myUser.id, this.myUser)
+            .then(response => { 
                 this.userDialog = false; 
+                this.fecthUsers();
             })
             .catch(error => {
-                console.error('Error al actualizar la compañía:', error);
-                // Mostrar un mensaje de error al usuario
-                
+                console.error('Error al actualizar el usuario', error);
+                this.userDialog = false; 
             });
-        },        
+        },  
 
+        editPass(slotProps) {
+            this.myUser.password = "";
+            this.myUser.confirmPassword = "";
+            this.myUser.id = slotProps.id;
+            this.myUser.username = slotProps.userName;
+            this.resetPassDialog = true;     
+        },
+
+        resetPassUser(){
+            if(this.checkPassword()){
+
+                axios.put('/admin-users-pass/' + this.myUser.id, this.myUser)
+                .then(response => { 
+                    this.resetPassDialog = false; 
+                    this.fecthUsers();
+                })
+                .catch(error => {
+                    console.error('Error al actualizar la contraseña del usuario ', error);
+                    this.resetPassDialog = false; 
+                });
+            }else{
+                alert("Passwords do not match")
+            }
+        },
 
         changeUserState(user) {
             this.myUser = user;
@@ -385,8 +398,18 @@ export default {
 
         handleInfoButtonClick(companyId) {
             this.$inertia.get('/' + this.$page.props.type + '/' + companyId);
-        }
-    }
+        },
+        
+        checkPassword() {           
+            if(this.myUser.password == this.myUser.confirmPassword) {
+                return true
+            }else{
+                return false
+            }
+    
+        },
+        
+    } 
 }
 
 
@@ -428,6 +451,17 @@ export default {
 
     .info-button:hover {
         background-color:rgba(0, 4, 252,0.1);
+        transition-duration: 0.5s;
+        padding:7px;
+    }
+    
+    .pass-button {
+        color:#a9ba3d;
+        border: 1px solid;
+    }
+
+    .pass-button:hover {
+        background-color:rgba(158, 178, 61, 0.1);
         transition-duration: 0.5s;
         padding:7px;
     }

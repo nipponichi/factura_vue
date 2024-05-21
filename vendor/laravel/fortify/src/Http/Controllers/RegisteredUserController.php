@@ -2,7 +2,6 @@
 
 namespace Laravel\Fortify\Http\Controllers;
 
-use Exception;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Request;
@@ -13,12 +12,6 @@ use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Fortify\Contracts\RegisterResponse;
 use Laravel\Fortify\Contracts\RegisterViewResponse;
 use Laravel\Fortify\Fortify;
-use Spatie\Permission\Models\Role;
-
-
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Laravel\Jetstream\Jetstream;
 
 
 class RegisteredUserController extends Controller
@@ -85,7 +78,7 @@ class RegisteredUserController extends Controller
 
     // Dispara el evento Registered y loguea al usuario
     event(new Registered($user));
-    $this->guard->login($user);
+    //$this->guard->login($user);
 
     return app(RegisterResponse::class);
 }

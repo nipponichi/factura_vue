@@ -17,14 +17,12 @@ class CustomerController extends Controller
 
     public function __construct()
     {
-        $this->middleware(['can:read company'])->only('index');
-        $this->middleware(['can:create company'])->only('create');
-        $this->middleware(['can:create company'])->only('store');
-        $this->middleware(['can:read company'])->only('show');
-        $this->middleware(['can:update company'])->only('edit');
-        $this->middleware(['can:update company'])->only('update');
+
+        $this->middleware(['can:read company'])->only(['index', 'show']);
+        $this->middleware(['can:create company'])->only(['create', 'store']);
+        $this->middleware(['can:update company'])->only(['edit', 'update']);
         $this->middleware(['can:delete company'])->only('destroy');
-    }
+}
 
 
     public static function index(string $companyId)
@@ -231,7 +229,7 @@ class CustomerController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-  /*  public function edit(string $id)
+    public function edit(string $id)
     {
         try {
 
@@ -254,12 +252,12 @@ class CustomerController extends Controller
 
             return response()->json(['message' => 'Compañía no encontrada ', $e->getMessage()], 500);
         }
-    }*/
+    }
 
     /**
      * Update the specified resource in storage.
      */
-    /*public function update(CompanyRequest $request, string $id)
+    public function update(CompanyRequest $request, string $id)
     {
         try {
             // Actualiza la compañía y devuelve el número de filas afectadas
@@ -277,13 +275,8 @@ class CustomerController extends Controller
                     'companies_detail.name' => $request->taxNumber,
                     'companies_email_register.email' => $request->taxNumber,
                     'companies_phone_register.phone' => $request->taxNumber,
-                    '.taxNumber' => $request->taxNumber,
-                    'companies.taxNumber' => $request->taxNumber,
-                    'companies.taxNumber' => $request->taxNumber,
-                    'companies.taxNumber' => $request->taxNumber,
-                    'companies.taxNumber' => $request->taxNumber,
-                    'companies.taxNumber' => $request->taxNumber,
-
+                    'taxNumber' => $request->taxNumber,
+            
                 ]);
 
             if ($company === 0) {
@@ -299,7 +292,7 @@ class CustomerController extends Controller
                 'message' => 'Error al editar la compañía: ' . $request->taxNumber . '. ' . $e->getMessage()
             ], 500);
         }
-    }*/
+    }
 
 
     /**
