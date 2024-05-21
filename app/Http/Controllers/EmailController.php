@@ -92,7 +92,6 @@ class EmailController extends Controller
         DB::beginTransaction();
 
         try {
-
             
             // Insertar en la tabla companies
             $newEmailId = DB::table('companies_email_register')->insertGetId([

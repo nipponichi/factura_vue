@@ -2,6 +2,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import TableUsersAdmin from '@/Pages/Admin/Partials/TableUsersAdmin.vue';
 
+
 </script>
 <template>
     <AppLayout title="Users Admin">

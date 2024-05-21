@@ -46,6 +46,7 @@ Route::middleware([
     Route::resource('/admin-products', AdminProductsController::class);
     Route::resource('/admin-invoices', AdminInvoicesController::class);
     Route::resource('/admin-users', AdminUsersController::class);
-    Route::get('/recargar-users', [AdminUsersController::class, 'recargar']);
+    Route::put('/admin-users-pass/{id}', [AdminUsersController::class, 'resetPass']);
+    Route::get('/admin-reload-users', [AdminUsersController::class, 'reload']);
     
 });
