@@ -22,7 +22,7 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => 'string|max:255',
+            'name' => 'string|max:255',
             'email' => 'string',
         ];
     }

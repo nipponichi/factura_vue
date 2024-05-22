@@ -35,7 +35,7 @@ class AdminUsersController extends Controller
             $users = DB::table('users')
             ->leftJoin('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
             ->leftJoin('roles', 'model_has_roles.role_id', '=', 'roles.id')
-            ->select('users.id', 'users.name as userName', 'users.email', 'roles.name as roleName', 'users.dt_end as active')
+            ->select('users.id', 'users.name as name', 'users.email', 'roles.name as role_type', 'users.dt_end as active')
             ->orderBy('users.id')
             ->whereNot('users.id',1)
             ->get();
@@ -54,7 +54,7 @@ class AdminUsersController extends Controller
             $users = DB::table('users')
             ->leftJoin('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
             ->leftJoin('roles', 'model_has_roles.role_id', '=', 'roles.id')
-            ->select('users.id', 'users.name as userName', 'users.email', 'roles.name as roleName', 'users.dt_end as active')
+            ->select('users.id', 'users.name as name', 'users.email', 'roles.name as role_type', 'users.dt_end as active')
             ->orderBy('users.id')
             ->whereNot('users.id',1)
             ->get();
@@ -86,7 +86,7 @@ class AdminUsersController extends Controller
 
             $pass = $request->password;
             $confirmPass = $request->confirmPassword;
-            $role_type = $request->roleName;
+            $role_type = $request->role_type;
             
             if($pass != $confirmPass) {
                 return response()->json(['message' => 'El password no coincide']);
@@ -98,7 +98,7 @@ class AdminUsersController extends Controller
 
             // Crear el nuevo usuario
             $user = User::create([
-                'name' => $request->username,
+                'name' => $request->name,
                 'email' => $request->email,
                 'password' => bcrypt($pass),
                 'created_at' => now(),
@@ -151,7 +151,7 @@ class AdminUsersController extends Controller
             DB::table('users')
             ->where('id', $id)
             ->update([
-                'name' => $request->username,
+                'name' => $request->name,
                 'email' => $request->email,
                 'updated_at' => now(),
             ]);

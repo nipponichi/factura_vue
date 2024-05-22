@@ -28,11 +28,12 @@
                 </template>
 
                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox" ></Column>
-                <Column field="name" header="Name" sortable class="dateTable"></Column>
+                <Column field="userEmail" header="User Account" sortable class="dateTable"></Column>
+                <Column field="name" header="Company name" sortable class="dateTable"></Column>
                 <Column field="taxNumber" header="Tax Number" sortable class="dateTable"></Column>
                 <Column field="phone" header="Phone" sortable class="dateTable"></Column>
                 <Column field="email" header="Email" sortable class="dateTable"></Column>
-                <Column field="town" header="Town" sortable class="dateTable"></Column>
+        
                 <Column :exportable="false" class="dateTable">
                     <template #body="slotProps">
                         <Button icon="pi pi-eye" outlined rounded class="mr-2 info-button" @click="handleInfoButtonClick(slotProps.data.id)" />
@@ -43,10 +44,31 @@
             </DataTable>
         </div>
 
+
         <!-- MODAL -->
         <Dialog v-model:visible="productDialog" :header="productos.id ? 'Modify company' : 'Create company'" id="titleCompany" :modal="true" class="p-fluid">
-            
+    
             <form style="width: 800px;" @submit.prevent="saveProduct">
+                
+                <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select an user</label>
+                <Dropdown v-model="selectedUser" :options="this.users" filter optionLabel="email" placeholder="Select an user" class="w-full md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+
+                    <template #value="slotProps">
+                        <div v-if="slotProps.value" class=" flex align-items-center ">
+                            <div>{{ slotProps.value.email }}</div>
+                        </div>
+                        <span v-else>
+                            {{ slotProps.placeholder }}
+                        </span>
+                    </template>
+                    <template #option="slotProps">
+                        <div class="flex align-items-center">
+                            <div>{{ slotProps.option.email }}</div>
+                        </div>
+                    </template>
+                </Dropdown>             
+                
+                
                 <div class="grid gap-3 mb-6 md:grid-cols-2">
                     <div>
                         <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company name</label>
@@ -57,44 +79,40 @@
                         <input type="text" id="taxNumber" v-model="productos.taxNumber" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Tax number" required />
                     </div>
                 </div>
-                <div class="mb-6">
-                    <div>
-                        <label for="address1" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address 1</label>
-                        <input type="text" id="address1" v-model="productos.address1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Address" required />
+                <div v-if="!productos.id">
+                    <div class="mb-6">
+                        <div>
+                            <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
+                            <input type="text" id="address" v-model="productos.address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Address" required />
+                        </div>
                     </div>
-                </div>
-                <div class="grid gap-3 mb-6 md:grid-cols-2">  
-                    <div>
-                        <label for="address2" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address 2</label>
-                        <input type="text" id="address2" v-model="productos.address2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Address line 2" />
-                    </div>
-                    <div>
-                        <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Town</label>
-                        <input type="text" id="town" v-model="productos.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Town" required />
-                    </div>  
-                    <div>
-                        <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Province</label>
-                        <input type="text" id="province" v-model="productos.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Province" required />
-                    </div>  
-                    <div>
-                        <label for="postCode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Post code</label>
-                        <input type="text" id="postCode" v-model="productos.postCode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Post code" pattern="^\d+$" required />
-                    </div>
-                    <div>
-                        <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
-                        <input type="text" id="country" v-model="productos.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Country" required />
-                    </div> 
-                    <div>
-                        <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email address</label>
-                        <input type="email" id="email" v-model="productos.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="info@mycompany.com" required />
-                    </div>    
-                    <div>
-                        <label for="phone1" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
-                        <input type="tel" id="phone1" v-model="productos.phone1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Phone" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
-                    </div>
-                    <div>
-                        <label for="phone2" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mobile phone</label>
-                        <input type="tel" id="phone2" v-model="productos.phone2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Mobile phone" pattern="^\+\d{1,3}\s?\d{1,14}$" />
+                    <div class="grid gap-3 mb-6 md:grid-cols-2">  
+                        
+                        <div>
+                            <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Province</label>
+                            <input type="text" id="province" v-model="productos.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Province" required />
+                        </div>  
+                        <div>
+                            <label for="postCode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Post code</label>
+                            <input type="text" id="postCode" v-model="productos.postCode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Post code" pattern="^\d+$" required />
+                        </div>
+                        <div>
+                            <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
+                            <input type="text" id="country" v-model="productos.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Country" required />
+                        </div> 
+                        <div>
+                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email address</label>
+                            <input type="email" id="email" v-model="productos.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="info@mycompany.com" required />
+                        </div>    
+                        <div>
+                            <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
+                            <input type="tel" id="phone" v-model="productos.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Phone" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
+                        </div>
+                        <div>
+                            <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Town</label>
+                            <input type="text" id="town" v-model="productos.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Town" required />
+                        </div> 
+                        
                     </div>
                 </div>
                 <div class="grid gap-3 md:grid-cols-1 justify-items-end">
@@ -178,23 +196,27 @@ export default {
     data() {
         console.log("PRIMER PASO");
         return {
-            products: null, // Aquí almacenarás los productos recuperados de alguna fuente, como una API
+            products: null,
+            users: [],
             productDialog: false, // Controla la visibilidad del diálogo de creación/edición de producto
             deleteProductDialog: false, // Controla la visibilidad del diálogo de borrado de producto individual
             deleteProductsDialog: false, // Controla la visibilidad del diálogo de borrado de productos en grupo
+            selectedCompany: '',
+            
             productos: { // Aquí almacenas los datos del producto que se va a crear/editar
                 name: '',
                 taxNumber: '',
                 email: '',
-                phone1: '',
-                phone2: '',
-                address1: '',
-                address2: '',
+                phone: '',
+                address: '',
                 postCode: '',
                 town: '',
                 province: '',
-                country: ''
+                country: '',
+                user_id: '',
+                userEmail: ''
             },
+            selectedUser: null,
             selectedProducts: [], // Almacena los productos seleccionados para borrado en grupo
             filters: {}, // Almacena los filtros de búsqueda en tiempo real
             submitted: false, // Indica si se ha enviado el formulario de creación/edición de producto
@@ -209,17 +231,49 @@ export default {
     mounted() {
         // Asigna los datos de la compañía pasados desde Laravel a una variable local
         this.products = this.$page.props.companies;
+        this.fetchUsers();
         
     },
 
     
     methods: {
+                
+        fetchUsers() {
+            
+            axios.get('/admin-reload-users')
+                .then(response => {
+                    this.users = response.data.users;
+
+                    console.log("usuarios " + response.data.users)
+                    
+                    
+                })
+                .catch(error => {
+                    console.error('Error fetching phone data:', error);
+                });
+        },
+
+        fetchCompanies() {
+            
+            axios.get('/admin-reload-companies')
+                .then(response => {
+                    this.products = response.data.companies;
+                    console.log("usuarios " + response.data.companies)
+                    
+                })
+                .catch(error => {
+                    console.error('Error fetching phone data:', error);
+                });
+        },
+
         openNew() {
             console.log("OPEN NEW-------------------")
             this.productos = {};
             this.submitted = false;
             this.productDialog = true;
+            this.selectedUser = null;
         },
+
         hideDialog() {
             console.log("HIDE")
             this.productDialog = false;
@@ -227,23 +281,28 @@ export default {
         },
         
         saveProduct() {
+            console.log("id: "+ this.selectedUser.id)
+            this.productos.user_id = this.selectedUser.id;
+            
             if (!this.productos.id) {
                 
                 // Realiza la solicitud para guardar el producto
-                axios.post('/'+ this.$page.props.type, this.productos)
+                axios.post('/admin-companies', this.productos)
                 .then(response => {
                     // La solicitud se completó con éxito, puedes hacer lo que necesites con la respuesta, como imprimirlo en la consola
                     console.log(response);
 
+                    this.fetchCompanies()
                     // Cierra el diálogo de producto
                     this.productDialog = false;
 
-                    this.products.push(response.data.company)
+                    
                 
                 })
                 .catch(error => {
                     // Si hay algún error en la solicitud, puedes manejarlo aquí
                     console.log(error.response);
+                    this.productDialog = false;
                 });   
 
             }else {
@@ -255,43 +314,29 @@ export default {
 
 
         editProduct(slotProduct) {
-
-
-            axios.get('/' + this.$page.props.type + '/' + slotProduct.id + '/edit').then(response => {
-
-
-                this.productos = response.data.product;
-                this.productDialog = true;
-
-            })
-            .catch(error => {
-                console.error('Error al obtener los datos del producto para editar:', error);
-            });
-            
-            
+            this.productDialog = true;
+            this.productos.id = slotProduct.id;
+            this.productos.user_id = slotProduct.user_id;
+            this.productos.name = slotProduct.name;
+            this.productos.userEmail = slotProduct.userEmail;
+            this.productos.taxNumber = slotProduct.taxNumber;
+            const selectedUser = this.users.find(user => user.email === slotProduct.userEmail);
+            this.selectedUser = selectedUser;     
         },
 
         updateProduct() {
 
-            console.log("Update" + this.productos.name)
 
-
-
-            axios.put('/' + this.$page.props.type + '/' + this.productos.id, this.productos)
+            axios.put('/admin-companies/' + this.productos.id, this.productos)
             .then(response => {
                 
-                // Busca el índice del objeto en la lista actual
-                const index = this.products.findIndex(producto => producto.id === this.productos.id);
-
-                // Actualiza los valores del objeto existente en la lista
-                if (index !== -1) {
-                this.products[index] = response.data.company;
-                } 
+                
+                this.fetchCompanies();
                 this.productDialog = false; 
             })
             .catch(error => {
                 console.error('Error al actualizar la compañía:', error);
-                // Mostrar un mensaje de error al usuario
+                this.productDialog = false; 
                 
             });
         },        

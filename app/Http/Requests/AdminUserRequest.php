@@ -23,10 +23,11 @@ class AdminUserRequest extends FormRequest
     {
 
             return [
-                'username' => 'string|max:255',
+                'name' => 'string|max:255',
                 'email' => 'string',
                 'password' => 'string',
                 'confirmPassword' => 'string',
+                
             ];
 
     }
