@@ -29,9 +29,9 @@
 
                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox" ></Column>
                 <Column field="id" header="ID" sortable class="dateTable"></Column>
-                <Column field="userName" header="Username" sortable class="dateTable"></Column>
+                <Column field="name" header="Username" sortable class="dateTable"></Column>
                 <Column field="email" header="Email" sortable class="dateTable"></Column>
-                <Column field="roleName" header="Role" sortable class="dateTable"></Column>
+                <Column field="role_type" header="Role" sortable class="dateTable"></Column>
                 <Column field="active" header="Active" sortable class="dateTable">
                     <template #body="slotProps">
                         <template v-if="slotProps.data.active === null">
@@ -63,8 +63,8 @@
             <form style="width: 800px;" @submit.prevent="saveUser">
                 <div class="grid gap-3 mb-6 md:grid-cols-2">
                     <div>
-                        <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
-                        <input type="text" id="username" v-model="myUser.username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Username" required />
+                        <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+                        <input type="text" id="name" v-model="myUser.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Username" required />
                     </div>
                     <div>
                         <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email address</label>
@@ -118,7 +118,7 @@
 
         <!-- MODAL RESET PASSWORD -->
 
-        <Dialog v-model:visible="resetPassDialog" :header="'Reset Password: ' + myUser.username" id="titleCompany" :modal="true" class="p-fluid">
+        <Dialog v-model:visible="resetPassDialog" :header="'Reset Password: ' + myUser.name" id="titleCompany" :modal="true" class="p-fluid">
             <form style="width: 800px;" @submit.prevent="resetPassUser">
                 
                 <div class="grid gap-3 mb-6 md:grid-cols-2">
@@ -146,7 +146,7 @@
         <Dialog v-model:visible="deleteUserDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="users">Are you sure you want to change company state<b>{{users.username}}</b>?</span>
+                <span v-if="users">Are you sure you want to change company state<b>{{users.name}}</b>?</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteUserDialog = false"/>
@@ -222,7 +222,7 @@ export default {
             resetPassDialog: false,
 
             myUser: { 
-                username: '',
+                name: '',
                 email: '',
                 password: '',
                 confirmPassword: '',
@@ -305,9 +305,9 @@ export default {
         },
 
         editUser(slotProps) {
-            this.myUser.username = slotProps.userName;
+            this.myUser.name = slotProps.name;
             this.myUser.email = slotProps.email;
-            this.myUser.role_type = slotProps.roleName;
+            this.myUser.role_type = slotProps.role_type;
             this.myUser.id = slotProps.id;
         
             this.userDialog = true;     
@@ -330,7 +330,7 @@ export default {
             this.myUser.password = "";
             this.myUser.confirmPassword = "";
             this.myUser.id = slotProps.id;
-            this.myUser.username = slotProps.userName;
+            this.myUser.name = slotProps.name;
             this.resetPassDialog = true;     
         },
 

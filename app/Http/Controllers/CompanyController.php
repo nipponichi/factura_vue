@@ -86,21 +86,6 @@ class CompanyController extends Controller
      */
     public function store(CompanyRequest $request)
     {
-        try {
-
-
-            $user_id = Auth::id();
-            $company = new Company($request->validated());
-            $company->user_id = $user_id;
-            $company->save();
-
-            //return Inertia::render('Companies/Index');
-            return response()->json(['message' => 'La compañía se ha creado correctamente', 'company' => $company]);
-            
-        }catch (Exception $e) {
-            // Devuelve una respuesta JSON con un mensaje de error
-            return response()->json(['message' => 'Error al crear la compañía: ', $e->getMessage()], 500);
-        }
     }
 
     /**

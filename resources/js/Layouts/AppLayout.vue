@@ -47,17 +47,22 @@ const logout = () => {
                             </div>
 
                             <!-- Navigation Links -->
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read company')">
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')">
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard') ">
                                     Dashboard
                                 </NavLink>
+                            </div>
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')">
+                                <NavLink :href="route('invoices.index')" :active="route().current('invoices.*')">
+                                    Invoice
+                                </NavLink>
                             </div>                       
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read company')" >
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')" >
                                 <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
                                     My Company
                                 </NavLink>
                             </div>
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read consulting')">
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view consulting')">
                                 <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
                                     Consulting
                                 </NavLink>
@@ -227,22 +232,22 @@ const logout = () => {
 
                 <!-- Responsive Navigation Menu -->
                 <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}" class="sm:hidden">
-                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read company')">
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view company')">
                         <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')" >
                             Dashboard
                         </ResponsiveNavLink>
                     </div>
-                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read company')">
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view company')">
                         <ResponsiveNavLink :href="route('invoices.index')" :active="route().current('invoices.*')">
                             Invoices
                         </ResponsiveNavLink>
                     </div>
-                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read company')">
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view company')">
                         <ResponsiveNavLink :href="route('companies.index')" :active="route().current('companies.*')">
                             My Company
                         </ResponsiveNavLink>
                     </div>
-                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read consulting')">
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view consulting')">
                         <ResponsiveNavLink :href="route('products.index')" :active="route().current('products.*')">
                             My Consulting
                         </ResponsiveNavLink>

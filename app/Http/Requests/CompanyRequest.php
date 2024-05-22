@@ -22,6 +22,7 @@ class CompanyRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'user_id' => 'int',
             'name' => 'string|max:255',
             'taxNumber' => 'string',
             'address' => 'string|max:255',

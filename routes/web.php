@@ -26,6 +26,7 @@ Route::middleware([
 ])->group(function () {
     Route::get('/dashboard', [RouteController::class, 'dashboard'])->name('dashboard');
     Route::resource('/companies', CompanyController::class);
+    Route::resource('/invoices', InvoiceController::class);
     Route::resource('/customer', CustomerController::class);
     Route::get('/customers/{id}', [CustomerController::class, 'index']);
     Route::put('/phones/{id}', [PhoneController::class, 'makeFavorite']);
@@ -48,5 +49,6 @@ Route::middleware([
     Route::resource('/admin-users', AdminUsersController::class);
     Route::put('/admin-users-pass/{id}', [AdminUsersController::class, 'resetPass']);
     Route::get('/admin-reload-users', [AdminUsersController::class, 'reload']);
+    Route::get('/admin-reload-companies', [AdminCompaniesController::class, 'reload']);
     
 });

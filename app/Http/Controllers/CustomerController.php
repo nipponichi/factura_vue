@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Http\Requests\CompanyRequest;
+use App\Http\Requests\CustomerRequest;
 use App\Models\Company;
 use Exception;
 use Illuminate\Support\Facades\Redirect;
@@ -78,7 +78,7 @@ class CustomerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CompanyRequest $request)
+    public function store(CustomerRequest $request)
     {
         DB::beginTransaction();
 
@@ -174,8 +174,6 @@ class CustomerController extends Controller
             return response()->json(['message' => 'Error al crear la compañía: ', $e->getMessage()], 500);
         }
 
-
-
     }
 
 
@@ -257,7 +255,7 @@ class CustomerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CompanyRequest $request, string $id)
+    public function update(CustomerRequest $request, string $id)
     {
         try {
             // Actualiza la compañía y devuelve el número de filas afectadas
