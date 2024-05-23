@@ -22,7 +22,7 @@
                 </template>
 
                 <Column field="name" header="Name" sortable class="dateTable"></Column>
-                <Column field="taxNumber" header="Tax Number" sortable class="dateTable"></Column>
+                <Column field="tax_number" header="Tax Number" sortable class="dateTable"></Column>
                 <Column field="phone" header="Phone" sortable class="dateTable"></Column>
                 <Column field="email" header="Email" sortable class="dateTable"></Column>
                 <Column field="town" header="Town" sortable class="dateTable"></Column>
@@ -91,6 +91,7 @@ export default {
     mounted() {
         
         this.companies = this.$page.props.companies;
+        
     },
 
     

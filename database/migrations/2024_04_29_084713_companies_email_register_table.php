@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('companies_email_register', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_detail_id')->constrained('companies_detail');
             $table->string('email');
-            $table->boolean('favorite')->default (false);
+            $table->boolean('favourite')->default (false);
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
-            $table->foreignId('company_detail_id')->constrained('companies_detail');
         });
     }
 

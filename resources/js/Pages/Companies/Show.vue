@@ -49,7 +49,7 @@
                                                 <div class="grid md:grid-cols-2 text-sm">
                                                     <div class="grid grid-cols-2">
                                                         <div class=" py-2 font-semibold">Tax Number:</div>
-                                                        <div class=" py-2">{{ company.taxNumber }}</div>
+                                                        <div class=" py-2">{{ company.tax_number }}</div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
                                                         <div class=" py-2 font-semibold">Email:</div>

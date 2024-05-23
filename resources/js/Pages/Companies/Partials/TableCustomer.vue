@@ -29,7 +29,7 @@
 
                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox" ></Column>
                 <Column field="name" header="Name" sortable class="dateTable"></Column>
-                <Column field="taxNumber" header="Tax Number" sortable class="dateTable"></Column>
+                <Column field="tax_number" header="Tax Number" sortable class="dateTable"></Column>
                 <Column field="phone" header="Phone" sortable class="dateTable"></Column>
                 <Column field="email" header="Email" sortable class="dateTable"></Column>
                 <Column field="town" header="Town" sortable class="dateTable"></Column>
@@ -53,8 +53,8 @@
                         <input type="text" id="name" v-model="company.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Company name" required />
                     </div>
                     <div>
-                        <label for="taxNumber" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tax number</label>
-                        <input type="text" id="taxNumber" v-model="company.taxNumber" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Tax number" required />
+                        <label for="tax_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tax number</label>
+                        <input type="text" id="tax_number" v-model="company.tax_number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Tax number" required />
                     </div>
                 </div>
 
@@ -181,7 +181,7 @@ export default {
             deleteCompaniesDialog: false, 
             company: {
                 name: '',
-                taxNumber: '',
+                tax_number: '',
                 email: '',
                 phone: '',
                 address: '',
@@ -218,8 +218,6 @@ export default {
         .catch(error => {
             console.error('Error al obtener los datos de los clientes:', error);
         });
-        /* this.companies = this.$page.props.customers;
-        console.log(this.companies);*/
     },
 
     
@@ -227,7 +225,7 @@ export default {
         openNew() {
         this.company = {
             name: '',
-            taxNumber: '',
+            tax_number: '',
             email: '',
             phone: '',
             address: '',
@@ -260,7 +258,6 @@ export default {
 
                     let myCompanyId = window.location.pathname.split('/').pop();
                     
-                    //this.companies.push(response.data.company);
                     axios.get('/customers/' + myCompanyId)
                     .then(response => {
                         // Asigna los datos de los clientes a la propiedad 'companies'
@@ -279,6 +276,7 @@ export default {
                     // Si hay algún error en la solicitud, puedes manejarlo aquí
                     console.log(error.response);
                     console.log(response.data.name);
+                    this.companyDialog = false;
                 });   
 
             }else {

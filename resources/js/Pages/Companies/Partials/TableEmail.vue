@@ -34,8 +34,8 @@
                 <Column :exportable="false"  header="Favourite" class="dateTable w-24 text-center">
             
                     <template #body="slotProps">
-                        <Button v-if="slotProps.data.favorite" icon="pi pi-star-fill"  class="mr-2 info-button" @click="makeFavorite(slotProps.data)" />
-                        <Button v-else icon="pi pi-star" class="mr-2 info-button" @click="makeFavorite(slotProps.data)" />
+                        <Button v-if="slotProps.data.favourite" icon="pi pi-star-fill"  class="mr-2 info-button" @click="makeFavourite(slotProps.data)" />
+                        <Button v-else icon="pi pi-star" class="mr-2 info-button" @click="makeFavourite(slotProps.data)" />
                     </template>
                 </Column>
 
@@ -65,8 +65,8 @@
                             <input type="email" id="email" v-model="myEmail.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="info@mycompany.com" required />
                         </div>  
                     <div v-if="!myEmail.id" class="flex items-center">
-                        <input id="link-checkbox" type="checkbox" v-model="myEmail.favorite" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Mark this email as a favorite.</label>
+                        <input id="link-checkbox" type="checkbox" v-model="myEmail.favourite" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Mark this email as a favourite.</label>
                     </div>
                     </div>
                     <div class="grid gap-3 md:grid-cols-1 justify-items-end">
@@ -122,7 +122,7 @@ export default {
             myEmail: { 
                 id: '',             
                 email: '',
-                favorite: '',
+                favourite: '',
                 companyID: window.location.pathname.split('/').pop(),
             },
             selectedEmails: [], 
@@ -168,8 +168,8 @@ export default {
 
         saveMyEmail() {
             console.log("companyId: "+ this.myEmail.companyID)
-            if(this.myEmail.favorite == null) {
-                this.myEmail.favorite = false
+            if(this.myEmail.favourite == null) {
+                this.myEmail.favourite = false
             }
             this.myEmail.isMobile = 0;
             if (!this.myEmail.id) {
@@ -192,16 +192,16 @@ export default {
         },
 
         editMyEmail(slotProps) {
-            console.log('edit: ' + slotProps.favorite)
+            console.log('edit: ' + slotProps.favourite)
             
                 this.myEmail.email = slotProps.email;
                 this.myEmail.id = slotProps.id;
-                this.myEmail.favorite = slotProps.favorite;
+                this.myEmail.favourite = slotProps.favourite;
                 this.emailDialog = true;
         },
 
         updateMyEmail() {
-            console.log("Update: " + this.myEmail.favorite)
+            console.log("Update: " + this.myEmail.favourite)
 
             axios.put('/email/' + this.myEmail.id, this.myEmail)
             .then(response => {
@@ -216,9 +216,9 @@ export default {
             });
         },
 
-        makeFavorite(slotProps) {
+        makeFavourite(slotProps) {
 
-            if (slotProps.favorite) {
+            if (slotProps.favourite) {
                 return alert("El telefono ya está seleccionado como favorito")
             }
 

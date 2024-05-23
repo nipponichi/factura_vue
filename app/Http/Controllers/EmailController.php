@@ -15,10 +15,7 @@ class EmailController extends Controller
         $this->middleware(['can:create company'])->only('create');
         $this->middleware(['can:create company'])->only('store');
         $this->middleware(['can:read company'])->only('show');
-        $this->middleware(['can:update company'])->only('edit');
-        $this->middleware(['can:update company'])->only('makeFavorite');
-        $this->middleware(['can:update company'])->only('favoriteTrue');
-        $this->middleware(['can:update company'])->only('update');
+        $this->middleware(['can:update company'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
         $this->middleware(['can:delete company'])->only('destroy');
     }
 
@@ -26,10 +23,10 @@ class EmailController extends Controller
     {
         try {
             $emails = DB::table('companies_email_register')
-                ->select('id','email', 'favorite')
+                ->select('id','email', 'favourite')
                 ->where('company_detail_id', $companyId)
                 ->whereNull('dt_end')
-                ->orderByDesc('favorite') 
+                ->orderByDesc('favourite')
                 ->get();
 
 
@@ -39,10 +36,10 @@ class EmailController extends Controller
         }
     }
 
-
+    // Not needed
     public function edit()
     {
-
+     //
     }
 
     public function update ($emailId, emailRequest $request)
@@ -53,7 +50,7 @@ class EmailController extends Controller
             $companyResult = DB::table('companies_email_register')
             ->select('company_detail_id')
             ->where('id', $emailId)
-            ->first(); 
+            ->first();
 
             if ($companyResult) {
                 $companyId = $companyResult->company_detail_id;
@@ -63,15 +60,15 @@ class EmailController extends Controller
             $newEmailId = DB::table('companies_email_register')->insertGetId([
                 'email' => $request->email,
                 'dt_start' => now(),
-                'favorite' => $request->favorite,
+                'favourite' => $request->favourite,
                 'company_detail_id' => $companyId,
             ]);
 
             $email = DB::table('companies_email_register')
-            ->select('id','company_detail_id', 'favorite')
+            ->select('id','company_detail_id', 'favourite')
             ->where('id', $newEmailId)
             ->whereNull('dt_end')
-            ->first(); 
+            ->first();
 
             DB::table('companies_email_register')
             ->where('id', $emailId)
@@ -97,19 +94,19 @@ class EmailController extends Controller
             $newEmailId = DB::table('companies_email_register')->insertGetId([
                 'email' => $request->email,
                 'dt_start' => now(),
-                'favorite' => $request->favorite,
+                'favourite' => $request->favourite,
                 'company_detail_id' => $request->companyID,
             ]);
 
-            if ($request->favorite === true) {
-                $this->favoriteTrue($newEmailId);
+            if ($request->favourite === true) {
+                $this->favouriteTrue($newEmailId);
             }
 
             $email = DB::table('companies_email_register')
-            ->select('email','id','company_detail_id', 'favorite')
+            ->select('email','id','company_detail_id', 'favourite')
             ->where('id', $newEmailId)
             ->whereNull('dt_end')
-            ->first(); 
+            ->first();
         
 
             DB::commit();
@@ -131,7 +128,7 @@ class EmailController extends Controller
                 ->select('company_detail_id')
                 ->where('id', $id)
                 ->whereNull('dt_end')
-                ->first(); 
+                ->first();
 
             if ($companyResult) {
                 $companyId = $companyResult->company_detail_id;
@@ -147,13 +144,13 @@ class EmailController extends Controller
             }
 
             $companyFav = DB::table('companies_email_register')
-            ->select('favorite')
+            ->select('favourite')
             ->where('id', $id)
             ->whereNull('dt_end')
             ->first();
             
             if ($companyFav) {
-                $companyEmail = $companyFav->favorite;
+                $companyEmail = $companyFav->favourite;
             }
 
             if ($companyEmail) {
@@ -174,23 +171,23 @@ class EmailController extends Controller
         }
     }
 
-    public function makeFavorite($id) {
+    public function makeFavourite($id) {
         try {
             
-            $this->favoriteTrue($id);
+            $this->favouriteTrue($id);
             
-            return response()->json(['message' => 'make favorite',], 200);
+            return response()->json(['message' => 'make favourite',], 200);
         } catch (Exception $e) {
             return response()->json(['message' => 'Error al seleccionar email favorito '.$e->getMessage()], 500);
         }
     }
 
-    public function favoriteTrue($id){
+    public function favouriteTrue($id){
         $companyResult = DB::table('companies_email_register')
         ->select('company_detail_id')
         ->where('id', $id)
         ->whereNull('dt_end')
-        ->first(); 
+        ->first();
 
         if ($companyResult) {
             $companyId = $companyResult->company_detail_id;
@@ -199,13 +196,13 @@ class EmailController extends Controller
         DB::table('companies_email_register')
         ->where('company_detail_id', $companyId)
         ->update([
-            'favorite' => 0,
+            'favourite' => 0,
         ]);
 
         DB::table('companies_email_register')
         ->where('id', $id)
         ->update([
-            'favorite' => 1,
+            'favourite' => 1,
         ]);
     }
 
