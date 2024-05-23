@@ -19,13 +19,13 @@ class CompanyController extends Controller
     
     public function __construct()
     {
-        $this->middleware(['can:read company'])->only('index'); 
-        $this->middleware(['can:create company'])->only('create'); 
-        $this->middleware(['can:create company'])->only('store');  
-        $this->middleware(['can:read company'])->only('show'); 
+        $this->middleware(['can:read company'])->only('index');
+        $this->middleware(['can:create company'])->only('create');
+        $this->middleware(['can:create company'])->only('store');
+        $this->middleware(['can:read company'])->only('show');
         $this->middleware(['can:update company'])->only('edit');
         $this->middleware(['can:update company'])->only('update');
-        $this->middleware(['can:delete company'])->only('destroy');     
+        $this->middleware(['can:delete company'])->only('destroy');
     }
 
 
@@ -38,29 +38,38 @@ class CompanyController extends Controller
         ->select(
             'companies.id',
             'companies.dt_end',
-            'companies.taxNumber',
-            'companies_detail.name',
+            'companies_tax_number_register.tax_number',
+            'companies_name_register.name',
             'companies_email_register.email',
             'companies_phone_register.phone',
             'companies_country_register.country',
             'companies_town_register.town',
             'companies_post_code_register.postCode',
-            'companies_province_register.province',       
+            'companies_province_register.province',
             'companies_address_register.address'
         )
         ->leftJoin('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
+        ->leftJoin('companies_name_register', 'companies_detail.id', '=', 'companies_name_register.company_detail_id')
+        ->leftJoin('companies_tax_number_register', 'companies_detail.id', '=', 'companies_tax_number_register.company_detail_id')
         ->leftJoin('companies_email_register', 'companies_detail.id', '=', 'companies_email_register.company_detail_id')
         ->leftJoin('companies_phone_register', 'companies_detail.id', '=', 'companies_phone_register.company_detail_id')
         ->leftJoin('companies_addresses', 'companies_detail.id', '=', 'companies_addresses.company_detail_id')
-        ->leftJoin('companies_town_register', 'companies_addresses.company_town_register_id', '=', 'companies_town_register.id')
-        ->leftJoin('companies_country_register', 'companies_addresses.company_country_register_id', '=', 'companies_country_register.id')
-        ->leftJoin('companies_province_register', 'companies_addresses.company_province_register_id', '=', 'companies_province_register.id')
-        ->leftJoin('companies_post_code_register', 'companies_addresses.company_post_code_register_id', '=', 'companies_post_code_register.id')
-        ->leftJoin('companies_address_register', 'companies_addresses.company_address_register_id', '=', 'companies_address_register.id')
+        ->leftJoin('companies_town_register', 'companies_addresses.id', '=', 'companies_town_register.company_addresses_id')
+        ->leftJoin('companies_country_register', 'companies_addresses.id','=', 'companies_country_register.company_addresses_id')
+        ->leftJoin('companies_province_register', 'companies_addresses.id', '=', 'companies_province_register.company_addresses_id')
+        ->leftJoin('companies_post_code_register', 'companies_addresses.id', '=', 'companies_post_code_register.company_addresses_id')
+        ->leftJoin('companies_address_register', 'companies_addresses.id', '=', 'companies_address_register.company_addresses_id')
+        
         ->where('companies.user_id', $userId)
-        ->where('companies_addresses.favorite', 1)
-        ->where('companies_phone_register.favorite', 1)
-        ->where('companies_email_register.favorite', 1)
+        ->where('companies_town_register.favourite', 1)
+        ->where('companies_country_register.favourite', 1)
+        ->where('companies_province_register.favourite', 1)
+        ->where('companies_post_code_register.favourite', 1)
+        ->where('companies_address_register.favourite', 1)
+        ->where('companies_phone_register.favourite', 1)
+        ->where('companies_email_register.favourite', 1)
+        ->whereNull('companies_name_register.dt_end')
+        ->whereNull('companies_tax_number_register.dt_end')
         ->whereNull('companies_addresses.dt_end')
         ->whereNull('companies_phone_register.dt_end')
         ->whereNull('companies_email_register.dt_end')
@@ -92,7 +101,7 @@ class CompanyController extends Controller
      * Display the specified resource.
      */
     public function show(string $id)
-    {      
+    {
         try {
 
             // Obtener el usuario autenticado
@@ -111,30 +120,38 @@ class CompanyController extends Controller
             ->select(
                 'companies.id',
                 'companies.dt_end',
-                'companies.taxNumber',
-                'companies_detail.name',
+                'companies_tax_number_register.tax_number',
+                'companies_name_register.name',
                 'companies_email_register.email',
                 'companies_phone_register.phone',
                 'companies_country_register.country',
                 'companies_town_register.town',
                 'companies_post_code_register.postCode',
-                'companies_province_register.province',       
+                'companies_province_register.province',
                 'companies_address_register.address'
             )
             ->leftJoin('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
+            ->leftJoin('companies_name_register', 'companies_detail.id', '=', 'companies_name_register.company_detail_id')
+            ->leftJoin('companies_tax_number_register', 'companies_detail.id', '=', 'companies_tax_number_register.company_detail_id')
             ->leftJoin('companies_email_register', 'companies_detail.id', '=', 'companies_email_register.company_detail_id')
             ->leftJoin('companies_phone_register', 'companies_detail.id', '=', 'companies_phone_register.company_detail_id')
             ->leftJoin('companies_addresses', 'companies_detail.id', '=', 'companies_addresses.company_detail_id')
-            ->leftJoin('companies_town_register', 'companies_addresses.company_town_register_id', '=', 'companies_town_register.id')
-            ->leftJoin('companies_country_register', 'companies_addresses.company_country_register_id', '=', 'companies_country_register.id')
-            ->leftJoin('companies_province_register', 'companies_addresses.company_province_register_id', '=', 'companies_province_register.id')
-            ->leftJoin('companies_post_code_register', 'companies_addresses.company_post_code_register_id', '=', 'companies_post_code_register.id')
-            ->leftJoin('companies_address_register', 'companies_addresses.company_address_register_id', '=', 'companies_address_register.id')
+            ->leftJoin('companies_town_register', 'companies_addresses.id', '=', 'companies_town_register.company_addresses_id')
+            ->leftJoin('companies_country_register', 'companies_addresses.id','=', 'companies_country_register.company_addresses_id')
+            ->leftJoin('companies_province_register', 'companies_addresses.id', '=', 'companies_province_register.company_addresses_id')
+            ->leftJoin('companies_post_code_register', 'companies_addresses.id', '=', 'companies_post_code_register.company_addresses_id')
+            ->leftJoin('companies_address_register', 'companies_addresses.id', '=', 'companies_address_register.company_addresses_id')
             ->where('companies.id', $id)
             ->where('companies.user_id', $userId)
-            ->where('companies_addresses.favorite', 1)
-            ->where('companies_phone_register.favorite', 1)
-            ->where('companies_email_register.favorite', 1)
+            ->where('companies_town_register.favourite', 1)
+            ->where('companies_country_register.favourite', 1)
+            ->where('companies_province_register.favourite', 1)
+            ->where('companies_post_code_register.favourite', 1)
+            ->where('companies_address_register.favourite', 1)
+            ->where('companies_phone_register.favourite', 1)
+            ->where('companies_email_register.favourite', 1)
+            ->whereNull('companies_name_register.dt_end')
+            ->whereNull('companies_tax_number_register.dt_end')
             ->whereNull('companies_addresses.dt_end')
             ->whereNull('companies_phone_register.dt_end')
             ->whereNull('companies_email_register.dt_end')

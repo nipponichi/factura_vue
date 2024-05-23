@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('companies_address_register', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_addresses_id')->constrained('companies_addresses');
             $table->string('address');
+            $table->boolean('favourite')->default (false);
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
         });

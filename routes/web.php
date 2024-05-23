@@ -29,13 +29,13 @@ Route::middleware([
     Route::resource('/invoices', InvoiceController::class);
     Route::resource('/customer', CustomerController::class);
     Route::get('/customers/{id}', [CustomerController::class, 'index']);
-    Route::put('/phones/{id}', [PhoneController::class, 'makeFavorite']);
+    Route::put('/phones/{id}', [PhoneController::class, 'makeFavourite']);
     Route::get('/phones/{id}', [PhoneController::class, 'index']);
     Route::resource('/phone', PhoneController::class);
-    Route::put('/emails/{id}', [EmailController::class, 'makeFavorite']);
+    Route::put('/emails/{id}', [EmailController::class, 'makeFavourite']);
     Route::get('/emails/{id}', [EmailController::class, 'index']);
     Route::resource('/email', EmailController::class);
-    Route::put('/addresses/{id}', [AddressController::class, 'makeFavorite']);
+    Route::put('/addresses/{id}', [AddressController::class, 'makeFavourite']);
     Route::get('/addresses/{id}', [AddressController::class, 'index']);
     Route::resource('/address', AddressController::class);
     Route::resource('/invoices', InvoiceController::class);

@@ -38,8 +38,8 @@
                 <Column :exportable="false"  header="Favourite" class="dateTable w-24 text-center">
             
                     <template #body="slotProps">
-                        <Button v-if="slotProps.data.favorite" icon="pi pi-star-fill"  class="mr-2 info-button" @click="makeFavorite(slotProps.data)" />
-                        <Button v-else icon="pi pi-star" class="mr-2 info-button" @click="makeFavorite(slotProps.data)" />
+                        <Button v-if="slotProps.data.favourite" icon="pi pi-star-fill"  class="mr-2 info-button" @click="makeFavourite(slotProps.data)" />
+                        <Button v-else icon="pi pi-star" class="mr-2 info-button" @click="makeFavourite(slotProps.data)" />
                     </template>
                 </Column>
 
@@ -90,9 +90,9 @@
                     </div>
                     
                         
-                    <div v-if="!myAddress.id" class="flex items-center">
-                        <input id="link-checkbox" type="checkbox" v-model="myAddress.favorite" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Mark this address as a favorite.</label>
+                    <div class="flex items-center">
+                        <input id="link-checkbox" type="checkbox" v-model="myAddress.favourite" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Mark this address as a favourite.</label>
                     </div>
                     
                     <div class="grid gap-3 md:grid-cols-1 justify-items-end">
@@ -152,7 +152,7 @@ export default {
                 town: '',
                 province: '',
                 country: '',
-                favorite: '',
+                favourite: '',
                 companyID: window.location.pathname.split('/').pop(),
             },
             selectedAddresses: [], 
@@ -173,15 +173,15 @@ export default {
     methods: {
         fetchAddresses() {
             let myCompanyId = window.location.pathname.split('/').pop();
-        axios.get('/addresses/' + myCompanyId)
-            .then(response => {
-                this.addresses = response.data.addresses;
-                
-            })
-            .catch(error => {
-                console.error('Error fetching addresses data:', error);
-            });
-    },
+            axios.get('/addresses/' + myCompanyId)
+                .then(response => {
+                    this.addresses = response.data.addresses;
+                    
+                })
+                .catch(error => {
+                    console.error('Error fetching addresses data:', error);
+                });
+        },
         openNew() {
             this.myAddress = {
                 address: '',
@@ -198,8 +198,8 @@ export default {
 
         saveMyAddress() {
             console.log("companyId: "+ this.myAddress.companyID)
-            if(this.myAddress.favorite == null) {
-                this.myAddress.favorite = false
+            if(this.myAddress.favourite == null) {
+                this.myAddress.favourite = false
             }
             if (!this.myAddress.id) {
                 axios.post('/address', this.myAddress)
@@ -221,7 +221,7 @@ export default {
         },
 
         editMyAddress(slotProps) {
-            console.log('edit: ' + slotProps.favorite)
+            
             
             this.myAddress.id = slotProps.id;
             this.myAddress.address = slotProps.address;
@@ -229,12 +229,20 @@ export default {
             this.myAddress.postCode = slotProps.postCode;
             this.myAddress.country = slotProps.country;
             this.myAddress.province = slotProps.province;
-            this.myAddress.favorite = slotProps.favorite;
+            this.updateFavoriteStatus(slotProps.favourite)
             this.addressDialog = true;
         },
 
+        updateFavoriteStatus(favourite) {
+            if (favourite == 1) {
+                this.myAddress.favourite = true;
+            } else {
+                this.myAddress.favourite = false;
+            }
+        },
+
+
         updateMyAddress() {
-            console.log("Update: " + this.myAddress.favorite)
 
             axios.put('/address/' + this.myAddress.id, this.myAddress)
 
@@ -250,10 +258,10 @@ export default {
             });
         },
 
-        makeFavorite(slotProps) {
+        makeFavourite(slotProps) {
             console.log(slotProps)
 
-            if (slotProps.favorite) {
+            if (slotProps.favourite) {
                 return alert("El telefono ya está seleccionado como favorito")
             }
 
@@ -273,7 +281,7 @@ export default {
             this.deleteAddressDialog = true;       
         },
         deleteMyAddress() {
-            const addressId = this.myAddress.id;
+            let addressId = this.myAddress.id;
 
             // Realizar la solicitud de eliminación al servidor
             axios.delete('/address/' + this.myAddress.id)

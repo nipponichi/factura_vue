@@ -17,10 +17,7 @@ class AddressController extends Controller
         $this->middleware(['can:create company'])->only('create');
         $this->middleware(['can:create company'])->only('store');
         $this->middleware(['can:read company'])->only('show');
-        $this->middleware(['can:update company'])->only('edit');
-        $this->middleware(['can:update company'])->only('makeFavorite');
-        $this->middleware(['can:update company'])->only('favoriteTrue');
-        $this->middleware(['can:update company'])->only('update');
+        $this->middleware(['can:update company'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
         $this->middleware(['can:delete company'])->only('destroy');
     }
     
@@ -29,23 +26,32 @@ class AddressController extends Controller
     {
         try {
 
+
             
             $addresses = DB::table('companies_addresses')
-            ->select('companies_addresses.id','companies_address_register.address', 'companies_country_register.country','companies_province_register.province',
-                'companies_town_register.town', 'companies_post_code_register.postCode', 'companies_addresses.favorite')
-            ->leftJoin('companies_address_register', 'companies_address_register.id', '=', 'companies_addresses.company_address_register_id')
-            ->leftJoin('companies_country_register', 'companies_country_register.id', '=', 'companies_addresses.company_country_register_id')
-            ->leftJoin('companies_province_register', 'companies_province_register.id', '=', 'companies_addresses.company_province_register_id')
-            ->leftJoin('companies_town_register', 'companies_town_register.id', '=', 'companies_addresses.company_town_register_id')
-            ->leftJoin('companies_post_code_register', 'companies_post_code_register.id', '=', 'companies_addresses.company_post_code_register_id')
+            ->select(
+                'companies_addresses.id',
+                'companies_address_register.address',
+                'companies_country_register.country',
+                'companies_province_register.province',
+                'companies_town_register.town',
+                'companies_post_code_register.postCode',
+                'companies_address_register.favourite'
+            )
+            ->leftJoin('companies_address_register', 'companies_addresses.id', '=', 'companies_address_register.company_addresses_id')
+            ->leftJoin('companies_country_register', 'companies_addresses.id', '=', 'companies_country_register.company_addresses_id')
+            ->leftJoin('companies_province_register', 'companies_addresses.id', '=', 'companies_province_register.company_addresses_id')
+            ->leftJoin('companies_town_register', 'companies_addresses.id', '=', 'companies_town_register.company_addresses_id')
+            ->leftJoin('companies_post_code_register', 'companies_addresses.id', '=', 'companies_post_code_register.company_addresses_id')
             ->where('companies_addresses.company_detail_id', $companyId)
-            ->where('companies_addresses.dt_end', null)
-            ->orderByDesc('companies_addresses.favorite')
+            ->orderByDesc('companies_address_register.favourite')
+            ->whereNull('companies_addresses.dt_end')
             ->get();
+
 
             return response()->json(['message' => 'all addresses', 'addresses' => $addresses], 200);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Error index addresses: ', 'addresses' => $addresses  . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error index addresses: '  . $e->getMessage()], 500);
         }
     }
 
@@ -55,70 +61,56 @@ class AddressController extends Controller
 
         
         try {
-            
-            // Insertar en la tabla companies
-            $newAddressId = DB::table('companies_address_register')->insertGetId([
-                'address' => $request->address,
-                'dt_start' => now(),
-            ]);
-            $newCountryId = DB::table('companies_country_register')->insertGetId([
-                'country' => $request->country,
-                'dt_start' => now(),
-            ]);
 
-            
-            $newTownId = DB::table('companies_town_register')->insertGetId([
-                'town' => $request->town,
+            $companyAddressId = DB::table('companies_addresses')->insertGetId([
                 'dt_start' => now(),
-            ]);
-
-            
-            $newPostCodeId = DB::table('companies_post_code_register')->insertGetId([
-                'postCode' => $request->postCode,
-                'dt_start' => now(),
-            ]);
-            $newProvinceId = DB::table('companies_province_register')->insertGetId([
-                'province' => $request->province,
-                'dt_start' => now(),
-            ]);
-
-            
-
-            $newCompanyAddressesId = DB::table('companies_addresses')->insertGetId([
-                'company_post_code_register_id' => $newPostCodeId,
-                'company_address_register_id' => $newAddressId,
-                'company_town_register_id' => $newTownId,
-                'company_country_register_id' => $newCountryId,
-                'company_province_register_id' => $newProvinceId,
-                'dt_start' => now(),
-                'favorite' => $request->favorite,
                 'company_detail_id' => $request->companyID,
             ]);
-
-            if ($request->favorite === true) {
-                $this->favoriteTrue($newCompanyAddressesId);
-            }
-
-
-            $addresses = DB::table('companies_addresses')
-            ->select('companies_addresses.id','companies_address_register.address', 'companies_country_register.country','companies_province_register.province',
-                'companies_town_register.town', 'companies_post_code_register.postCode', 'companies_addresses.favorite')
-            ->leftJoin('companies_address_register', 'companies_address_register.id', '=', 'companies_addresses.company_address_register_id')
-            ->leftJoin('companies_country_register', 'companies_country_register.id', '=', 'companies_addresses.company_country_register_id')
-            ->leftJoin('companies_province_register', 'companies_province_register.id', '=', 'companies_addresses.company_province_register_id')
-            ->leftJoin('companies_town_register', 'companies_town_register.id', '=', 'companies_addresses.company_town_register_id')
-            ->leftJoin('companies_post_code_register', 'companies_post_code_register.id', '=', 'companies_addresses.company_post_code_register_id')
-            ->where('companies_addresses.company_detail_id', $request->companyID)
-            ->where('companies_addresses.dt_end', null)
-            ->orderByDesc('companies_addresses.favorite')
-            ->get();
-
             
+            DB::table('companies_address_register')->insert([
+                'favourite' => $request->favourite,
+                'address' => $request->address,
+                'dt_start' => now(),
+                'company_addresses_id' => $companyAddressId,
+            
+            ]);
+
+            DB::table('companies_town_register')->insert([
+                'favourite' => $request->favourite,
+                'town' => $request->town,
+                'dt_start' => now(),
+                'company_addresses_id' => $companyAddressId,
+            ]);
+
+            DB::table('companies_province_register')->insert([
+                'favourite' => $request->favourite,
+                'province' => $request->province,
+                'dt_start' => now(),
+                'company_addresses_id' => $companyAddressId,
+            ]);
+
+            DB::table('companies_post_code_register')->insert([
+                'favourite' => $request->favourite,
+                'postCode' => $request->postCode,
+                'dt_start' => now(),
+                'company_addresses_id' => $companyAddressId,
+            ]);
+
+            DB::table('companies_country_register')->insert([
+                'favourite' => $request->favourite,
+                'country' => $request->country,
+                'dt_start' => now(),
+                'company_addresses_id' => $companyAddressId,
+            ]);
+
+            if ($request->favourite === true) {
+                $this->favouriteTrue($companyAddressId);
+            }
 
             DB::commit();
 
 
-            return response()->json(['message' => 'El addresses se ha creado correctamente', 'addresses' => $addresses]);
+            return response()->json(['message' => 'El addresses se ha creado correctamente']);
 
             
         } catch (Exception $e) {
@@ -128,86 +120,65 @@ class AddressController extends Controller
 
     }
 
-    public function update ($addressId, AddressRequest $request)
+    public function update ($companyAddressId, AddressRequest $request)
     {
+
         DB::beginTransaction();
         try {
-            
-             // Insertar en la tabla companies
-            $newAddressId = DB::table('companies_address_register')->insertGetId([
-                'address' => $request->address,
-                'dt_start' => now(),
-            ]);
-
-            $newCountryId = DB::table('companies_country_register')->insertGetId([
-                'country' => $request->country,
-                'dt_start' => now(),
-            ]);
-
-            
-            $newTownId = DB::table('companies_town_register')->insertGetId([
-                'town' => $request->town,
-                'dt_start' => now(),
-            ]);
-
-            
-            $newPostCodeId = DB::table('companies_post_code_register')->insertGetId([
-                'postCode' => $request->postCode,
-                'dt_start' => now(),
-            ]);
-            $newProvinceId = DB::table('companies_province_register')->insertGetId([
-                'province' => $request->province,
-                'dt_start' => now(),
-            ]);
-
-            $companyResult = DB::table('companies_addresses')
-            ->select('company_detail_id')
-            ->where('id', $addressId)
-            ->first(); 
-
-            if ($companyResult) {
-                $companyId = $companyResult->company_detail_id;
-            }
-
-            $newCompanyAddressesId = DB::table('companies_addresses')->insertGetId([
-                'company_post_code_register_id' => $newPostCodeId,
-                'company_address_register_id' => $newAddressId,
-                'company_town_register_id' => $newTownId,
-                'company_country_register_id' => $newCountryId,
-                'company_province_register_id' => $newProvinceId,
-                'dt_start' => now(),
-                'favorite' => $request->favorite,
-                'company_detail_id' => $companyId,
-            ]);
-
-            if ($request->favorite === true) {
-                $this->favoriteTrue($newCompanyAddressesId);
-            }
-
-            $address = DB::table('companies_addresses')
-            ->select('companies_addresses.id','companies_address_register.address', 'companies_country_register.country','companies_province_register.province',
-                'companies_town_register.town', 'companies_post_code_register.postCode', 'companies_addresses.favorite')
-            ->leftJoin('companies_address_register', 'companies_address_register.id', '=', 'companies_addresses.company_address_register_id')
-            ->leftJoin('companies_country_register', 'companies_country_register.id', '=', 'companies_addresses.company_country_register_id')
-            ->leftJoin('companies_province_register', 'companies_province_register.id', '=', 'companies_addresses.company_province_register_id')
-            ->leftJoin('companies_town_register', 'companies_town_register.id', '=', 'companies_addresses.company_town_register_id')
-            ->leftJoin('companies_post_code_register', 'companies_post_code_register.id', '=', 'companies_addresses.company_post_code_register_id')
-            ->where('companies_addresses.id', $newCompanyAddressesId)
-            ->where('companies_addresses.dt_end', null)
-            ->orderByDesc('companies_addresses.favorite')
-            ->get();
 
             DB::table('companies_addresses')
-            ->where('id', $addressId)
-            ->update([
-                'dt_end' => now(),
+            ->where('id', $companyAddressId)
+            ->update(['dt_end' => now()]);
+
+            $newCompanyAddressesId = DB::table('companies_addresses')->insertGetId([
+                'dt_start' => now(),
+                'company_detail_id' => $request->companyID,
             ]);
 
+             // Insertar en la tabla companies
+            DB::table('companies_address_register')->insert([
+                'address' => $request->address,
+                'company_addresses_id' => $newCompanyAddressesId,
+                'dt_start' => now(),
+            ]);
+
+            DB::table('companies_country_register')->insert([
+                'country' => $request->country,
+                'company_addresses_id' => $newCompanyAddressesId,
+                'dt_start' => now(),
+            ]);
+
+            
+            DB::table('companies_town_register')->insert([
+                'town' => $request->town,
+                'company_addresses_id' => $newCompanyAddressesId,
+                'dt_start' => now(),
+            ]);
+
+            
+            DB::table('companies_post_code_register')->insert([
+                'postCode' => $request->postCode,
+                'company_addresses_id' => $newCompanyAddressesId,
+                'dt_start' => now(),
+            ]);
+
+            DB::table('companies_province_register')->insert([
+                'province' => $request->province,
+                'company_addresses_id' => $newCompanyAddressesId,
+                'dt_start' => now(),
+            ]);
+
+            if ($request->favourite === true) {
+                $this->favouriteTrue($newCompanyAddressesId);
+            }
+
+            $this->dateEnd($companyAddressId);
+
             DB::commit();
-            return response()->json(['message' => 'update','email' => $address, 200]);
+            return response()->json(['message' => 'La dirección se ha modificado con éxito', 200]);
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error update '. $e->getMessage()], 500);
+            return response()->json(['message' => 'Error al modificar la direccion', $e->getMessage()], 500);
         }
     }
 
@@ -215,45 +186,42 @@ class AddressController extends Controller
     {
         DB::beginTransaction();
         try {
-            $companyResult = DB::table('companies_addresses')
-                ->select('company_detail_id')
-                ->where('id', $id)
-                ->whereNull('dt_end')
-                ->first(); 
-
-            if ($companyResult) {
-                $companyId = $companyResult->company_detail_id;
-            }
-            
-            $activeAddressesCount = DB::table('companies_addresses')
-                ->where('company_detail_id', $companyId)
-                ->whereNull('dt_end')
-                ->count();
-
-            if ($activeAddressesCount <=1) {
-                return response()->json(['message' => 'Debes tener al menos una dirección activo para poder eliminar.'], 400);
-            }
-
-            $companyFav = DB::table('companies_addresses')
-            ->select('favorite')
-            ->where('id', $id)
-            ->whereNull('dt_end')
-            ->first();
-            
-            if ($companyFav) {
-                $companyEmail = $companyFav->favorite;
-            }
-
-            if ($companyEmail) {
-                return response()->json(['message' => 'No puedes eliminar una dirección marcada como favorito.'], 400);
-            }
-
             DB::table('companies_addresses')
             ->where('id', $id)
             ->update([
                 'dt_end' => now(),
             ]);
+ 
+            $companyResult = DB::table('companies_addresses')
+            ->select([
+                'company_detail_id',
+            ])
+            ->where('id', $id)
+            ->first();
 
+            $activeAddressesCount = DB::table('companies_addresses')
+            ->where('company_detail_id', $companyResult->company_detail_id)
+            ->whereNull('dt_end')
+            ->count();
+
+            if ($activeAddressesCount == 0) {
+                DB::rollback();
+                return response()->json(['message' => 'Debes tener al menos una dirección activo para poder eliminar.'], 400);
+            }
+
+            $companyFav = DB::table('companies_address_register')
+            ->select('favourite')
+            ->where('company_addresses_id', $id)
+            ->first();
+            
+
+            if ($companyFav->favourite) {
+                DB::rollback();
+                return response()->json(['message' => 'No puedes eliminar una dirección marcada como favorito.'], 400);
+            }
+            
+            $this->dateEnd($id);
+            
             DB::commit();
             return response()->json(['message' => 'Se ha eliminado la dirección con éxito']);
         } catch (Exception $e) {
@@ -262,39 +230,77 @@ class AddressController extends Controller
         }
     }
 
-    public function makeFavorite($id) {
+    public function makeFavourite($companyAddressesId) {
         try {
             
-            $this->favoriteTrue($id);
+            $this->favouriteTrue($companyAddressesId);
             
-            return response()->json(['message' => 'make favorite',], 200);
+            return response()->json(['message' => 'make favourite'], 200);
         } catch (Exception $e) {
             return response()->json(['message' => 'Error al seleccionar teléfono favorito '.$e->getMessage()], 500);
         }
     }
 
-    public function favoriteTrue($id){
-        $companyResult = DB::table('companies_addresses')
-        ->select('company_detail_id')
-        ->where('companies_addresses.id', $id)
-        ->whereNull('dt_end')
-        ->first(); 
+    public function favouriteTrue($newFavoriteCompanyAddressesId){
 
-        if ($companyResult) {
-            $companyId = $companyResult->company_detail_id;
+        $companyDetail = DB::table('companies_addresses')
+        ->select([
+            'company_detail_id',
+        ])
+        ->where('id', $newFavoriteCompanyAddressesId)
+        ->first();
+        
+        // Obtener todas las IDs de direcciones de la empresa
+        $companyAddressesIds = DB::table('companies_addresses')
+            ->select('id')
+            ->where('company_detail_id', $companyDetail->company_detail_id)
+            ->get();
+
+        // Tablas a actualizar
+        $tablesToUpdate = [
+            'companies_address_register',
+            'companies_province_register',
+            'companies_country_register',
+            'companies_town_register',
+            'companies_post_code_register'
+        ];
+
+        // Desmarcar todas las direcciones como favoritas
+        foreach ($companyAddressesIds as $addressId) {
+            foreach ($tablesToUpdate as $table) {
+                DB::table($table)
+                    ->where('company_addresses_id', $addressId->id)
+                    ->update(['favourite' => false]);
+            }
         }
 
-        DB::table('companies_addresses')
-        ->where('company_detail_id', $companyId)
-        ->update([
-            'favorite' => 0,
-        ]);
+        // Marcar la nueva dirección como favorita en todas las tablas
+        foreach ($tablesToUpdate as $table) {
+            DB::table($table)
+                ->where('company_addresses_id', $newFavoriteCompanyAddressesId)
+                ->update(['favourite' => true]);
+        }
+        
+    }
 
-        DB::table('companies_addresses')
-        ->where('companies_addresses.id', $id)
-        ->update([
-            'favorite' => 1,
-        ]);
+    public function dateEnd($oldCompanyAddressesId){
+
+        // Tablas a actualizar
+        $tablesToUpdate = [
+            'companies_address_register',
+            'companies_province_register',
+            'companies_country_register',
+            'companies_town_register',
+            'companies_post_code_register'
+        ];
+
+        // Desmarcar todas las direcciones como favoritas
+        foreach ($tablesToUpdate as $table) {
+            DB::table($table)
+                ->where('company_addresses_id', $oldCompanyAddressesId)
+                ->update(['dt_end' => now()]);
+        }
+        
     }
 
 }

@@ -9,15 +9,14 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('companies_detail', function (Blueprint $table) {
+        Schema::create('companies_name_register', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('company_detail_id')->constrained('companies_detail');
             $table->string('name');
-            $table->tinyInteger('verified')->default(0);
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
-            $table->foreignId('company_id')->constrained();
         });
     }
 
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('companies_details');
+        Schema::dropIfExists('companies_name_register');
     }
 };

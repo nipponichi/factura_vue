@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('companies_customers', function (Blueprint $table) {
             $table->foreignId('company_id_company')->constrained();
             $table->foreignId('company_id_customer')->constrained();
+            $table->tinyInteger('isConsulting')->default(false);
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
-            $table->tinyInteger('isConsulting')->default(false);
         });
     }
 

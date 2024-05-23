@@ -34,8 +34,8 @@
                 <Column :exportable="false"  header="Favourite" class="dateTable w-24 text-center">
             
                     <template #body="slotProps">
-                        <Button v-if="slotProps.data.favorite" icon="pi pi-star-fill"  class="mr-2 info-button" @click="makeFavorite(slotProps.data)" />
-                        <Button v-else icon="pi pi-star" class="mr-2 info-button" @click="makeFavorite(slotProps.data)" />
+                        <Button v-if="slotProps.data.favourite" icon="pi pi-star-fill"  class="mr-2 info-button" @click="makeFavourite(slotProps.data)" />
+                        <Button v-else icon="pi pi-star" class="mr-2 info-button" @click="makeFavourite(slotProps.data)" />
                     </template>
                 </Column>
 
@@ -50,7 +50,7 @@
                     </Column>
                 </div>
 
-     
+    
                 
             </DataTable>
         </div>
@@ -65,8 +65,8 @@
                         <input type="tel" id="phone" v-model="myPhone.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Phone" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
                     </div>
                     <div v-if="!myPhone.id" class="flex items-center">
-                        <input id="link-checkbox" type="checkbox" v-model="myPhone.favorite" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Mark this phone number as a favorite.</label>
+                        <input id="link-checkbox" type="checkbox" v-model="myPhone.favourite" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Mark this phone number as a favourite.</label>
                     </div>
                     </div>
                     <div class="grid gap-3 md:grid-cols-1 justify-items-end">
@@ -122,7 +122,7 @@ export default {
             myPhone: { 
                 id: '',             
                 phone: '',
-                favorite: '',
+                favourite: '',
                 isMobile: 0,
                 companyID: window.location.pathname.split('/').pop(),
             },
@@ -169,8 +169,8 @@ export default {
 
         saveMyPhone() {
             console.log("companyId: "+ this.myPhone.companyID)
-            if(this.myPhone.favorite == null) {
-                this.myPhone.favorite = false
+            if(this.myPhone.favourite == null) {
+                this.myPhone.favourite = false
             }
             this.myPhone.isMobile = 0;
             if (!this.myPhone.id) {
@@ -193,18 +193,18 @@ export default {
         },
 
         editMyPhone(slotProps) {
-            console.log('edit: ' + slotProps.favorite)
+            console.log('edit: ' + slotProps.favourite)
             
                 this.myPhone.phone = slotProps.phone;
                 this.myPhone.id = slotProps.id;
-                this.myPhone.favorite = slotProps.favorite;
+                this.myPhone.favourite = slotProps.favourite;
                 this.phoneDialog = true;
 
 
         },
 
         updateMyPhone() {
-            console.log("Update: " + this.myPhone.favorite)
+            console.log("Update: " + this.myPhone.favourite)
 
             axios.put('/phone/' + this.myPhone.id, this.myPhone)
             .then(response => {
@@ -219,9 +219,9 @@ export default {
             });
         },
 
-        makeFavorite(slotProps) {
+        makeFavourite(slotProps) {
 
-            if (slotProps.favorite) {
+            if (slotProps.favourite) {
                 return alert("El telefono ya está seleccionado como favorito")
             }
 

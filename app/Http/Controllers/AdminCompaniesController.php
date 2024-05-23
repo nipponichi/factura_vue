@@ -572,6 +572,14 @@ class AdminCompaniesController extends Controller
             ]);
             DB::commit();
 
+            // "Elimina" las relaciones de la compañia
+            DB::table('invoices')
+            ->where('company_id_company', $oldCompanyId)
+            ->update([
+                'dt_end' => now(),
+                'isConsulting' => false
+            ]);
+
             return response()->json(['message' => 'La compañia se ha modificado correctamente.'], 200);
         } catch (Exception $e) {
             DB::rollBack();

@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies_invoice_design', function (Blueprint $table) {
-            $table->id(); 
-            $table->string('configuration');
+        Schema::create('companies_tax_number_register', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('company_detail_id')->constrained('companies_detail');
+            $table->string('tax_number');
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
         });
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users_role');
+        Schema::dropIfExists('companies_tax_number_register');
     }
 };
