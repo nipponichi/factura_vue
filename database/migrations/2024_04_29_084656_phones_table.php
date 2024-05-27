@@ -11,12 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('products_price_register', function (Blueprint $table) {
-            $table->decimal('price');
+        Schema::create('phones', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('company_id')->constrained('companies');
+            $table->string('phone');
+            $table->boolean('favourite')->default (false);
+            $table->boolean('isMobile')->default (false);
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
-            $table->foreignId('product_detail_id')->constrained('products_detail');
-        });  
+        });
     }
 
     /**
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('products_price_register');
+        Schema::dropIfExists('phones');
     }
 };

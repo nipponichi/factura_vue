@@ -22,9 +22,9 @@ class EmailController extends Controller
     public static function index($companyId)
     {
         try {
-            $emails = DB::table('companies_email_register')
+            $emails = DB::table('emails')
                 ->select('id','email', 'favourite')
-                ->where('company_detail_id', $companyId)
+                ->where('company_id', $companyId)
                 ->whereNull('dt_end')
                 ->orderByDesc('favourite')
                 ->get();
@@ -47,30 +47,30 @@ class EmailController extends Controller
         DB::beginTransaction();
         try {
             
-            $companyResult = DB::table('companies_email_register')
-            ->select('company_detail_id')
+            $companyResult = DB::table('emails')
+            ->select('company_id')
             ->where('id', $emailId)
             ->first();
 
             if ($companyResult) {
-                $companyId = $companyResult->company_detail_id;
+                $companyId = $companyResult->company_id;
             }
 
 
-            $newEmailId = DB::table('companies_email_register')->insertGetId([
+            $newEmailId = DB::table('emails')->insertGetId([
                 'email' => $request->email,
                 'dt_start' => now(),
                 'favourite' => $request->favourite,
-                'company_detail_id' => $companyId,
+                'company_id' => $companyId,
             ]);
 
-            $email = DB::table('companies_email_register')
-            ->select('id','company_detail_id', 'favourite')
+            $email = DB::table('emails')
+            ->select('id','company_id', 'favourite')
             ->where('id', $newEmailId)
             ->whereNull('dt_end')
             ->first();
 
-            DB::table('companies_email_register')
+            DB::table('emails')
             ->where('id', $emailId)
             ->update([
                 'dt_end' => now(),
@@ -91,19 +91,19 @@ class EmailController extends Controller
         try {
             
             // Insertar en la tabla companies
-            $newEmailId = DB::table('companies_email_register')->insertGetId([
+            $newEmailId = DB::table('emails')->insertGetId([
                 'email' => $request->email,
                 'dt_start' => now(),
                 'favourite' => $request->favourite,
-                'company_detail_id' => $request->companyID,
+                'company_id' => $request->companyID,
             ]);
 
             if ($request->favourite === true) {
                 $this->favouriteTrue($newEmailId);
             }
 
-            $email = DB::table('companies_email_register')
-            ->select('email','id','company_detail_id', 'favourite')
+            $email = DB::table('emails')
+            ->select('email','id','company_id', 'favourite')
             ->where('id', $newEmailId)
             ->whereNull('dt_end')
             ->first();
@@ -124,18 +124,18 @@ class EmailController extends Controller
     {
         DB::beginTransaction();
         try {
-            $companyResult = DB::table('companies_email_register')
-                ->select('company_detail_id')
+            $companyResult = DB::table('emails')
+                ->select('company_id')
                 ->where('id', $id)
                 ->whereNull('dt_end')
                 ->first();
 
             if ($companyResult) {
-                $companyId = $companyResult->company_detail_id;
+                $companyId = $companyResult->company_id;
             }
             
-            $activeEmailsCount = DB::table('companies_email_register')
-                ->where('company_detail_id', $companyId)
+            $activeEmailsCount = DB::table('emails')
+                ->where('company_id', $companyId)
                 ->whereNull('dt_end')
                 ->count();
 
@@ -143,7 +143,7 @@ class EmailController extends Controller
                 return response()->json(['message' => 'Debes tener al menos un email activo para poder eliminar.'], 400);
             }
 
-            $companyFav = DB::table('companies_email_register')
+            $companyFav = DB::table('emails')
             ->select('favourite')
             ->where('id', $id)
             ->whereNull('dt_end')
@@ -157,7 +157,7 @@ class EmailController extends Controller
                 return response()->json(['message' => 'No puedes eliminar un email marcado como favorito.'], 400);
             }
 
-            DB::table('companies_email_register')
+            DB::table('emails')
             ->where('id', $id)
             ->update([
                 'dt_end' => now(),
@@ -183,23 +183,23 @@ class EmailController extends Controller
     }
 
     public function favouriteTrue($id){
-        $companyResult = DB::table('companies_email_register')
-        ->select('company_detail_id')
+        $companyResult = DB::table('emails')
+        ->select('company_id')
         ->where('id', $id)
         ->whereNull('dt_end')
         ->first();
 
         if ($companyResult) {
-            $companyId = $companyResult->company_detail_id;
+            $companyId = $companyResult->company_id;
         }
 
-        DB::table('companies_email_register')
-        ->where('company_detail_id', $companyId)
+        DB::table('emails')
+        ->where('company_id', $companyId)
         ->update([
             'favourite' => 0,
         ]);
 
-        DB::table('companies_email_register')
+        DB::table('emails')
         ->where('id', $id)
         ->update([
             'favourite' => 1,

@@ -4,7 +4,7 @@
             <Toolbar class="mb-4 border border-slate-200 ...">
                 <template #start>
                     <Button label="New" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
-                    <Button label="Delete" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedAdminUsers || !selectedAdminUsers.length" />
+                    <Button label="Change Status" icon="pi pi-cog" class="status-button" @click="confirmDeleteSelected" :disabled="!selectedAdminUsers || !selectedAdminUsers.length" />
                 </template>
             </Toolbar>
 
@@ -32,7 +32,7 @@
                 <Column field="name" header="Username" sortable class="dateTable"></Column>
                 <Column field="email" header="Email" sortable class="dateTable"></Column>
                 <Column field="role_type" header="Role" sortable class="dateTable"></Column>
-                <Column field="active" header="Active" sortable class="dateTable">
+                <Column field="active" header="Status" sortable class="dateTable">
                     <template #body="slotProps">
                         <template v-if="slotProps.data.active === null">
                             <Button icon="pi pi-check" outlined rounded class="mr-2 info-active" severity="danger" @click="changeUserState(slotProps.data)"/>
@@ -386,12 +386,14 @@ export default {
             this.selectedAdminUsers.forEach(myUser => {
             axios.delete('/admin-users/' + myUser.id)
                 .then(response => {
-                    this.fecthUsers()
+                    
                 })
                 .catch(error => {
-                console.error('Error al eliminar el producto:', error);
+                    console.error('Error al eliminar el producto:', error);
+                    this.deleteUsersDialog = false;
                 });
             });
+            this.fecthUsers()
             this.deleteUsersDialog = false;
         },
 
@@ -431,8 +433,8 @@ export default {
         padding: 8px;
         font-size:15px;
     }
-    .danger-button {
-        background-color:rgb(239, 68, 68);
+    .status-button {
+        background-color:rgb(129, 27, 247);
         color: #ffffff;
         font-size:15px;
         padding: 8px;

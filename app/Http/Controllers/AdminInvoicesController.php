@@ -9,14 +9,14 @@ class AdminInvoicesController extends Controller
 {
 
     public function __construct()
-    {       
+    {
         $this->middleware(function ($request, $next) {
             if (!auth()->user()->hasRole('admin')) {
                 abort(403, 'No tienes permiso para acceder a esta página.');
             }
             
             return $next($request);
-        });   
+        });
     }
     /**
      * Display a listing of the resource.

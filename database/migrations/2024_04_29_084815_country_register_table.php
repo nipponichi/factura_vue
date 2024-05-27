@@ -11,14 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        
-        Schema::create('invoices_details', function (Blueprint $table) {
+        Schema::create('countries', function (Blueprint $table) {
             $table->id();
-            $table->decimal('tax');
-            $table->decimal('subtotal');
-            $table->dateTime('dt_start')->useCurrent();
-            $table->dateTime('dt_end')->nullable();
-            $table->foreignId('invoice_id')->constrained();
+            $table->string('country');
         });
     }
 
@@ -27,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('invoices_details');
+        Schema::dropIfExists('countries');
     }
 };

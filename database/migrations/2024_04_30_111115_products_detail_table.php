@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('products_detail', function (Blueprint $table) {
+        Schema::create('products_details', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->integer('stock')->nullable();
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
             $table->foreignId('product_id')->constrained();
-        });    
+        });
     }
 
     /**
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('products_detail');
+        Schema::dropIfExists('products_details');
     }
 };

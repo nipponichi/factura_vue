@@ -29,6 +29,7 @@ Route::middleware([
     Route::resource('/invoices', InvoiceController::class);
     Route::resource('/customer', CustomerController::class);
     Route::get('/customers/{id}', [CustomerController::class, 'index']);
+    Route::get('/customers/{companyID}/{customerID}', [CustomerController::class, 'show']);
     Route::put('/phones/{id}', [PhoneController::class, 'makeFavourite']);
     Route::get('/phones/{id}', [PhoneController::class, 'index']);
     Route::resource('/phone', PhoneController::class);

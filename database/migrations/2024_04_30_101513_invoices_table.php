@@ -21,7 +21,7 @@ return new class extends Migration
             $table->String('type');
             $table->boolean('paid')->default (false);
             $table->boolean('active')->default (false);
-            $table->foreignId('company_invoice_design_id')->constrained('companies_invoice_design');
+            $table->foreignId('invoice_designs_id')->constrained('invoices_designs');
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->useCurrent();
         });

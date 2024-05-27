@@ -28,9 +28,9 @@
                 </template>
 
                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox" ></Column>
-                <Column field="userEmail" header="User Account" sortable class="dateTable"></Column>
+                <Column field="user_email" header="User Account" sortable class="dateTable"></Column>
                 <Column field="name" header="Company name" sortable class="dateTable"></Column>
-                <Column field="taxNumber" header="Tax Number" sortable class="dateTable"></Column>
+                <Column field="tax_number" header="Tax Number" sortable class="dateTable"></Column>
                 <Column field="phone" header="Phone" sortable class="dateTable"></Column>
                 <Column field="email" header="Email" sortable class="dateTable"></Column>
         
@@ -75,8 +75,8 @@
                         <input type="text" id="name" v-model="productos.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Company name" required />
                     </div>
                     <div>
-                        <label for="taxNumber" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tax number</label>
-                        <input type="text" id="taxNumber" v-model="productos.taxNumber" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Tax number" required />
+                        <label for="tax_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tax number</label>
+                        <input type="text" id="tax_number" v-model="productos.tax_number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Tax number" required />
                     </div>
                 </div>
                 <div v-if="!productos.id">
@@ -93,8 +93,8 @@
                             <input type="text" id="province" v-model="productos.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Province" required />
                         </div>  
                         <div>
-                            <label for="postCode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Post code</label>
-                            <input type="text" id="postCode" v-model="productos.postCode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Post code" pattern="^\d+$" required />
+                            <label for="post_code" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Post code</label>
+                            <input type="text" id="post_code" v-model="productos.post_code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Post code" pattern="^\d+$" required />
                         </div>
                         <div>
                             <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
@@ -205,16 +205,16 @@ export default {
             
             productos: { // Aquí almacenas los datos del producto que se va a crear/editar
                 name: '',
-                taxNumber: '',
+                tax_number: '',
                 email: '',
                 phone: '',
                 address: '',
-                postCode: '',
+                post_code: '',
                 town: '',
                 province: '',
                 country: '',
                 user_id: '',
-                userEmail: ''
+                user_email: ''
             },
             selectedUser: null,
             selectedProducts: [], // Almacena los productos seleccionados para borrado en grupo
@@ -242,11 +242,7 @@ export default {
             
             axios.get('/admin-reload-users')
                 .then(response => {
-                    this.users = response.data.users;
-
-                    console.log("usuarios " + response.data.users)
-                    
-                    
+                    this.users = response.data.users;                    
                 })
                 .catch(error => {
                     console.error('Error fetching phone data:', error);
@@ -258,8 +254,6 @@ export default {
             axios.get('/admin-reload-companies')
                 .then(response => {
                     this.products = response.data.companies;
-                    console.log("usuarios " + response.data.companies)
-                    
                 })
                 .catch(error => {
                     console.error('Error fetching phone data:', error);
@@ -318,9 +312,8 @@ export default {
             this.productos.id = slotProduct.id;
             this.productos.user_id = slotProduct.user_id;
             this.productos.name = slotProduct.name;
-            this.productos.userEmail = slotProduct.userEmail;
-            this.productos.taxNumber = slotProduct.taxNumber;
-            const selectedUser = this.users.find(user => user.email === slotProduct.userEmail);
+            this.productos.tax_number = slotProduct.tax_number;
+            const selectedUser = this.users.find(user => user.email === slotProduct.user_email);
             this.selectedUser = selectedUser;     
         },
 
@@ -342,45 +335,57 @@ export default {
         },        
 
         confirmDeleteProduct(productos) {
-            console.log("Confirm deletee");
             this.product = productos;
             this.deleteProductDialog = true;       
         },
 
         deleteProduct() {
-            console.log("DELETE")
-            this.products = this.products.filter(val => val.id !== this.product.id);
-            this.deleteProductDialog = false;
 
-            console.log(this.product.id);
+            axios.delete('/admin-companies/' + this.product.id)
+                .then(response => { 
+                    
+                    // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
+                    this.products = this.products.filter(val => val.id !== this.productos);
 
-            axios.delete('/'+ this.$page.props.type+ '/'+ this.product.id)
-                .then(response => { console.log(response)})
-                .catch(error => { console.log(error.response)})
+                    // Limpiar el objeto myEmail después de la eliminación exitosa
+                    this.productos = {};
+
+                    // Cerrar el diálogo de eliminación de teléfono
+                    this.deleteEmailDialog = false;
                 
-            this.product = {};
+                })
+                .catch(error => {
+                    console.log(error.response)
+                    this.deleteProductDialog = false;
+                })
+                
+            
         },
         
         confirmDeleteSelected() {
-            console.log("CONFIRM DELETE SELECTED")
             this.deleteProductsDialog = true;
         },
         
         deleteSelectedProducts() {
+
             // Envía una solicitud de eliminación para cada producto seleccionado
             this.selectedProducts.forEach(productos => {
-            axios.delete('/' + this.$page.props.type + '/' + productos.id)
+            axios.delete('/admin-companies/' + productos.id)
                 .then(response => {
-                console.log('Producto eliminado:', productos.id);
-                // Elimina el producto de la lista de productos
-                this.products = this.products.filter(p => p.id !== productos.id);
+
+
+                    // Solo elimina la compañía de la lista si la solicitud DELETE tiene éxito
+                    this.products = this.products.filter(val => val.id !== this.productos);
+
                 })
                 .catch(error => {
                 console.error('Error al eliminar el producto:', error);
+                this.deleteProductsDialog = false;
                 });
             });
             this.selectedProducts = [];
             this.deleteProductsDialog = false;
+            
         },
 
 

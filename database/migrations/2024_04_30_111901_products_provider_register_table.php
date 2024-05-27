@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         
-        Schema::create('products_provider_register', function (Blueprint $table) {    
+        Schema::create('products_providers', function (Blueprint $table) {
             $table->string('provider');
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
-            $table->foreignId('product_detail_id')->constrained('products_detail');
-        });  
+            $table->foreignId('product_detail_id')->constrained('products_details');
+        });
     }
 
     /**
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('products_provider_register');
+        Schema::dropIfExists('products_providers');
     }
 };

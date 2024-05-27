@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\CustomerRequest;
+use App\Http\Requests\CustomerHeadRequest;
 use App\Models\Company;
 use Exception;
 use Illuminate\Support\Facades\Redirect;
@@ -28,52 +29,48 @@ class CustomerController extends Controller
     public static function index(string $companyId)
     {
         try {
-
             $companies = DB::table('companies')
             ->select(
+                
+                'companies.id',
                 'companies.dt_end',
-                'companies_tax_number_register.tax_number',
-                'companies_name_register.name',
-                'companies_email_register.email',
-                'companies_phone_register.phone',
-                'companies_country_register.country',
-                'companies_town_register.town',
-                'companies_post_code_register.postCode',
-                'companies_province_register.province',
-                'companies_address_register.address'
+                'companies_tax_numbers.tax_number',
+                'companies_names.name',
+                'emails.email',
+                'phones.phone',
+                'addresses.address',
+                'addresses.town',
+                'addresses.province',
+                'addresses.post_code',
+                'addresses.country',
+                'companies_users.user_id',
+                'users.email as user_email'
             )
-            ->leftJoin('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
-            ->leftJoin('companies_name_register', 'companies_detail.id', '=', 'companies_name_register.company_detail_id')
-            ->leftJoin('companies_tax_number_register', 'companies_detail.id', '=', 'companies_tax_number_register.company_detail_id')
-            ->leftJoin('companies_email_register', 'companies_detail.id', '=', 'companies_email_register.company_detail_id')
-            ->leftJoin('companies_phone_register', 'companies_detail.id', '=', 'companies_phone_register.company_detail_id')
-            ->leftJoin('companies_addresses', 'companies_detail.id', '=', 'companies_addresses.company_detail_id')
-            ->leftJoin('companies_town_register', 'companies_addresses.id', '=', 'companies_town_register.company_addresses_id')
-            ->leftJoin('companies_country_register', 'companies_addresses.id','=', 'companies_country_register.company_addresses_id')
-            ->leftJoin('companies_province_register', 'companies_addresses.id', '=', 'companies_province_register.company_addresses_id')
-            ->leftJoin('companies_post_code_register', 'companies_addresses.id', '=', 'companies_post_code_register.company_addresses_id')
-            ->leftJoin('companies_address_register', 'companies_addresses.id', '=', 'companies_address_register.company_addresses_id')
+    
+            ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
+            ->leftJoin('users', 'users.id', '=', 'companies_users.user_id')
+            ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
+            ->leftJoin('companies_tax_numbers', 'companies.id', '=', 'companies_tax_numbers.company_id')
+            ->leftJoin('emails', 'companies.id', '=', 'emails.company_id')
+            ->leftJoin('phones', 'companies.id', '=', 'phones.company_id')
+            ->leftJoin('addresses', 'companies.id', '=', 'addresses.company_id')
+            ->where('addresses.favourite', 1)
+            ->where('phones.favourite', 1)
+            ->where('emails.favourite', 1)
+            ->whereNull('companies_users.dt_end')
+            ->whereNull('companies_names.dt_end')
+            ->whereNull('companies_tax_numbers.dt_end')
+            ->whereNull('addresses.dt_end')
+            ->whereNull('phones.dt_end')
+            ->whereNull('emails.dt_end')
             ->whereIn('companies.id', function ($query) use ($companyId) {
                 $query->select('company_id_customer')
                     ->from('companies_customers')
                     ->where('company_id_company', $companyId)
                     ->where('dt_end', null);
-
             })
-            
-            ->where('companies_town_register.favourite', 1)
-            ->where('companies_country_register.favourite', 1)
-            ->where('companies_province_register.favourite', 1)
-            ->where('companies_post_code_register.favourite', 1)
-            ->where('companies_address_register.favourite', 1)
-            ->where('companies_phone_register.favourite', 1)
-            ->where('companies_email_register.favourite', 1)
-            ->whereNull('companies_name_register.dt_end')
-            ->whereNull('companies_tax_number_register.dt_end')
-            ->whereNull('companies_addresses.dt_end')
-            ->whereNull('companies_phone_register.dt_end')
-            ->whereNull('companies_email_register.dt_end')
             ->get();
+
 
             return response()->json(['message' => 'Companies: ', $companies], 200);
         } catch (Exception $e) {
@@ -101,84 +98,53 @@ class CustomerController extends Controller
         try {
             $companyId = DB::table('companies')->insertGetId([
                 'dt_start' => now(),
-                'user_id' => 1,
             ]);
 
-            // Insertar en la tabla companies_detail
-            $companyDetailId = DB::table('companies_detail')->insertGetId([
+            DB::table('companies_users')->insert ([
+                'user_id' => 1,
                 'company_id' => $companyId,
                 'dt_start' => now(),
             ]);
 
+
             // Insertar en la tabla companies
-            DB::table('companies_tax_number_register')->insert([
+            DB::table('companies_tax_numbers')->insert([
                 'tax_number' => $request->tax_number,
-                'company_detail_id' => $companyDetailId,
+                'company_id' => $companyId,
                 'dt_start' => now(),
             ]);
 
-            DB::table('companies_name_register')->insert([
+            DB::table('companies_names')->insert([
                 'name' => $request->name,
-                'company_detail_id' => $companyDetailId,
+                'company_id' => $companyId,
                 'dt_start' => now(),
             ]);
 
             // Insertar en la tabla companies_email_register
-            DB::table('companies_email_register')->insert([
+            DB::table('emails')->insert([
                 'email' => $request->email,
                 'favourite' =>true,
                 'dt_start' => now(),
-                'company_detail_id' => $companyDetailId,
+                'company_id' => $companyId,
             ]);
 
             // Insertar en la tabla companies_phone_register
-            DB::table('companies_phone_register')->insert([
+            DB::table('phones')->insert([
                 'phone' => $request->phone,
                 'favourite' =>true,
                 'dt_start' => now(),
-                'company_detail_id' => $companyDetailId,
+                'company_id' => $companyId,
             ]);
 
-            $companyAddressId = DB::table('companies_addresses')->insertGetId([
-                'dt_start' => now(),
-                'company_detail_id' => $companyDetailId,
-            ]);
-
-            
-            DB::table('companies_address_register')->insert([
-                'favourite' => true,
+            DB::table('addresses')->insertGetId([
                 'address' => $request->address,
-                'dt_start' => now(),
-                'company_addresses_id' => $companyAddressId,
-            
-            ]);
-
-            DB::table('companies_town_register')->insert([
-                'favourite' => true,
                 'town' => $request->town,
-                'dt_start' => now(),
-                'company_addresses_id' => $companyAddressId,
-            ]);
-
-            DB::table('companies_province_register')->insert([
-                'favourite' => true,
                 'province' => $request->province,
-                'dt_start' => now(),
-                'company_addresses_id' => $companyAddressId,
-            ]);
-
-            DB::table('companies_post_code_register')->insert([
-                'favourite' => true,
-                'postCode' => $request->postCode,
-                'dt_start' => now(),
-                'company_addresses_id' => $companyAddressId,
-            ]);
-
-            DB::table('companies_country_register')->insert([
-                'favourite' => true,
+                'post_code' => $request->post_code,
                 'country' => $request->country,
+                'favourite' => true,
                 'dt_start' => now(),
-                'company_addresses_id' => $companyAddressId,
+                'company_id' => $companyId,
             ]);
 
 
@@ -204,46 +170,74 @@ class CustomerController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($companyId, $customerId)
     {
-        
         try {
 
-            $companies = Company::select(
+            $userId = Auth::id();
+            $user = Auth::user();
+            
+
+            $currentUserId = DB::table('companies_users')
+            ->select([
+                'user_id'
+            ])
+            ->where('company_id', $companyId)
+            ->first();
+
+
+            // Verificar si el usuario es el propietario de la empresa o tiene el rol de administrador
+            if ($userId != $currentUserId->user_id && !$user->hasRole('admin')) {
+                return Redirect::route('companies.index')->with('error', 'No se encontró el cliente');
+            }
+        
+            $companies = DB::table('companies')
+            ->select(
                 'companies.id',
-                'companies.taxNumber',
-                'companies_detail.name',
-                'companies_email_register.email',
-                'companies_town_register.town',
-                'companies_country_register.country',
-                'companies_province_register.province',
-                'companies_post_code_register.postCode',
-                'companies_phone_register.phone',
-                'companies_address_register.address'
+                'companies.dt_end',
+                'companies_tax_numbers.tax_number',
+                'companies_names.name',
+                'emails.email',
+                'phones.phone',
+                'addresses.country',
+                'addresses.town',
+                'addresses.post_code',
+                'addresses.province',
+                'addresses.address'
             )
-            ->leftJoin('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
-            ->leftJoin('companies_email_register', 'companies_detail.id', '=', 'companies_email_register.company_detail_id')
-            ->leftJoin('companies_addresses as addr_detail', 'companies_detail.id', '=', 'addr_detail.id')
-            ->leftJoin('companies_town_register', 'addr_detail.company_town_register_id', '=', 'companies_town_register.id')
-            ->leftJoin('companies_country_register', 'addr_detail.company_country_register_id', '=', 'companies_country_register.id')
-            ->leftJoin('companies_province_register', 'addr_detail.company_province_register_id', '=', 'companies_province_register.id')
-            ->leftJoin('companies_post_code_register', 'addr_detail.company_post_code_register_id', '=', 'companies_post_code_register.id')
-            ->leftJoin('companies_address_register', 'addr_detail.company_address_register_id', '=', 'companies_address_register.id')
-            ->leftJoin('companies_phone_address', 'addr_detail.id', '=', 'companies_phone_address.companies_addresses_id')
-            ->leftJoin('companies_phone_register', 'companies_phone_address.companies_phone_register_id', '=', 'companies_phone_register.id')
-            ->whereIn('companies.id', function ($query) use ($id) {
+            ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
+            ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
+            ->leftJoin('companies_tax_numbers', 'companies.id', '=', 'companies_tax_numbers.company_id')
+            ->leftJoin('emails', 'companies.id', '=', 'emails.company_id')
+            ->leftJoin('phones', 'companies.id', '=', 'phones.company_id')
+            ->leftJoin('addresses', 'companies.id', '=', 'addresses.company_id')
+
+            ->where('companies.id', $customerId)
+            ->where('addresses.favourite', 1)
+            ->where('phones.favourite', 1)
+            ->where('emails.favourite', 1)
+            ->whereIn('companies.id', function ($query) use ($companyId) {
                 $query->select('company_id_customer')
                     ->from('companies_customers')
-                    ->where('company_id_company', $id);
+                    ->where('company_id_company', $companyId)
+                    ->where('dt_end', null);
             })
-            ->get();
             
-            
-            return response()->json(['message' => 'Companies: ', $companies], 200);
-        } catch (Exception $e) {
-            return response()->json(['message' => 'Error index companies: ' . $e->getMessage()], 500);
-        }
 
+            ->whereNull('companies_names.dt_end')
+            ->whereNull('companies_tax_numbers.dt_end')
+            ->whereNull('addresses.dt_end')
+            ->whereNull('phones.dt_end')
+            ->whereNull('emails.dt_end')
+            ->first();
+
+            
+            return Inertia::render('Customers/Show', ['company' => $companies]);
+            
+        }catch (Exception $e) {
+                
+            return response()->json(['message' => 'Cliente no encontrada ', $e->getMessage()], 500);
+        }
 
     }
 
@@ -253,69 +247,73 @@ class CustomerController extends Controller
      */
     public function edit(string $id)
     {
-        try {
-
-            $companies = Company::where('companies.id', $id)
-                ->join('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
-                ->join('companies_email_register', 'companies_detail.company_id', '=', 'companies_email_register.company_detail_id')
-                ->join('companies_phone_register', 'companies_detail.company_id', '=', 'companies_phone_register.company_detail_id')
-                ->join('companies_address_register', 'companies_detail.company_id', '=', 'companies_address_register.company_detail_id')
-                ->join('companies_province_register', 'companies_detail.company_id', '=', 'companies_province_register.company_detail_id')
-                ->join('companies_town_register', 'companies_detail.company_id', '=', 'companies_town_register.company_detail_id')
-                ->join('companies_post_code_register', 'companies_detail.company_id', '=', 'companies_post_code_register.company_detail_id')
-                ->join('companies_country_register', 'companies_detail.company_id', '=', 'companies_country_register.company_detail_id')
-                ->first();
-
-
-
-            return response()->json(['company' => $companies]);
-
-        } catch (Exception $e) {
-
-            return response()->json(['message' => 'Compañía no encontrada ', $e->getMessage()], 500);
-        }
+        //
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(CustomerRequest $request, string $id)
+    public function update(CustomerHeadRequest $request, $companyId)
     {
+        DB::beginTransaction();
         try {
-            // Actualiza la compañía y devuelve el número de filas afectadas
-            $company = Company::where('companies.id', $id)
-                ->join('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
-                ->join('companies_email_register', 'companies_detail.company_id', '=', 'companies_email_register.company_detail_id')
-                ->join('companies_phone_register', 'companies_detail.company_id', '=', 'companies_phone_register.company_detail_id')
-                ->join('companies_address_register', 'companies_detail.company_id', '=', 'companies_address_register.company_detail_id')
-                ->join('companies_province_register', 'companies_detail.company_id', '=', 'companies_province_register.company_detail_id')
-                ->join('companies_town_register', 'companies_detail.company_id', '=', 'companies_town_register.company_detail_id')
-                ->join('companies_post_code_register', 'companies_detail.company_id', '=', 'companies_post_code_register.company_detail_id')
-                ->join('companies_country_register', 'companies_detail.company_id', '=', 'companies_country_register.company_detail_id')
-                ->update([
-                    'companies.taxNumber' => $request->taxNumber,
-                    'companies_detail.name' => $request->taxNumber,
-                    'companies_email_register.email' => $request->taxNumber,
-                    'companies_phone_register.phone' => $request->taxNumber,
-                    'taxNumber' => $request->taxNumber,
-            
+
+
+            $oldCompanyName = DB::table('companies_names')
+            ->select([
+                'name',
+            ])
+            ->where('company_id',$companyId)
+            ->first();
+
+            if ($oldCompanyName->name != $request->name) {
+                
+                DB::table('companies_names')
+                ->where ('company_id', $companyId)
+                ->update ([
+                    'dt_end' => now(),
+                ]);
+                
+                DB::table('companies_names') ->insert ([
+                    'name' => $request->name,
+                    'company_id' => $companyId,
+                    'dt_start' => now(),
                 ]);
 
-            if ($company === 0) {
-                return response()->json([
-                    'message' => 'No se encontró ninguna compañía con el ID proporcionado.'
-                ], 404);
+            }
+
+            $oldCompanyTaxNumber = DB::table('companies_tax_numbers')
+            ->select([
+                'tax_number',
+            ])
+            ->where('company_id',$companyId)
+            ->first();
+
+            if ($oldCompanyTaxNumber->tax_number != $request->tax_number) {
+
+                DB::table('companies_tax_numbers')
+                ->where ('company_id', $companyId)
+                ->update ([
+                    'dt_end' => now(),
+                ]);
+                DB::table('companies_tax_numbers') ->insert ([
+                    'tax_number' => $request->tax_number,
+                    'company_id' => $companyId,
+                    'dt_start' => now(),
+                ]);
+
             }
 
 
+            DB::commit();
+            
+            return response()->json(['message' => 'La compañia se ha modificado correctamente.'], 200);
         } catch (Exception $e) {
-            // Devuelve una respuesta JSON con un mensaje de error
-            return response()->json([
-                'message' => 'Error al editar la compañía: ' . $request->taxNumber . '. ' . $e->getMessage()
-            ], 500);
+            DB::rollBack();
+            return response()->json(['message' => 'Error al editar la compañía: ' . $e->getMessage()], 500);
         }
     }
-
+    
 
     /**
      * Remove the specified resource from storage.

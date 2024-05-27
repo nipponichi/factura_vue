@@ -22,9 +22,9 @@ class PhoneController extends Controller
     public static function index($companyId)
     {
         try {
-            $phones = DB::table('companies_phone_register')
+            $phones = DB::table('phones')
                 ->select('id','phone', 'favourite', 'isMobile')
-                ->where('company_detail_id', $companyId)
+                ->where('company_id', $companyId)
                 ->whereNull('dt_end')
                 ->orderByDesc('favourite')
                 ->get();
@@ -45,31 +45,31 @@ class PhoneController extends Controller
         DB::beginTransaction();
         try {
             
-            $companyResult = DB::table('companies_phone_register')
-            ->select('company_detail_id')
+            $companyResult = DB::table('phones')
+            ->select('company_id')
             ->where('id', $phoneId)
             ->first();
 
             if ($companyResult) {
-                $companyId = $companyResult->company_detail_id;
+                $companyId = $companyResult->company_id;
             }
 
 
-            $newPhoneId = DB::table('companies_phone_register')->insertGetId([
+            $newPhoneId = DB::table('phones')->insertGetId([
                 'phone' => $request->phone,
                 'dt_start' => now(),
                 'favourite' => $request->favourite,
                 'isMobile' => 1,
-                'company_detail_id' => $companyId,
+                'company_id' => $companyId,
             ]);
 
-            $phone = DB::table('companies_phone_register')
-            ->select('phone','id','company_detail_id', 'favourite')
+            $phone = DB::table('phones')
+            ->select('phone','id','company_id', 'favourite')
             ->where('id', $newPhoneId)
             ->whereNull('dt_end')
             ->first();
 
-            DB::table('companies_phone_register')
+            DB::table('phones')
             ->where('id', $phoneId)
             ->update([
                 'dt_end' => now(),
@@ -91,19 +91,19 @@ class PhoneController extends Controller
 
             
             // Insertar en la tabla companies
-            $newPhoneId = DB::table('companies_phone_register')->insertGetId([
+            $newPhoneId = DB::table('phones')->insertGetId([
                 'phone' => $request->phone,
                 'dt_start' => now(),
                 'favourite' => $request->favourite,
-                'company_detail_id' => $request->companyID,
+                'company_id' => $request->companyID,
             ]);
 
             if ($request->favourite === true) {
                 $this->makeFavourite($newPhoneId);
             }
 
-            $phone = DB::table('companies_phone_register')
-            ->select('phone','isMobile','id','company_detail_id', 'favourite')
+            $phone = DB::table('phones')
+            ->select('phone','isMobile','id','company_id', 'favourite')
             ->where('id', $newPhoneId)
             ->whereNull('dt_end')
             ->first();
@@ -124,18 +124,18 @@ class PhoneController extends Controller
     {
         DB::beginTransaction();
         try {
-            $companyResult = DB::table('companies_phone_register')
-                ->select('company_detail_id')
+            $companyResult = DB::table('phones')
+                ->select('company_id')
                 ->where('id', $id)
                 ->whereNull('dt_end')
                 ->first();
 
             if ($companyResult) {
-                $companyId = $companyResult->company_detail_id;
+                $companyId = $companyResult->company_id;
             }
             
-            $activePhonesCount = DB::table('companies_phone_register')
-                ->where('company_detail_id', $companyId)
+            $activePhonesCount = DB::table('phones')
+                ->where('company_id', $companyId)
                 ->whereNull('dt_end')
                 ->count();
 
@@ -143,7 +143,7 @@ class PhoneController extends Controller
                 return response()->json(['message' => 'Debes tener al menos un número de teléfono activo para poder eliminar.'], 400);
             }
 
-            $companyFav = DB::table('companies_phone_register')
+            $companyFav = DB::table('phones')
             ->select('favourite')
             ->where('id', $id)
             ->whereNull('dt_end')
@@ -157,7 +157,7 @@ class PhoneController extends Controller
                 return response()->json(['message' => 'No puedes eliminar un teléfono marcado como favorito.'], 400);
             }
 
-            DB::table('companies_phone_register')
+            DB::table('phones')
             ->where('id', $id)
             ->update([
                 'dt_end' => now(),
@@ -183,23 +183,23 @@ class PhoneController extends Controller
     }
 
     public function favouriteTrue($id){
-        $companyResult = DB::table('companies_phone_register')
-        ->select('company_detail_id')
+        $companyResult = DB::table('phones')
+        ->select('company_id')
         ->where('id', $id)
         ->whereNull('dt_end')
         ->first();
 
         if ($companyResult) {
-            $companyId = $companyResult->company_detail_id;
+            $companyId = $companyResult->company_id;
         }
 
-        DB::table('companies_phone_register')
-        ->where('company_detail_id', $companyId)
+        DB::table('phones')
+        ->where('company_id', $companyId)
         ->update([
             'favourite' => 0,
         ]);
 
-        DB::table('companies_phone_register')
+        DB::table('phones')
         ->where('id', $id)
         ->update([
             'favourite' => 1,

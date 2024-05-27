@@ -38,41 +38,33 @@ class CompanyController extends Controller
         ->select(
             'companies.id',
             'companies.dt_end',
-            'companies_tax_number_register.tax_number',
-            'companies_name_register.name',
-            'companies_email_register.email',
-            'companies_phone_register.phone',
-            'companies_country_register.country',
-            'companies_town_register.town',
-            'companies_post_code_register.postCode',
-            'companies_province_register.province',
-            'companies_address_register.address'
+            'companies_tax_numbers.tax_number',
+            'companies_names.name',
+            'emails.email',
+            'phones.phone',
+            'addresses.address',
+            'addresses.post_code',
+            'addresses.province',
+            'addresses.town',
+            'addresses.country'
         )
-        ->leftJoin('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
-        ->leftJoin('companies_name_register', 'companies_detail.id', '=', 'companies_name_register.company_detail_id')
-        ->leftJoin('companies_tax_number_register', 'companies_detail.id', '=', 'companies_tax_number_register.company_detail_id')
-        ->leftJoin('companies_email_register', 'companies_detail.id', '=', 'companies_email_register.company_detail_id')
-        ->leftJoin('companies_phone_register', 'companies_detail.id', '=', 'companies_phone_register.company_detail_id')
-        ->leftJoin('companies_addresses', 'companies_detail.id', '=', 'companies_addresses.company_detail_id')
-        ->leftJoin('companies_town_register', 'companies_addresses.id', '=', 'companies_town_register.company_addresses_id')
-        ->leftJoin('companies_country_register', 'companies_addresses.id','=', 'companies_country_register.company_addresses_id')
-        ->leftJoin('companies_province_register', 'companies_addresses.id', '=', 'companies_province_register.company_addresses_id')
-        ->leftJoin('companies_post_code_register', 'companies_addresses.id', '=', 'companies_post_code_register.company_addresses_id')
-        ->leftJoin('companies_address_register', 'companies_addresses.id', '=', 'companies_address_register.company_addresses_id')
+        ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
+        ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
+        ->leftJoin('companies_tax_numbers', 'companies.id', '=', 'companies_tax_numbers.company_id')
+        ->leftJoin('emails', 'companies.id', '=', 'emails.company_id')
+        ->leftJoin('phones', 'companies.id', '=', 'phones.company_id')
+        ->leftJoin('addresses', 'companies.id', '=', 'addresses.company_id')
         
-        ->where('companies.user_id', $userId)
-        ->where('companies_town_register.favourite', 1)
-        ->where('companies_country_register.favourite', 1)
-        ->where('companies_province_register.favourite', 1)
-        ->where('companies_post_code_register.favourite', 1)
-        ->where('companies_address_register.favourite', 1)
-        ->where('companies_phone_register.favourite', 1)
-        ->where('companies_email_register.favourite', 1)
-        ->whereNull('companies_name_register.dt_end')
-        ->whereNull('companies_tax_number_register.dt_end')
-        ->whereNull('companies_addresses.dt_end')
-        ->whereNull('companies_phone_register.dt_end')
-        ->whereNull('companies_email_register.dt_end')
+        ->where('companies_users.user_id', $userId)
+        ->where('addresses.favourite', 1)
+        ->where('phones.favourite', 1)
+        ->where('emails.favourite', 1)
+        ->whereNull('companies_users.dt_end')
+        ->whereNull('companies_names.dt_end')
+        ->whereNull('companies_tax_numbers.dt_end')
+        ->whereNull('addresses.dt_end')
+        ->whereNull('phones.dt_end')
+        ->whereNull('emails.dt_end')
         ->get();
 
 
@@ -107,54 +99,49 @@ class CompanyController extends Controller
             // Obtener el usuario autenticado
             $userId = Auth::id();
 
-            // Verificar si el usuario autenticado es propietario de la empresa
-            $company = Company::where('id', $id)
-                ->where('user_id', $userId)
-                ->first();
+            $company = DB::table('companies_users')
+            ->select('company_id')
+            ->where('user_id', $userId)
+            ->first();
 
-            if (!$company) {
+            // Comprobar si se encontró una 'epresa y si company_id tiene un valor
+            if ($company->company_id != $id) {
                 return Redirect::route('companies.index')->with('error', 'No se encontró la empresa');
             }
+
             
             $companies = DB::table('companies')
             ->select(
                 'companies.id',
                 'companies.dt_end',
-                'companies_tax_number_register.tax_number',
-                'companies_name_register.name',
-                'companies_email_register.email',
-                'companies_phone_register.phone',
-                'companies_country_register.country',
-                'companies_town_register.town',
-                'companies_post_code_register.postCode',
-                'companies_province_register.province',
-                'companies_address_register.address'
+                'companies_tax_numbers.tax_number',
+                'companies_names.name',
+                'emails.email',
+                'phones.phone',
+                'addresses.country',
+                'addresses.town',
+                'addresses.post_code',
+                'addresses.province',
+                'addresses.address'
             )
-            ->leftJoin('companies_detail', 'companies.id', '=', 'companies_detail.company_id')
-            ->leftJoin('companies_name_register', 'companies_detail.id', '=', 'companies_name_register.company_detail_id')
-            ->leftJoin('companies_tax_number_register', 'companies_detail.id', '=', 'companies_tax_number_register.company_detail_id')
-            ->leftJoin('companies_email_register', 'companies_detail.id', '=', 'companies_email_register.company_detail_id')
-            ->leftJoin('companies_phone_register', 'companies_detail.id', '=', 'companies_phone_register.company_detail_id')
-            ->leftJoin('companies_addresses', 'companies_detail.id', '=', 'companies_addresses.company_detail_id')
-            ->leftJoin('companies_town_register', 'companies_addresses.id', '=', 'companies_town_register.company_addresses_id')
-            ->leftJoin('companies_country_register', 'companies_addresses.id','=', 'companies_country_register.company_addresses_id')
-            ->leftJoin('companies_province_register', 'companies_addresses.id', '=', 'companies_province_register.company_addresses_id')
-            ->leftJoin('companies_post_code_register', 'companies_addresses.id', '=', 'companies_post_code_register.company_addresses_id')
-            ->leftJoin('companies_address_register', 'companies_addresses.id', '=', 'companies_address_register.company_addresses_id')
+            ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
+            ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
+            ->leftJoin('companies_tax_numbers', 'companies.id', '=', 'companies_tax_numbers.company_id')
+            ->leftJoin('emails', 'companies.id', '=', 'emails.company_id')
+            ->leftJoin('phones', 'companies.id', '=', 'phones.company_id')
+            ->leftJoin('addresses', 'companies.id', '=', 'addresses.company_id')
+
             ->where('companies.id', $id)
-            ->where('companies.user_id', $userId)
-            ->where('companies_town_register.favourite', 1)
-            ->where('companies_country_register.favourite', 1)
-            ->where('companies_province_register.favourite', 1)
-            ->where('companies_post_code_register.favourite', 1)
-            ->where('companies_address_register.favourite', 1)
-            ->where('companies_phone_register.favourite', 1)
-            ->where('companies_email_register.favourite', 1)
-            ->whereNull('companies_name_register.dt_end')
-            ->whereNull('companies_tax_number_register.dt_end')
-            ->whereNull('companies_addresses.dt_end')
-            ->whereNull('companies_phone_register.dt_end')
-            ->whereNull('companies_email_register.dt_end')
+            ->where('companies_users.user_id', $userId)
+           /* ->where('addresses.favourite', 1)
+            ->where('phones.favourite', 1)
+            ->where('emails.favourite', 1)*/
+
+           /* ->whereNull('companies_names.dt_end')
+            ->whereNull('companies_tax_numbers.dt_end')
+            ->whereNull('addresses.dt_end')
+            ->whereNull('phones.dt_end')
+            ->whereNull('emails.dt_end')*/
             ->first();
 
             
@@ -162,7 +149,7 @@ class CompanyController extends Controller
             
         }catch (Exception $e) {
                 
-            return response()->json(['message' => 'Compañía no encontrada ', $e->getMessage()], 500);
+            return response()->json(['message' => 'Compañía no encontrada ahora ', $e->getMessage()], 500);
         }
     }
 
@@ -195,12 +182,15 @@ class CompanyController extends Controller
     {
         $user_id = Auth::id();
 
-        // Busca empresas relacionadas con el usuario actual
-        $company = Company::where('user_id', $user_id)->get();
+        $company = DB::table('companies_users')
+            ->select('company_id')
+            ->where('user_id', $user_id)
+            ->whereNull('dt_end')
+            ->first();
 
-
-        // Si la colección de empresas está vacía, devuelve false, de lo contrario, devuelve true
-        return $company->isEmpty() ? false : true;
+        // Si no hay una compañía asociada, devuelve false, de lo contrario, devuelve true
+        return $company === null ? false : true;
     }
+
 
 }

@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies_inovice_number_series', function (Blueprint $table) {
+        Schema::create('inovice_number_series', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_detail_id')->constrained('companies_detail');
+            $table->foreignId('company_id')->constrained('companies');
             $table->String('init_format');
             $table->boolean('favourite')->default (false);
             $table->dateTime('dt_start')->useCurrent();
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users_role');
+        Schema::dropIfExists('inovice_number_series');
     }
 };

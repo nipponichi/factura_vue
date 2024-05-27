@@ -10,23 +10,23 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {      
+    {
         
-        Schema::create('roles_limit', function (Blueprint $table) {
-            $table->id(); 
-            $table->bigInteger('create_invoices');
-            $table->bigInteger('create_customers'); 
-            $table->bigInteger('create_companies');
-            $table->bigInteger('create_products');
+        Schema::create('roles_limits', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('invoices');
+            $table->bigInteger('customers');
+            $table->bigInteger('companies');
+            $table->bigInteger('products');
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
         });
         
-        Schema::create('users_limit', function (Blueprint $table) {
+        Schema::create('users_limits', function (Blueprint $table) {
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('role_limit_id')->constrained('roles_limit');
+            $table->foreignId('role_limit_id')->constrained('roles_limits');
         });
         
     }
@@ -36,6 +36,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users_role');
+        Schema::dropIfExists('roles_limits');
+        Schema::dropIfExists('users_limits');
     }
 };
