@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies_province_register', function (Blueprint $table) {
+        Schema::create('companies_tax_numbers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_addresses_id')->constrained('companies_addresses');
-            $table->string('province');
-            $table->boolean('favourite')->default (false);
+            $table->foreignId('company_id')->constrained('companies');
+            $table->string('tax_number');
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
         });
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('companies_province_register');
+        Schema::dropIfExists('companies_tax_numbers');
     }
 };

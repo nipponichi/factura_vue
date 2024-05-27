@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies', function (Blueprint $table) {
+        Schema::create('post_codes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->nullable();    
-            $table->dateTime('dt_start')->useCurrent();
-            $table->dateTime('dt_end')->nullable();  
+            $table->string('post_code');
         });
     }
 
@@ -24,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('companies');
+        Schema::dropIfExists('post_codes');
     }
 };

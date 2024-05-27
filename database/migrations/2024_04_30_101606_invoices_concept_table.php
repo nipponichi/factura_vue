@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies_email_register', function (Blueprint $table) {
+        
+        Schema::create('invoices_concepts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_detail_id')->constrained('companies_detail');
-            $table->string('email');
-            $table->boolean('favourite')->default (false);
+            $table->string('name');
+            $table->integer('stock')->nullable();
+            $table->string('state');
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
+            $table->foreignId('invoice_detail_id')->constrained('invoices_details');
         });
     }
 
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('companies_email_register');
+        Schema::dropIfExists('invoices_concepts');
     }
 };

@@ -59,41 +59,44 @@
                 </div>
 
                 
-                <div class="mb-6">
+                <div v-if="!this.company.id">
 
-                    <div>
-                        <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
-                        <input type="text" id="address1" v-model="company.address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Address" required />
-                    </div>
-                </div>
-                <div class="grid gap-3 mb-6 md:grid-cols-2"> 
-                    
-                    <div>
-                        <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Town</label>
-                        <input type="text" id="town" v-model="company.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Town" required />
-                    </div>  
-                    <div>
-                        <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Province</label>
-                        <input type="text" id="province" v-model="company.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Province" required />
-                    </div>  
-                    <div>
-                        <label for="postCode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Post code</label>
-                        <input type="text" id="postCode" v-model="company.postCode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Post code" pattern="^\d+$" required />
-                    </div>
-                    <div>
-                        <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
-                        <input type="text" id="country" v-model="company.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Country" required />
-                    </div>
-                    <div>
-                        <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email address</label>
-                        <input type="email" id="email" v-model="company.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="info@mycompany.com" required />
-                    </div>    
-                    <div>
-                        <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
-                        <input type="tel" id="phone" v-model="company.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Phone" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
-                    </div>
+                    <div class="mb-6">
 
-                    
+                        <div>
+                            <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
+                            <input type="text" id="address1" v-model="company.address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Address" required />
+                        </div>
+                    </div>
+                    <div class="grid gap-3 mb-6 md:grid-cols-2"> 
+                        
+                        <div>
+                            <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Town</label>
+                            <input type="text" id="town" v-model="company.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Town" required />
+                        </div>  
+                        <div>
+                            <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Province</label>
+                            <input type="text" id="province" v-model="company.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Province" required />
+                        </div>  
+                        <div>
+                            <label for="post_code" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Post code</label>
+                            <input type="text" id="post_code" v-model="company.post_code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Post code" pattern="^\d+$" required />
+                        </div>
+                        <div>
+                            <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
+                            <input type="text" id="country" v-model="company.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Country" required />
+                        </div>
+                        <div>
+                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email address</label>
+                            <input type="email" id="email" v-model="company.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="info@mycompany.com" required />
+                        </div>    
+                        <div>
+                            <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
+                            <input type="tel" id="phone" v-model="company.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Phone" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
+                        </div>
+
+                        
+                    </div>
                 </div>
                 
                 <div class="grid gap-3 md:grid-cols-1 justify-items-end">
@@ -173,22 +176,23 @@ import axios from 'axios';
 
 export default {
     data() {
-        console.log("PRIMERdd PASO");
+        
         return {
             companies: null, 
             companyDialog: false, 
             deleteCompanyDialog: false, 
             deleteCompaniesDialog: false, 
             company: {
+                id:'',
                 name: '',
                 tax_number: '',
                 email: '',
                 phone: '',
                 address: '',
-                postCode: '',
+                post_code: '',
                 town: '',
                 province: '',
-                country: '',
+                country: ''
             },
             selectedCompanies: [], 
             filters: {}, 
@@ -196,17 +200,22 @@ export default {
         };
     },
     created() {
-        console.log("Created");
         this.filters = {
             'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
         }
     },
     mounted() {
         
-        let myCompanyId = window.location.pathname.split('/').pop();
-        console.log("id: " + myCompanyId);
-        axios.get('/customers/' + myCompanyId)
-        .then(response => {
+        this.fetchCustomers();
+    },
+
+    
+    methods: {
+        fetchCustomers() {
+            let myCompanyId = window.location.pathname.split('/').pop();
+            console.log("id: " + myCompanyId);
+            axios.get('/customers/' + myCompanyId)
+            .then(response => {
             // Asigna los datos de los clientes a la propiedad 'companies'
             this.companies = response.data[0];
             console.log(this.companies);
@@ -218,26 +227,17 @@ export default {
         .catch(error => {
             console.error('Error al obtener los datos de los clientes:', error);
         });
-    },
+        },
 
-    
-    methods: {
         openNew() {
-        this.company = {
-            name: '',
-            tax_number: '',
-            email: '',
-            phone: '',
-            address: '',
-            postCode: '',
-            town: '',
-            province: '',
-            country: '',
-            companyID: window.location.pathname.split('/').pop(),
-        };
-        this.submitted = false;
-        this.companyDialog = true;
-    },
+            // Para hacer asociación en tabla Companies_Customers
+            this.company = {
+                companyID: window.location.pathname.split('/').pop(),
+            };
+            this.submitted = false;
+            this.companyDialog = true;
+        },
+        
         hideDialog() {
             console.log("HIDE")
             this.companyDialog = false;
@@ -246,105 +246,70 @@ export default {
         
         saveCompany() {
             if (!this.company.id) {
-                
-                // Realiza la solicitud para guardar la compañía
+
                 axios.post('/customer', this.company)
                 .then(response => {
-                    // La solicitud se completó con éxito, puedes hacer lo que necesites con la respuesta, como imprimirlo en la consola
-                    console.log(response);
-
-                    // Cierra el diálogo de compañía
                     this.companyDialog = false;
-
-                    let myCompanyId = window.location.pathname.split('/').pop();
-                    
-                    axios.get('/customers/' + myCompanyId)
-                    .then(response => {
-                        // Asigna los datos de los clientes a la propiedad 'companies'
-                        this.companies = response.data[0];
-                        console.log(this.companies);
-                        // Itera sobre todos los elementos del array 'companies'
-                        this.companies.forEach((company, index) => {
-                            console.log(`Company ${index + 1}:`, company);
-                        });
-                    })
-
-                    console.log(response.data.company);
-                
+                    this.fetchCustomers();
                 })
                 .catch(error => {
-                    // Si hay algún error en la solicitud, puedes manejarlo aquí
                     console.log(error.response);
-                    console.log(response.data.name);
                     this.companyDialog = false;
                 });   
 
             }else {
-                
                 this.updateCompany();
-                
             }
         },
 
 
         editCompany(slotCompany) {
-
-
-            axios.get('/customer/' + slotCompany.id + '/edit').then(response => {
-
-
-                this.company = response.data.company;
-                this.companyDialog = true;
-
-            })
-            .catch(error => {
-                console.error('Error al obtener los datos de la compañía para editar:', error);
-            });
-            
+            this.company.id = slotCompany.id;    
+            this.company.name = slotCompany.name;
+            this.company.tax_number = slotCompany.tax_number;
+            this.companyDialog = true;
             
         },
 
         updateCompany() {
 
-            console.log( "Updatessss: " + JSON.stringify(this.company))
-
             axios.put('/customer/' + this.company.id, this.company)
             .then(response => {
                 
-                // Busca el índice del objeto en la lista actual
-                const index = this.companies.findIndex(company => company.id === this.company.id);
-
-                // Actualiza los valores del objeto existente en la lista
-                if (index !== -1) {
-                this.companies[index] = response.data.company;
-                } 
+                this.fetchCustomers();
                 this.companyDialog = false; 
             })
             .catch(error => {
                 console.error('Error al actualizar la compañía:', error);
-                // Mostrar un mensaje de error al usuario
+                this.companyDialog = false; 
                 
             });
         },        
 
         confirmDeleteCompany(company) {
-            console.log("Confirm delete");
             this.company = company;
             this.deleteCompanyDialog = true;       
         },
 
         deleteCompany() {
-            console.log("DELETE")
-            this.companies = this.companies.filter(val=> val.id !== this.company.id);
-            this.deleteCompanyDialog = false;
-
-            console.log(this.company.id);
+            
 
             axios.delete('/customer/'+ this.company.id)
-                .then(response => { console.log(response)})
-                .catch(error => { console.log(error.response)})
+                .then(response => {
+                    
+                    this.companies = this.companies.filter(val=> val.id !== this.company.id);
+
+                    this.company = {};
+
+                    this.deleteCompanyDialog = false;
                 
-            this.company = {};
+                })
+                .catch(error => { 
+                    console.log(error.response)
+                    this.deleteCompanyDialog = false;
+                })
+                
+            
         },
         
         confirmDeleteSelected() {
@@ -371,9 +336,11 @@ export default {
         },
 
 
-        handleInfoButtonClick(companyId) {
-            this.$inertia.get('/customer/' + companyId);
+        handleInfoButtonClick(customerID) {
+            let companyID = window.location.pathname.split('/').pop();
+            this.$inertia.get(`/customers/${companyID}/${customerID}`);
         }
+
     }
 }
 

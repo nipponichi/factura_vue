@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies_name_register', function (Blueprint $table) {
+        Schema::create('emails', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_detail_id')->constrained('companies_detail');
-            $table->string('name');
+            $table->foreignId('company_id')->constrained('companies');
+            $table->string('email');
+            $table->boolean('favourite')->default (false);
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
         });
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('companies_name_register');
+        Schema::dropIfExists('emails');
     }
 };

@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies_address_register', function (Blueprint $table) {
+        Schema::create('invoices_designs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_addresses_id')->constrained('companies_addresses');
-            $table->string('address');
+            $table->foreignId('company_id')->constrained('companies');
+            $table->string('configuration');
             $table->boolean('favourite')->default (false);
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('companies_address_register');
+        Schema::dropIfExists('invoices_designs');
     }
 };

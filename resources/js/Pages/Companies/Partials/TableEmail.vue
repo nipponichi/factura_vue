@@ -140,18 +140,19 @@ export default {
         this.fetchEmails();
             
     },
+    
     methods: {
         fetchEmails() {
             let myCompanyId = window.location.pathname.split('/').pop();
-        axios.get('/emails/' + myCompanyId)
-            .then(response => {
-                this.emails = response.data.emails;
-                
-            })
-            .catch(error => {
-                console.error('Error fetching emails data:', error);
-            });
-    },
+            axios.get('/emails/' + myCompanyId)
+                .then(response => {
+                    this.emails = response.data.emails;
+                    
+                })
+                .catch(error => {
+                    console.error('Error fetching emails data:', error);
+                });
+            },
         openNew() {
             this.myEmail = {
                 email: '',
@@ -238,7 +239,6 @@ export default {
             this.deleteEmailDialog = true;       
         },
         deleteMyEmail() {
-            const emailId = this.myEmail.id;
 
             // Realizar la solicitud de eliminación al servidor
             axios.delete('/email/' + this.myEmail.id)
@@ -246,7 +246,7 @@ export default {
                     console.log(response);
                     
                     // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
-                    this.emails = this.emails.filter(val => val.id !== emailId);
+                    this.emails = this.emails.filter(val => val.id !== this.myEmail.id);
 
                     // Limpiar el objeto myEmail después de la eliminación exitosa
                     this.myEmail = {};

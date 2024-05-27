@@ -29,7 +29,7 @@
                 
 
                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox" ></Column>
-                <Column field="postCode" header="PostCode" sortable class="dateTable"></Column>
+                <Column field="post_code" header="PostCode" sortable class="dateTable"></Column>
                 <Column field="town" header="Town" sortable class="dateTable"></Column>
                 <Column field="address" header="Address" sortable class="dateTable"></Column>
                 <Column field="province" header="Province" sortable class="dateTable"></Column>
@@ -80,8 +80,8 @@
                             <input type="text" id="province" v-model="myAddress.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Province" required />
                         </div>  
                         <div>
-                            <label for="postCode" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Post code</label>
-                            <input type="text" id="postCode" v-model="myAddress.postCode" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Post code" pattern="^\d+$" required />
+                            <label for="post_code" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Post code</label>
+                            <input type="text" id="post_code" v-model="myAddress.post_code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Post code" pattern="^\d+$" required />
                         </div>
                         <div>
                             <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
@@ -148,7 +148,7 @@ export default {
             myAddress: { 
                 id: '',             
                 address: '',
-                postCode: '',
+                post_code: '',
                 town: '',
                 province: '',
                 country: '',
@@ -220,13 +220,11 @@ export default {
             }
         },
 
-        editMyAddress(slotProps) {
-            
-            
+        editMyAddress(slotProps) { 
             this.myAddress.id = slotProps.id;
             this.myAddress.address = slotProps.address;
             this.myAddress.town = slotProps.town;
-            this.myAddress.postCode = slotProps.postCode;
+            this.myAddress.post_code = slotProps.post_code;
             this.myAddress.country = slotProps.country;
             this.myAddress.province = slotProps.province;
             this.updateFavoriteStatus(slotProps.favourite)
@@ -277,11 +275,14 @@ export default {
         },
         
         confirmDeleteAddress(address) {
-            this.myAddress = address;
+            this.myAddress.address = address.address;
+            this.myAddress.id = address.id;
             this.deleteAddressDialog = true;       
         },
+
         deleteMyAddress() {
-            let addressId = this.myAddress.id;
+            let addressId = this.myAddress.id
+            console.log(this.myAddress.id)
 
             // Realizar la solicitud de eliminación al servidor
             axios.delete('/address/' + this.myAddress.id)

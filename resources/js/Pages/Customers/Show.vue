@@ -22,21 +22,6 @@
                                                 <strong><p class=" text-slate-400 font-bold mt-2">{{ company.country }}</p></strong>
                                             </div>
                                         </div>
-                                        <div class="flex justify-center lg:pt-0 pt-8">
-                                            <div class="p-3 text-center">
-                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">33</span>
-                                                <span class="text-sm text-slate-400">Customers</span>
-                                            </div>
-                                            <div class="p-3 text-center">
-                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">24</span>
-                                                <span class="text-sm text-slate-400">Products</span>
-                                            </div>
-
-                                            <div class="p-3 text-center">
-                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">564</span>
-                                                <span class="text-sm text-slate-400">Invoices</span>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                                 
@@ -44,7 +29,6 @@
                                     <h1 class="text-lg text-slate-700 leading-normal mb-1">Company details:</h1>
                                     <div class="flex flex-wrap justify-center">
                                         <div>
-
                                             <div class="text-gray-700">
                                                 <div class="grid md:grid-cols-2 text-sm">
                                                     <div class="grid grid-cols-2">
@@ -80,24 +64,6 @@
                         <div class="border-b border-gray-200 dark:border-gray-700">
                             <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
                                 <li class="me-2">
-                                    <button @click="changeTab('customers')" :class="{'border-b-2 border-blue-500': activeTab === 'customers'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
-                                        <i class="pi pi-users w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        Customers
-                                    </button>
-                                </li>
-                                <li class="me-2">
-                                    <button @click="changeTab('products')" :class="{'border-b-2 border-blue-500': activeTab === 'products'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
-                                        <i class="pi pi-shopping-cart w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        Products
-                                    </button>
-                                </li>
-                                <li class="me-2">
-                                    <button @click="changeTab('invoices')" :class="{'border-b-2 border-blue-500': activeTab === 'invoices'}" class="inline-flex items-center justify-center p-4 border-transparent rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
-                                        <i class="pi pi-file w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        Invoices
-                                    </button>
-                                </li>
-                                <li class="me-2">
                                     <button @click="changeTab('phone')" :class="{'border-b-2 border-blue-500': activeTab === 'phone'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-phone w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
                                         Phone
@@ -121,16 +87,8 @@
                         </div>
             
                         <div class="flex flex-col items-center justify-center w-full">
-                            <table v-if="activeTab === 'customers'" class="w-full">
-                                <TableCustomers />
-                            </table>
-                            <table v-else-if="activeTab === 'products'" class="w-full">
-                                <Tables />
-                            </table>
-                            <table v-else-if="activeTab === 'invoices'" class="w-full">
-                                <TableInvoice />
-                            </table>
-                            <table v-else-if="activeTab === 'phone'" class="w-full">
+                            
+                            <table v-if="activeTab === 'phone'" class="w-full">
                                 <TablePhone />
                             </table>
                             <table v-else-if="activeTab === 'email'" class="w-full">
@@ -150,8 +108,6 @@
 
 <script setup>
     import AppLayout from '@/Layouts/AppLayout.vue';
-    import TableCustomers from '@/Pages/Companies/Partials/TableCustomer.vue';
-    import TableInvoice from '@/Pages/Companies/Partials/TableInvoice.vue';
     import TablePhone from '@/Pages/Companies/Partials/TablePhone.vue';
     import TableEmail from '@/Pages/Companies/Partials/TableEmail.vue';
     import TableAddress from '@/Pages/Companies/Partials/TableAddress.vue';
@@ -160,7 +116,7 @@
     import { ref } from 'vue';
     
     // Definimos la variable reactive para almacenar la pestaña activa
-    const activeTab = ref('customers');
+    const activeTab = ref('phone');
 
     // Método para cambiar la pestaña activa
     const changeTab = (tabName) => {
@@ -186,6 +142,7 @@
         },
 
         methods: {
+        
 
         },
     };

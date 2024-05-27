@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies_addresses', function (Blueprint $table) {
+        Schema::create('towns', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_detail_id')->constrained('companies_detail');
-            $table->dateTime('dt_start')->useCurrent();
-            $table->dateTime('dt_end')->nullable();
+            $table->string('town');
         });
     }
 
@@ -24,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('companies_addresses');
+        Schema::dropIfExists('towns');
     }
 };
