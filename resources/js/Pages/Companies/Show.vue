@@ -151,7 +151,7 @@
 <script setup>
     import AppLayout from '@/Layouts/AppLayout.vue';
     import TableCustomers from '@/Pages/Companies/Partials/TableCustomer.vue';
-    import TableInvoice from '@/Pages/Companies/Partials/TableInvoice.vue';
+    import TableInvoice from '@/Pages/Invoices/Partials/TableInvoice.vue';
     import TablePhone from '@/Pages/Companies/Partials/TablePhone.vue';
     import TableEmail from '@/Pages/Companies/Partials/TableEmail.vue';
     import TableAddress from '@/Pages/Companies/Partials/TableAddress.vue';
