@@ -10,7 +10,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\AddressController;
-use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\RouteController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,7 +27,7 @@ Route::middleware([
     Route::get('/dashboard', [RouteController::class, 'dashboard'])->name('dashboard');
     Route::resource('/companies', CompanyController::class);
     Route::get('/companies-invoice', [CompanyController::class, 'companiesInvoice']);
-    Route::resource('/invoices', InvoiceController::class);
+    Route::resource('/invoices', DocumentController::class);
     Route::resource('/customer', CustomerController::class);
     Route::get('/customers/{id}', [CustomerController::class, 'index']);
     Route::get('/customers/{companyID}/{customerID}', [CustomerController::class, 'show']);
@@ -40,9 +40,11 @@ Route::middleware([
     Route::put('/addresses/{id}', [AddressController::class, 'makeFavourite']);
     Route::get('/addresses/{id}', [AddressController::class, 'index']);
     Route::resource('/address', AddressController::class);
-    Route::resource('/invoices', InvoiceController::class);
     Route::resource('/products', ProductController::class);
     Route::get('/has-company', [CompanyController::class, 'hasCompany'])->name('companies.hasCompany');
+    Route::resource('/documents', DocumentController::class);
+    Route::get('/documents-type', [DocumentController::class, 'documentType']);
+    Route::get('/documents-serie/{typeID}/{companyID}', [DocumentController::class, 'documentSerie']);
 
     // Admin
     Route::resource('/admin-companies', AdminCompaniesController::class);

@@ -23,7 +23,7 @@ class CustomerController extends Controller
         $this->middleware(['can:create company'])->only(['create', 'store']);
         $this->middleware(['can:update company'])->only(['edit', 'update']);
         $this->middleware(['can:delete company'])->only('destroy');
-}
+    }
 
 
     public static function index(string $companyId)
