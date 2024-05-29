@@ -13,7 +13,7 @@
                             >
                             <span>
                                 <i class="pi pi-plus mr-2"></i>
-                                {{'Companies' }}
+                                {{'Empresas' }}
                             </span>
                         </button>
                     </div>
@@ -28,7 +28,7 @@
                             >
                             <span>
                                 <i class="pi pi-plus mr-2"></i>
-                                {{'Document type' }}
+                                {{'Tipo de documento' }}
                             </span>
                         </button>
                     </div>
@@ -45,7 +45,7 @@
                             >
                             <span>
                                 <i class="pi pi-file-export mr-2"></i>
-                                {{'Export'}}
+                                {{'Exportar'}}
                             </span>
                         </button>
                     </div>
@@ -74,7 +74,7 @@
                             >
                             <span>
                                 <i class="pi pi-upload mr-2"></i>
-                                {{'Save' }}
+                                {{'Guardar' }}
                             </span>
                         </button>
                     </div>
@@ -154,15 +154,15 @@
                         </div>
                             <div class="grid md:grid-cols-1 text-m gap-y-1">
                             <div class="flex items-center">
-                                <div class="font-semibold mr-3">Company name:</div>
+                                <div class="font-semibold mr-3">Nombre empresa</div>
                                 <div class="text-gray-700">{{this.selectedCompany.name}}</div>
                             </div>
                             <div class="flex items-center">
-                                <div class="font-semibold mr-3">Tax Number:</div>
+                                <div class="font-semibold mr-3">CIF:</div>
                                 <div class="text-gray-700">{{this.selectedCompany.tax_number}}</div>
                             </div>
                             <div class="flex items-center">
-                                <div class="font-semibold mr-3">Phone:</div>
+                                <div class="font-semibold mr-3">Tlfno:</div>
                                 <div class="text-gray-700">{{this.selectedCompany.phone}}</div>
                             </div>
                             <div class="flex items-center">
@@ -171,7 +171,7 @@
                             </div>
                             
                             <div class="flex items-center">
-                                <div class="font-semibold mr-3">Address:</div>
+                                <div class="font-semibold mr-3">Dirección:</div>
                                 <div class="text-gray-700">{{this.selectedCompany.address}}</div>
                             
                             </div>
@@ -184,15 +184,15 @@
                     <div class="showCustomer" style="width: 21rem;"> <!-- Establece el ancho fijo -->
                         <div class="grid md:grid-cols-1 text-m gap-y-1">
                             <div class="flex items-center">
-                                <div class="font-semibold mr-2">Customer name:</div>
+                                <div class="font-semibold mr-2">Cliente:</div>
                                 <div class="text-gray-700">{{ this.selectedCustomer.name }}</div>
                             </div>
                             <div class="flex items-center">
-                                <div class="font-semibold mr-2">Tax number:</div>
+                                <div class="font-semibold mr-2">CIF:</div>
                                 <div class="text-gray-700">{{ this.selectedCustomer.tax_number }}</div>
                             </div>
                             <div class="flex items-center">
-                                <div class="font-semibold mr-2">Phone:</div>
+                                <div class="font-semibold mr-2">Teléfono:</div>
                                 <div class="text-gray-700">{{ this.selectedCustomer.phone }}</div>
                             </div>
                             <div class="flex items-center">
@@ -211,8 +211,8 @@
                 <template #start>
                     <div class="flex items-center justify-between ">
                         <div class="flex items-center">
-                            <Button label="New concept" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="addRow" />
-                            <Button label="Delete" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
+                            <Button label="Añadir línea" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="addRow" />
+                            <Button label="Eliminar" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
                         </div>
                         <div class="flex-grow"></div>
                     </div>
@@ -220,7 +220,7 @@
 
                 <template #end>
                     <div class="relative rounded-md shadow-sm">
-                        <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm" v-model="filters['global'].value" placeholder="Search...">
+                        <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm" v-model="filters['global'].value" placeholder="Búsqueda...">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
@@ -241,22 +241,22 @@
                 </template>
 
                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox"></Column>
-                <Column field="product" header="Description" sortable class="dateTable">
+                <Column field="product" header="Descricción" sortable class="dateTable">
                     <template #body="slotProps">
                         <InputText class="input" v-model="slotProps.data.product" />
                     </template>
                 </Column>
-                <Column field="amount" header="Quantity" sortable class="dateTable">
+                <Column field="amount" header="Cantidad" sortable class="dateTable">
                     <template #body="slotProps">
                         <InputText class="input input-short" v-model="slotProps.data.amount" />
                     </template>
                 </Column>
-                <Column field="price" header="Price" sortable class="dateTable">
+                <Column field="price" header="Precio" sortable class="dateTable">
                     <template #body="slotProps">
                         <InputText class="input input-short" v-model="slotProps.data.price" />
                     </template>
                 </Column>
-                <Column field="taxes" header="Tax (%)" sortable class="dateTable">
+                <Column field="taxes" header="IVA (%)" sortable class="dateTable">
                     <template #body="slotProps">
                         <Dropdown class="input-short" v-model="slotProps.data.taxes" :options="taxOptions" optionLabel="label" optionValue="value" />
                     </template>
@@ -276,7 +276,7 @@
             </DataTable>
 
             <div class="flex justify-end mt-4 pr-4">
-                <Button label="New concept" icon="pi pi-plus" severity="success" class="success-button" @click="addRow()" />
+                <Button label="Añadir línea" icon="pi pi-plus" severity="success" class="success-button" @click="addRow()" />
             </div>
         </div>
 
@@ -301,8 +301,8 @@
         </div>
 
         <!-- MODAL COMPANY -->
-        <Dialog v-model:visible="productDialog" :style="{width: '450px'}" header="Select companies" :modal="true" @change="handleCompanySelection">
-            <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">Select your company:</label>
+        <Dialog v-model:visible="productDialog" :style="{width: '450px'}" header="Selección de empresas" :modal="true" @change="handleCompanySelection">
+            <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">Selecciona tu empresa:</label>
             <Dropdown v-model="selectedCompany" :options="companies" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="handleCompanySelection">
                 <template #value="slotProps">
                     <div v-if="slotProps.value" class="flex align-items-center">
@@ -315,7 +315,7 @@
                     </div>
                 </template>
             </Dropdown>
-            <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">Select a customer:</label>
+            <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">Selecciona un cliente:</label>
             <Dropdown v-model="selectedCustomer" :options="this.customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                 <template #value="slotProps">
                     <div v-if="slotProps.value" class=" flex align-items-center ">
@@ -414,6 +414,7 @@ export default {
             imageUrl: 'https://placehold.co/300x300/e2e8f0/e2e8f0',
             companies: null,
             customers: null,
+            isDisabled: true,
             types: [],
             series: [],
             productDialog: false,

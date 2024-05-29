@@ -26,13 +26,13 @@
                                 </div>
                                 
                                 <div class="py-5 border-t border-slate-200 text-center">
-                                    <h1 class="text-lg text-slate-700 leading-normal mb-1">Company details:</h1>
+                                    <h1 class="text-lg text-slate-700 leading-normal mb-1">Detalle de cliente:</h1>
                                     <div class="flex flex-wrap justify-center">
                                         <div>
                                             <div class="text-gray-700">
                                                 <div class="grid md:grid-cols-2 text-sm">
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Tax Number:</div>
+                                                        <div class=" py-2 font-semibold">CIF:</div>
                                                         <div class=" py-2">{{ company.tax_number }}</div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
@@ -42,11 +42,11 @@
                                                         </div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Phone :</div>
+                                                        <div class=" py-2 font-semibold">Teléfono:</div>
                                                         <div class=" py-2">{{ company.phone }}</div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Address :</div>
+                                                        <div class=" py-2 font-semibold">Dirección:</div>
                                                         <div class=" py-2">{{ company.address}} </div>
                                                     </div>
                                                     

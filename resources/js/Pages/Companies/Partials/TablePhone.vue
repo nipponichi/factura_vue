@@ -3,8 +3,8 @@
         <div class="card">
             <Toolbar class="mb-4 border border-slate-200 ...">
                 <template #start>
-                    <Button label="New" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
-                    <Button label="Delete" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedPhones || !selectedPhones.length" />
+                    <Button label="Añadir" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
+                    <Button label="Eliminar" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedPhones || !selectedPhones.length" />
                 </template>
             </Toolbar>
 
@@ -14,9 +14,9 @@
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} companies">
                 <template #header>
                     <div class="flex justify-between items-center mt-2">
-                        <h4>Manage Phones</h4>
+                        <h4>Gestionar teléfonos</h4>
                         <div class="relative rounded-md shadow-sm w-1/4">
-                            <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm" v-model="filters['global'].value" placeholder="Search...">
+                            <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm" v-model="filters['global'].value" placeholder="Búsqueda...">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
@@ -29,9 +29,9 @@
 
                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox w-16" ></Column>
                 
-                <Column field="phone" header="Phone" sortable class="dateTable"></Column>
+                <Column field="phone" header="Teléfono" sortable class="dateTable"></Column>
                 
-                <Column :exportable="false"  header="Favourite" class="dateTable w-24 text-center">
+                <Column :exportable="false"  header="Favorito" class="dateTable w-24 text-center">
             
                     <template #body="slotProps">
                         <Button v-if="slotProps.data.favourite" icon="pi pi-star-fill"  class="mr-2 info-button" @click="makeFavourite(slotProps.data)" />
@@ -42,7 +42,7 @@
                 
                 
                 <div class="utility-button">
-                    <Column :exportable="false" header="Utilities" class="headerUtil dateTable w-24">
+                    <Column :exportable="false" header="Utilidades" class="headerUtil dateTable w-24">
                         <template #body="slotProps">
                             <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editMyPhone(slotProps.data)" />
                             <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeletePhone(slotProps.data)" />

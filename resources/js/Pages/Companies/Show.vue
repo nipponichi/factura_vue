@@ -25,30 +25,30 @@
                                         <div class="flex justify-center lg:pt-0 pt-8">
                                             <div class="p-3 text-center">
                                                 <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">33</span>
-                                                <span class="text-sm text-slate-400">Customers</span>
+                                                <span class="text-sm text-slate-400">Clientes</span>
                                             </div>
                                             <div class="p-3 text-center">
                                                 <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">24</span>
-                                                <span class="text-sm text-slate-400">Products</span>
+                                                <span class="text-sm text-slate-400">Productos</span>
                                             </div>
 
                                             <div class="p-3 text-center">
                                                 <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">564</span>
-                                                <span class="text-sm text-slate-400">Invoices</span>
+                                                <span class="text-sm text-slate-400">Facturas</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <div class="py-5 border-t border-slate-200 text-center">
-                                    <h1 class="text-lg text-slate-700 leading-normal mb-1">Company details:</h1>
+                                    <h1 class="text-lg text-slate-700 leading-normal mb-1">Detalle de empresa:</h1>
                                     <div class="flex flex-wrap justify-center">
                                         <div>
 
                                             <div class="text-gray-700">
                                                 <div class="grid md:grid-cols-2 text-sm">
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Tax Number:</div>
+                                                        <div class=" py-2 font-semibold">CIF:</div>
                                                         <div class=" py-2">{{ company.tax_number }}</div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
@@ -58,11 +58,11 @@
                                                         </div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Phone :</div>
+                                                        <div class=" py-2 font-semibold">Teléfono:</div>
                                                         <div class=" py-2">{{ company.phone }}</div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Address :</div>
+                                                        <div class=" py-2 font-semibold">Dirección:</div>
                                                         <div class=" py-2">{{ company.address}} </div>
                                                     </div>
                                                     
@@ -82,25 +82,25 @@
                                 <li class="me-2">
                                     <button @click="changeTab('customers')" :class="{'border-b-2 border-blue-500': activeTab === 'customers'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-users w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        Customers
+                                        Clientes
                                     </button>
                                 </li>
                                 <li class="me-2">
                                     <button @click="changeTab('products')" :class="{'border-b-2 border-blue-500': activeTab === 'products'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-shopping-cart w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        Products
+                                        Productos
                                     </button>
                                 </li>
                                 <li class="me-2">
                                     <button @click="changeTab('invoices')" :class="{'border-b-2 border-blue-500': activeTab === 'invoices'}" class="inline-flex items-center justify-center p-4 border-transparent rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-file w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        Invoices
+                                        Facturas
                                     </button>
                                 </li>
                                 <li class="me-2">
                                     <button @click="changeTab('phone')" :class="{'border-b-2 border-blue-500': activeTab === 'phone'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-phone w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        Phone
+                                        Teléfono
                                     </button>
                                 </li>
                                 <li class="me-2">
@@ -112,7 +112,7 @@
                                 <li class="me-2">
                                     <button @click="changeTab('address')" :class="{'border-b-2 border-blue-500': activeTab === 'address'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-home w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        Address
+                                        Dirección
                                     </button>
                                 </li>
                                 

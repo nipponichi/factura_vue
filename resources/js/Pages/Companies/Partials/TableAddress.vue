@@ -3,8 +3,8 @@
         <div class="card">
             <Toolbar class="mb-4 border border-slate-200 ...">
                 <template #start>
-                    <Button label="New" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
-                    <Button label="Delete" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedAddresses || !selectedAddresses.length" />
+                    <Button label="Añadir" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
+                    <Button label="Eliminar" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedAddresses || !selectedAddresses.length" />
                 </template>
             </Toolbar>
 
@@ -14,9 +14,9 @@
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} companies">
                 <template #header>
                     <div class="flex justify-between items-center mt-2">
-                        <h4>Manage addresses</h4>
+                        <h4>Gestionar direcciones</h4>
                         <div class="relative rounded-md shadow-sm w-1/4">
-                            <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm" v-model="filters['global'].value" placeholder="Search...">
+                            <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm" v-model="filters['global'].value" placeholder="Búsqueda...">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
@@ -29,13 +29,13 @@
                 
 
                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox" ></Column>
-                <Column field="post_code" header="PostCode" sortable class="dateTable"></Column>
-                <Column field="town" header="Town" sortable class="dateTable"></Column>
-                <Column field="address" header="Address" sortable class="dateTable"></Column>
-                <Column field="province" header="Province" sortable class="dateTable"></Column>
-                <Column field="country" header="Country" sortable class="dateTable"></Column>
+                <Column field="post_code" header="Código postal" sortable class="dateTable"></Column>
+                <Column field="town" header="Población" sortable class="dateTable"></Column>
+                <Column field="address" header="Dirección" sortable class="dateTable"></Column>
+                <Column field="province" header="Provincia" sortable class="dateTable"></Column>
+                <Column field="country" header="País" sortable class="dateTable"></Column>
                 
-                <Column :exportable="false"  header="Favourite" class="dateTable w-24 text-center">
+                <Column :exportable="false"  header="Favorito" class="dateTable w-24 text-center">
             
                     <template #body="slotProps">
                         <Button v-if="slotProps.data.favourite" icon="pi pi-star-fill"  class="mr-2 info-button" @click="makeFavourite(slotProps.data)" />
@@ -46,7 +46,7 @@
                 
                 
                 <div class="utility-button">
-                    <Column :exportable="false" header="Utilities" class="headerUtil dateTable w-24">
+                    <Column :exportable="false" header="Utilidades" class="headerUtil dateTable w-24">
                         <template #body="slotProps">
                             <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editMyAddress(slotProps.data)" />
                             <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteAddress(slotProps.data)" />
@@ -61,30 +61,30 @@
 
         <!-- MODAL -->
             <template>
-                <Dialog v-model:visible="addressDialog" :header="myAddress.id ? 'Update address' : 'Create address'" id="titleAddress" :modal="true" class="p-fluid">
+                <Dialog v-model:visible="addressDialog" :header="myAddress.id ? 'Modificar dirección' : 'Crear dirección'" id="titleAddress" :modal="true" class="p-fluid">
                 <form style="width: 800px;" @submit.prevent="saveMyAddress">
                     
                     <div class="mb-6">
                         <div>
-                            <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
+                            <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Dirección</label>
                             <input type="text" id="address" v-model="myAddress.address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Address" required />
                         </div>
                     </div>
                     <div class="grid gap-3 mb-6 md:grid-cols-2">                
                         <div>
-                            <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Town</label>
+                            <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Población</label>
                             <input type="text" id="town" v-model="myAddress.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Town" required />
                         </div>  
                         <div>
-                            <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Province</label>
+                            <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Provincia</label>
                             <input type="text" id="province" v-model="myAddress.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Province" required />
                         </div>  
                         <div>
-                            <label for="post_code" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Post code</label>
+                            <label for="post_code" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Código postal</label>
                             <input type="text" id="post_code" v-model="myAddress.post_code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Post code" pattern="^\d+$" required />
                         </div>
                         <div>
-                            <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
+                            <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">País</label>
                             <input type="text" id="country" v-model="myAddress.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Country" required />
                         </div>            
                     </div>
@@ -92,13 +92,13 @@
                         
                     <div class="flex items-center">
                         <input id="link-checkbox" type="checkbox" v-model="myAddress.favourite" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Mark this address as a favourite.</label>
+                        <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Marcar dirección como favorita.</label>
                     </div>
                     
                     <div class="grid gap-3 md:grid-cols-1 justify-items-end">
                     <div>
-                        <button type="button" class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog">Close</button>
-                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ myAddress.id ? 'Update' : 'Save' }}</button>
+                        <button type="button" class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog">Cerrar</button>
+                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ myAddress.id ? 'Actualizar' : 'Guardar' }}</button>
                     </div>
                     </div>
                 </form>
@@ -110,7 +110,7 @@
         <Dialog v-model:visible="deleteAddressDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="myAddress">Are you sure you want to delete <b>{{myAddress.address}}</b>?</span>
+                <span v-if="myAddress">¿Está seguro qué desea eliminar la dirección de <b>{{myAddress.address}}</b>?</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteAddressDialog = false"/>
@@ -122,7 +122,7 @@
         <Dialog v-model:visible="deleteAddressesDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="myAddress">Are you sure you want to delete the selected addresses?</span>
+                <span v-if="myAddress">¿Está seguro de que desea eliminar las direcciones seleccionadas?</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteAddressesDialog = false"/>

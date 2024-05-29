@@ -54,17 +54,17 @@ const logout = () => {
                             </div>
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')">
                                 <NavLink :href="route('invoices.index')" :active="route().current('invoices.*')">
-                                    Invoice
+                                    Facturación
                                 </NavLink>
                             </div>                       
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')" >
                                 <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
-                                    My Company
+                                    Mi Empresa
                                 </NavLink>
                             </div>
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view consulting')">
                                 <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
-                                    Consulting
+                                    Asesoría
                                 </NavLink>
                             </div>
 
@@ -72,22 +72,22 @@ const logout = () => {
                             <!-- NAVIGATION ADMIN -->
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
                                 <NavLink :href="route('admin-users.index')" :active="route().current('admin-users.*')">
-                                    Users
+                                    Usuarios
                                 </NavLink>
                             </div>    
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
                                 <NavLink :href="route('admin-companies.index')" :active="route().current('admin-companies.*')">
-                                    Companies
+                                    Empresas
                                 </NavLink>
                             </div>
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
                                 <NavLink :href="route('admin-invoices.index')" :active="route().current('admin-invoices.*')">
-                                    Invoices
+                                    Facturas
                                 </NavLink>
                             </div> 
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
                                 <NavLink :href="route('admin-products.index')" :active="route().current('admin-produtcs.*')">
-                                    Products
+                                    Productos
                                 </NavLink>
                             </div>                                           
                         </div>
@@ -177,12 +177,8 @@ const logout = () => {
                                         </div>
 
                                         <DropdownLink :href="route('profile.show')">
-                                            Profile
-                                        </DropdownLink>
-                                        
-                                        <DropdownLink :href="route('profile.show')">
-                                            Pricing
-                                        </DropdownLink>
+                                            Perfil
+                                        </DropdownLink>a
 
                                         <DropdownLink v-if="$page.props.jetstream.hasApiFeatures" :href="route('api-tokens.index')">
                                             API Tokens
@@ -193,7 +189,7 @@ const logout = () => {
                                         <!-- Authentication -->
                                         <form @submit.prevent="logout">
                                             <DropdownLink as="button">
-                                                Log Out
+                                                Cerrar sesión
                                             </DropdownLink>
                                         </form>
                                     </template>
