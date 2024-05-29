@@ -12,13 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('documents_details', function (Blueprint $table) {
             $table->id();
-            $table->string('reference');
+            $table->string('description');
+            $table->decimal('quantity');
+            $table->decimal('tax');
+            $table->decimal('price');
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
-            $table->foreignId('company_id')->constrained();
+            $table->foreignId('documents_id')->constrained('documents');
         });
+    
     }
 
     /**
@@ -26,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('products');
+        Schema::dropIfExists('documents_details');
     }
 };

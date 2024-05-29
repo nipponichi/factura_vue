@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('inovice_number_series', function (Blueprint $table) {
+        Schema::create('documents_series', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies');
-            $table->String('init_format');
-            $table->boolean('favourite')->default (false);
+            $table->foreignId('documents_type_id')->constrained('documents_type');
+            $table->String('serie');
+            $table->integer('number');
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
         });
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('inovice_number_series');
+        Schema::dropIfExists('document_series');
     }
 };

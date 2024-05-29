@@ -217,7 +217,7 @@ export default {
             axios.get('/customers/' + myCompanyId)
             .then(response => {
             // Asigna los datos de los clientes a la propiedad 'companies'
-            this.companies = response.data[0];
+            this.companies = response.data.customers;
             console.log(this.companies);
             // Itera sobre todos los elementos del array 'companies'
             this.companies.forEach((company, index) => {

@@ -2,149 +2,194 @@
     <div>
         <div class="card">
 
+            <div class="select flex flex-col md:flex-row justify-end">
 
-            <div class="selector flex justify-between">  
-                <div class="showCompany">
-                    <Dropdown v-model="selectedUser" :options="this.users" filter optionLabel="email" placeholder="Select your company" class="w-full md:w-4rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
-                        <template #value="slotProps">
-                            <div v-if="slotProps.value" class="flex align-items-center">
-                                <div>{{ slotProps.value.email }}</div>
-                            </div>
-                            <span v-else>
-                                {{ slotProps.placeholder }}
-                            </span>
-                        </template>
-                        <template #option="slotProps">
-                            <div class="flex align-items-center">
-                                <div>{{ slotProps.option.email }}</div>
-                            </div>
-                        </template>
-                    </Dropdown>
+                <div class="relative inline-block w-50 mb-4 ml-2">
+                    <button 
+                        type="button" 
+                        class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
+                        @click="exportDocument()"
+                        >
+                        <span>
+                            <i class="pi pi-upload mr-2"></i>
+                            {{'Export'}}
+                        </span>
+                    </button>
+                </div>
+                
+                <div class="relative inline-block w-50 mb-4 ml-2">
+                    <button 
+                        type="button" 
+                        class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
+                        @click="saveDocument()"
+                        >
+                        <span>
+                            <i class="pi pi-plus mr-2"></i>
+                            {{'Save' }}
+                        </span>
+                    </button>
+                </div>
 
-                    <div class="relative max-w-md mx-auto md:max-w-2xl mt-6 min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-xl mt-16 p-6">
+                
+            </div>
+
+            <div class="select flex flex-col md:flex-row justify-between">
+                <div class="relative inline-block w-50 mb-4 ml-12">
+                    <button 
+                        type="button" 
+                        class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
+                        @click="selectCompany()"
+                        >
+                        <span>
+                            <i class="pi pi-plus mr-2"></i>
+                            {{'Select companies' }}
+                        </span>
+                    </button>
+                </div>
+
+                <div class="relative inline-block w-50 mb-4 ml-12">
+                    <button 
+                        type="button" 
+                        class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
+                        @click="selectDocument()"
+                        >
+                        <span>
+                            <i class="pi pi-plus mr-2"></i>
+                            {{'Select Documents' }}
+                        </span>
+                    </button>
+                </div>
+                
+                
+            </div>
+
+
+            <div class="selector flex flex-col md:flex-row justify-between items-start ml-12">
+                <!-- Foto -->
+                <div class="w-64 h-32 mb-3 md:mb-0 border rounded-lg overflow-hidden relative bg-gray-100 mr-0 md:mr-4">
+                    <img
+                        alt="Company Logo"
+                        :src="imageUrl"
+                        class="object-cover w-full h-48 cursor-pointer"
+                        @click="openFileInput"
+                    />
+                    <div class="absolute top-0 left-0 right-0 bottom-0 w-full block cursor-pointer flex items-center justify-center">
+                        <button
+                        type="button"
+                        style="background-color: rgba(255, 255, 255, 0.65)"
+                        class="hover:bg-gray-100 text-gray-700 font-semibold py-2 px-4 text-sm border border-gray-300 rounded-lg shadow-sm"
+                        @click="openFileInput"
+                        >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="icon icon-tabler icon-tabler-camera"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            stroke-width="2"
+                            stroke="currentColor"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <rect x="0" y="0" width="24" height="24" stroke="none"></rect>
+                            <path
+                            d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"
+                            />
+                            <circle cx="12" cy="13" r="3" />
+                        </svg>
+                        <input type="file" ref="fileInput" @change="handleFileChange" style="display: none" />
+                        </button>
+                    </div>
+
+
+                </div>
+
+                <div class="grid md:grid-cols-1 text-sm gap-y-1 mr-28">
+                    <div class="flex items-center">
+                        <div class="font-semibold mr-3">Nº Invoice:</div>
+                        <div class="text-gray-700">F-123456</div>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="font-semibold mr-3">Date:</div>
                         <div>
-                            <div class="w-32 h-32 mb-1 border rounded-lg overflow-hidden relative bg-gray-100">
-                                <img alt="Company Logo" id="image" class="object-cover w-full h-32" src="https://placehold.co/300x300/e2e8f0/e2e8f0" />             
-                                <div class="absolute top-0 left-0 right-0 bottom-0 w-full block cursor-pointer flex items-center justify-center" onClick="document.getElementById('fileInput').click()">
-                                    <button type="button"
-                                        style="background-color: rgba(255, 255, 255, 0.65)"
-                                        class="hover:bg-gray-100 text-gray-700 font-semibold py-2 px-4 text-sm border border-gray-300 rounded-lg shadow-sm"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-camera" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="0" y="0" width="24" height="24" stroke="none"></rect>
-                                            <path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" />
-                                            <circle cx="12" cy="13" r="3" />
-                                        </svg>							  
-                                    </button>
-                                </div>
-                            </div>
-                            <input name="photo" id="fileInput" accept="image/*" class="hidden" type="file" onChange="let file = this.files[0]; 
-                                var reader = new FileReader();
-            
-                                reader.onload = function (e) {
-                                    document.getElementById('image').src = e.target.result;
-                                    document.getElementById('image2').src = e.target.result;
-                                };
-                            
-                                reader.readAsDataURL(file);
-                            ">
+                            <input
+                                type="date"
+                                v-model="fecha"
+                                @change="cambiarFormatoFecha"
+                                class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-400"
+                            />
                         </div>
-                        <div class="grid md:grid-cols-2 text-sm gap-y-2">
-                            <div class="flex items-center">
-                                <div class="font-semibold">Company name:</div>
-                                <div></div>
-                            </div>
+                    </div>
+                </div>  
+                
 
+            </div>
+        
+            <div class="selector flex flex-col md:flex-row justify-between mt-6 ml-12">
+                <div class="showCompany">
+
+                    <div class="flex justify-center">
+                        
+                        </div>
+                            <div class="grid md:grid-cols-1 text-m gap-y-1">
                             <div class="flex items-center">
-                                <div class="font-semibold">Tax Number:</div>
-                                <div></div>
+                                <div class="font-semibold mr-3">Company name:</div>
+                                <div class="text-gray-700">{{this.selectedCompany.name}}</div>
                             </div>
                             <div class="flex items-center">
-                                <div class="font-semibold">Phone:</div>
-                                <div></div>
+                                <div class="font-semibold mr-3">Tax Number:</div>
+                                <div class="text-gray-700">{{this.selectedCompany.tax_number}}</div>
                             </div>
                             <div class="flex items-center">
-                                <div class="font-semibold">Email:</div>
-                                <div>
-                                    <a href="" class="text-blue-800 underline hover:no-underline">example@example.com</a>
-                                </div>
+                                <div class="font-semibold mr-3">Phone:</div>
+                                <div class="text-gray-700">{{this.selectedCompany.phone}}</div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="font-semibold mr-3">Email:</div>
+                                <div class="text-gray-700">{{ this.selectedCompany.email }}</div>
                             </div>
                             
                             <div class="flex items-center">
-                                <div class="font-semibold">Address:</div>
-                                <div></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="showCustomer">
-                    <div class="invoiceDetails">
-                        <div class="relative max-w-md mx-auto md:max-w-2xl mt-6 min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-xl mt-16 p-6">
-                            <div class="grid md:grid-cols-1 text-sm gap-y-2">
-                                <div class="flex items-center">
-                                    <div class="font-semibold mr-3">Invoice number:</div>
-                                    <div></div>
-                                </div>
-    
-                                <div class="flex items-center">
-                                    <label class="font-semibold mr-3" for="birth_date">Date:</label>
-                                    <FloatLabel>
-                                        <Calendar v-model="date" inputId="birth_date" :locale="es" />                                    
-                                    </FloatLabel>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <Dropdown v-model="selectedUser" :options="this.users" filter optionLabel="email" placeholder="Select a customer" class="w-full md:w-4rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
-                        <template #value="slotProps">
-                            <div v-if="slotProps.value" class="flex align-items-center">
-                                <div>{{ slotProps.value.email }}</div>
-                            </div>
-                            <span v-else>
-                                {{ slotProps.placeholder }}
-                            </span>
-                        </template>
-                        <template #option="slotProps">
-                            <div class="flex align-items-center">
-                                <div>{{ slotProps.option.email }}</div>
-                            </div>
-                        </template>
-                    </Dropdown>   
-
-                    <div class="relative max-w-md mx-auto md:max-w-2xl mt-6 min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-xl mt-16 p-6">
-                        <div class="grid md:grid-cols-2 text-sm gap-y-2">
-                            <div class="flex items-center">
-                                <div class="font-semibold">Company name:</div>
-                                <div></div>
-                            </div>
-
-                            <div class="flex items-center">
-                                <div class="font-semibold">Tax Number:</div>
-                                <div></div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="font-semibold">Phone:</div>
-                                <div></div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="font-semibold">Email:</div>
-                                <div>
-                                    <a href="" class="text-blue-800 underline hover:no-underline">example@example.com</a>
-                                </div>
-                            </div>
+                                <div class="font-semibold mr-3">Address:</div>
+                                <div class="text-gray-700">{{this.selectedCompany.address}}</div>
                             
+                            </div>
+                        
+                        </div>
+                    
+                    </div>
+                    
+
+                    <div class="showCustomer" style="width: 21rem;"> <!-- Establece el ancho fijo -->
+                        <div class="grid md:grid-cols-1 text-m gap-y-1">
                             <div class="flex items-center">
-                                <div class="font-semibold">Address:</div>
-                                <div></div>
+                                <div class="font-semibold mr-2">Customer name:</div>
+                                <div class="text-gray-700">{{ this.selectedCustomer.name }}</div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="font-semibold mr-2">Tax number:</div>
+                                <div class="text-gray-700">{{ this.selectedCustomer.tax_number }}</div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="font-semibold mr-2">Phone:</div>
+                                <div class="text-gray-700">{{ this.selectedCustomer.phone }}</div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="font-semibold mr-2">Email:</div>
+                                <div class="text-gray-700">{{ this.selectedCustomer.email }}</div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="font-semibold mr-3">Dirección:</div>
+                                <div class="text-gray-700">{{ this.selectedCustomer.address }}</div>
                             </div>
                         </div>
                     </div>
-                </div>
+
             </div>  
-            <Toolbar class="mb-4 border border-slate-200 ...">
+            <Toolbar class="mb-4 mt-8 border border-slate-200 ...">
                 <template #start>
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between ">
                         <div class="flex items-center">
                             <Button label="Add" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="addRow" />
                             <Button label="Delete" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
@@ -211,7 +256,7 @@
             </DataTable>
 
             <div class="flex justify-end mt-4 pr-4">
-                <Button label="Add" icon="pi pi-plus" severity="success" class="success-button" @click="addRow" />
+                <Button label="Add" icon="pi pi-plus" severity="success" class="success-button" @click="addRow()" />
             </div>
         </div>
 
@@ -235,12 +280,76 @@
             </div>
         </div>
 
+        <!-- MODAL COMPANY -->
+        <Dialog v-model:visible="productDialog" :style="{width: '450px'}" header="Select companies" :modal="true" @change="handleCompanySelection">
+            <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">Select your company:</label>
+            <Dropdown v-model="selectedCompany" :options="companies" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="handleCompanySelection">
+                <template #value="slotProps">
+                    <div v-if="slotProps.value" class="flex align-items-center">
+                        <div>{{ slotProps.value.name }}</div>
+                    </div>
+                </template>
+                <template #option="slotProps">
+                    <div class="flex align-items-center">
+                        <div>{{ slotProps.option.name }}</div>
+                    </div>
+                </template>
+            </Dropdown>
+            <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">Select a customer:</label>
+            <Dropdown v-model="selectedCustomer" :options="this.customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                <template #value="slotProps">
+                    <div v-if="slotProps.value" class=" flex align-items-center ">
+                        <div>{{ slotProps.value.name }}</div>
+                    </div>
+                </template>
+                <template #option="slotProps">
+                    <div class="flex align-items-center">
+                        <div>{{ slotProps.option.name }}</div>
+                    </div>
+                </template>
+            </Dropdown>  
+
+        </Dialog>
+
+        <!-- MODAL DOCUMENT -->
+
+        <Dialog v-model:visible="documentDialog" :style="{width: '450px'}" header="Select document" :modal="true" @change="handleDocumentSelection">
+            <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">Select document type</label>
+            <Dropdown v-model="selectedType" :options="documents" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="handleCompanySelection">
+                <template #value="slotProps">
+                    <div v-if="slotProps.value" class="flex align-items-center">
+                        <div>{{ slotProps.value.name }}</div>
+                    </div>
+                </template>
+                <template #option="slotProps">
+                    <div class="flex align-items-center">
+                        <div>{{ slotProps.option.name }}</div>
+                    </div>
+                </template>
+            </Dropdown>
+            <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">Select document serie</label>
+            <Dropdown v-model="selectedSerie" :options="this.series" filter optionLabel="serie" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                <template #value="slotProps">
+                    <div v-if="slotProps.value" class=" flex align-items-center ">
+                        <div>{{ slotProps.value.serie }}</div>
+                    </div>
+                </template>
+                <template #option="slotProps">
+                    <div class="flex align-items-center">
+                        <div>{{ slotProps.option.serie }}</div>
+                    </div>
+                </template>
+            </Dropdown>  
+
+        </Dialog>
+
+
 
         <!-- MODAL DELETE SIMPLE -->
         <Dialog v-model:visible="deleteProductDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="product">Are you sure you want to delete <b>{{product.name}}</b>?</span>
+                <span v-if="companies">Are you sure you want to delete <b>{{companies.name}}</b>?</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteProductDialog = false" />
@@ -263,14 +372,14 @@
 </template>
 <script>
 import { FilterMatchMode } from 'primevue/api';
-import es from 'primevue/calendar/locale/es';
 
 
 
 export default {
     data() {
         return {
-
+            fecha: '',
+            fechaFormateada: '',
             taxOptions: [
                 { label: '0%', value: 0 },
                 { label: '4%', value: 4 },
@@ -278,13 +387,16 @@ export default {
                 { label: '10%', value: 10 },
                 { label: '21%', value: 21 },
             ],
+            imageUrl: 'https://placehold.co/300x300/e2e8f0/e2e8f0',
             users: [],
+            companies: null,
+            customers: null,
             productDialog: false,
             deleteProductDialog: false,
             deleteProductsDialog: false,
-            selectedCompany: '',
             products: [],
-            selectedUser: null,
+            selectedCompany: [],
+            selectedCustomer: [],
             selectedProducts: [],
             filters: {},
             submitted: false,
@@ -306,12 +418,80 @@ export default {
         this.filters = {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
         };
+
+        // Inicializa la fecha con la fecha de hoy
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const day = today.getDate().toString().padStart(2, '0');
+        this.fecha = `${year}-${month}-${day}`;
     },
 
+    mounted() {
+        this.fetchCompanies();
+        
+    },
     
     methods: {
 
+        handleCompanySelection() {
+            
+            axios.get('/customers/'+this.selectedCompany.id)
+                .then(response => {
+            
+                    this.customers = response.data.customers;                 
+                })
+                .catch(error => {
+                    console.error('Error fetching phone data:', error);
+                });
+        },
+
+        handleDocumentSelection() {
+            
+            axios.get('/customers/'+this.selectedCompany.id)
+                .then(response => {
+            
+                    this.customers = response.data.customers;                 
+                })
+                .catch(error => {
+                    console.error('Error fetching phone data:', error);
+                });
+        },
         
+        fetchCompanies() {
+            
+            axios.get('/companies-invoice')
+                .then(response => {
+                    this.companies = response.data.companies;     
+                
+                })
+                .catch(error => {
+                    console.error('Error fetching phone data:', error);
+                });
+        },
+
+        selectCompany() {
+            this.productDialog = true
+        },
+
+        selectDocument() {
+            this.productDialog = true
+        },
+
+        openFileInput() {
+            this.$refs.fileInput.click();
+        },
+        
+        handleFileChange(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = () => {
+                this.imageUrl = reader.result;
+            };
+            
+            reader.readAsDataURL(file);
+        },
         
         addRow() {
             let newProduct = {
@@ -346,9 +526,10 @@ export default {
             });
             this.selectedProducts = [];
             this.deleteProductsDialog = false;
+            
         },
     },
-};
+}
 </script>
 
 <style>
@@ -466,5 +647,12 @@ export default {
     border-top: #E2E8F0 1px solid;
     border-bottom: #E2E8F0 1px solid;
     min-width: 10rem;
+}
+
+@media (max-width: 768px) { 
+    .showCompany,
+    .showCustomer {
+        margin-bottom: 1.5rem;
+    }
 }
 </style>

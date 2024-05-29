@@ -15,6 +15,27 @@ class CompanySeeder extends Seeder
      */
     public function run(): void
     {
+
+    //Tipos de documentos
+
+    DB::table('documents_type')->insert([
+        'name' => 'Factura',
+    ]);
+
+    DB::table('documents_type')->insert([
+        'name' => 'Presupuesto',
+    ]);
+
+    DB::table('documents_type')->insert([
+        'name' => 'Albarán',
+    ]);
+
+    DB::table('documents_type')->insert([
+        'name' => 'Pedido',
+    ]);
+
+
+    //PRIMERA COMPAÑIA
     DB::table('companies')->insert([
         'verified' => true,
         'dt_start' => now(),
@@ -74,9 +95,24 @@ class CompanySeeder extends Seeder
     ]);
 
 
+    DB::table('documents_series')->insert([
+        'serie' => 'F',
+        'number' => 1,
+        'company_id' => 1,
+        'documents_type_id' => 1,
+        'dt_start' => now(),
+    ]);
+
+    
+    DB::table('documents_series')->insert([
+        'serie' => 'P',
+        'number' => 23,
+        'company_id' => 1,
+        'documents_type_id' => 2,
+        'dt_start' => now(),
+    ]);
 
     //SEGUNDA COMPAÑIA
-
 
     DB::table('companies')->insert([
         'verified' => true,
@@ -133,6 +169,29 @@ class CompanySeeder extends Seeder
         'company_id' => 2,
         'dt_start' => now(),
     ]);
+
+
+    DB::table('documents_series')->insert([
+        'serie' => 'F24',
+        'number' => 44,
+        'company_id' => 2,
+        'documents_type_id' => 1,
+        'dt_start' => now(),
+    ]);
+
+    
+    DB::table('documents_series')->insert([
+        'serie' => 'P24',
+        'number' => 1,
+        'company_id' => 2,
+        'documents_type_id' => 2,
+        'dt_start' => now(),
+    ]);
+
+
+
+
+    
     
 
 }
