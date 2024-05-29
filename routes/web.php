@@ -26,6 +26,7 @@ Route::middleware([
 ])->group(function () {
     Route::get('/dashboard', [RouteController::class, 'dashboard'])->name('dashboard');
     Route::resource('/companies', CompanyController::class);
+    Route::get('/companies-invoice', [CompanyController::class, 'companiesInvoice']);
     Route::resource('/invoices', InvoiceController::class);
     Route::resource('/customer', CustomerController::class);
     Route::get('/customers/{id}', [CustomerController::class, 'index']);

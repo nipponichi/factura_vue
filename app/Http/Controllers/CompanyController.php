@@ -19,13 +19,10 @@ class CompanyController extends Controller
     
     public function __construct()
     {
-        $this->middleware(['can:read company'])->only('index');
-        $this->middleware(['can:create company'])->only('create');
-        $this->middleware(['can:create company'])->only('store');
-        $this->middleware(['can:read company'])->only('show');
-        $this->middleware(['can:update company'])->only('edit');
-        $this->middleware(['can:update company'])->only('update');
-        $this->middleware(['can:delete company'])->only('destroy');
+        $this->middleware('can:read company')->only(['index', 'show', 'companyInvoice']);
+        $this->middleware('can:create company')->only(['create', 'store']);
+        $this->middleware('can:update company')->only(['edit', 'update']);
+        $this->middleware('can:delete company')->only('destroy');
     }
 
 
@@ -67,9 +64,50 @@ class CompanyController extends Controller
         ->whereNull('emails.dt_end')
         ->get();
 
-
         return Inertia::render('Companies/Index', ['companies' => $companies]);
     
+    }
+
+    public static function companiesInvoice()
+    {
+        // Obtiene el ID del usuario autenticado
+        $userId = Auth::id();
+        
+        $companies = DB::table('companies')
+        ->select(
+            'companies.id',
+            'companies.dt_end',
+            'companies_tax_numbers.tax_number',
+            'companies_names.name',
+            'emails.email',
+            'phones.phone',
+            'addresses.address',
+            'addresses.post_code',
+            'addresses.province',
+            'addresses.town',
+            'addresses.country'
+        )
+        ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
+        ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
+        ->leftJoin('companies_tax_numbers', 'companies.id', '=', 'companies_tax_numbers.company_id')
+        ->leftJoin('emails', 'companies.id', '=', 'emails.company_id')
+        ->leftJoin('phones', 'companies.id', '=', 'phones.company_id')
+        ->leftJoin('addresses', 'companies.id', '=', 'addresses.company_id')
+        
+        ->where('companies_users.user_id', $userId)
+        ->where('addresses.favourite', 1)
+        ->where('phones.favourite', 1)
+        ->where('emails.favourite', 1)
+        ->whereNull('companies_users.dt_end')
+        ->whereNull('companies_names.dt_end')
+        ->whereNull('companies_tax_numbers.dt_end')
+        ->whereNull('addresses.dt_end')
+        ->whereNull('phones.dt_end')
+        ->whereNull('emails.dt_end')
+        ->get();
+
+        return response()->json(['message' => 'Compañía no encontrada ahora ', 'companies' => $companies]);
+
     }
     
 

@@ -11,15 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        
-        Schema::create('invoices_concepts', function (Blueprint $table) {
+       
+        Schema::create('documents_type', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('stock')->nullable();
-            $table->string('state');
-            $table->dateTime('dt_start')->useCurrent();
-            $table->dateTime('dt_end')->nullable();
-            $table->foreignId('invoice_detail_id')->constrained('invoices_details');
         });
     }
 
@@ -28,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('invoices_concepts');
+        Schema::dropIfExists('documents_type');
     }
 };

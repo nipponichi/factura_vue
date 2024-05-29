@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('products_prices', function (Blueprint $table) {
-            $table->decimal('price');
+      /*  Schema::create('document_designs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('company_id')->constrained('companies');
+            $table->string('configuration');
+            $table->boolean('favourite')->default (false);
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
-            $table->foreignId('product_detail_id')->constrained('products_details');
-        });
+        });*/
     }
 
     /**
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('products_prices');
+        Schema::dropIfExists('invoices_designs');
     }
 };

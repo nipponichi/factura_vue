@@ -72,7 +72,7 @@ class CustomerController extends Controller
             ->get();
 
 
-            return response()->json(['message' => 'Companies: ', $companies], 200);
+            return response()->json(['message' => 'Compañía no encontrada ahora ', 'customers' => $companies]);
         } catch (Exception $e) {
             return response()->json(['message' => 'Error index companies: ' . $e->getMessage()], 500);
         }

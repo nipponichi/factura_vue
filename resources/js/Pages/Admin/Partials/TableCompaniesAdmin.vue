@@ -52,7 +52,7 @@
                 
                 <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select an user</label>
                 <Dropdown v-model="selectedUser" :options="this.users" filter optionLabel="email" placeholder="Select an user" class="w-full md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
-
+                        
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class=" flex align-items-center ">
                             <div>{{ slotProps.value.email }}</div>
