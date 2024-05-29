@@ -106,7 +106,7 @@ class CompanyController extends Controller
         ->whereNull('emails.dt_end')
         ->get();
 
-        return response()->json(['message' => 'Compañía no encontrada ahora ', 'companies' => $companies]);
+        return response()->json(['message' => 'Compañía encontrada ahora ', 'companies' => $companies]);
 
     }
     

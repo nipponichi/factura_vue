@@ -2,69 +2,89 @@
     <div>
         <div class="card">
 
-            <div class="select flex flex-col md:flex-row justify-end">
+            <div class="select flex flex-col md:flex-row justify-between mb-4">
 
-                <div class="relative inline-block w-50 mb-4 ml-2">
-                    <button 
-                        type="button" 
-                        class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
-                        @click="exportDocument()"
-                        >
-                        <span>
-                            <i class="pi pi-upload mr-2"></i>
-                            {{'Export'}}
-                        </span>
-                    </button>
-                </div>
-                
-                <div class="relative inline-block w-50 mb-4 ml-2">
-                    <button 
-                        type="button" 
-                        class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
-                        @click="saveDocument()"
-                        >
-                        <span>
-                            <i class="pi pi-plus mr-2"></i>
-                            {{'Save' }}
-                        </span>
-                    </button>
+                <div class="flex justify-start md:justify-end mb-3 md:mb-0">
+                    <div class="relative inline-block w-50">
+                        <button 
+                            type="button" 
+                            class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
+                            @click="selectCompany()"
+                            >
+                            <span>
+                                <i class="pi pi-plus mr-2"></i>
+                                {{'Companies' }}
+                            </span>
+                        </button>
+                    </div>
+
+                    <div class="relative inline-block w-50 ml-2">
+                        <button 
+                            type="button" 
+                            class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
+                            @click="selectDocument()"
+                            :class="{ 'opacity-50': !this.selectedCompany.id }"
+                            :disabled="!this.selectedCompany.id"
+                            >
+                            <span>
+                                <i class="pi pi-plus mr-2"></i>
+                                {{'Document type' }}
+                            </span>
+                        </button>
+                    </div>
                 </div>
 
-                
+                <div class="flex justify-end">
+                    <div class="relative inline-block w-50 ml-2">
+                        <button 
+                            type="button" 
+                            class="px-4 py-2 bg-purple-500 text-white rounded flex items-center justify-between" 
+                            @click="exportDocument()"
+                            :class="{ 'opacity-50': isDisabled }"
+                            :disabled="isDisabled"
+                            >
+                            <span>
+                                <i class="pi pi-file-export mr-2"></i>
+                                {{'Export'}}
+                            </span>
+                        </button>
+                    </div>
+                    
+                    <div class="relative inline-block w-50 ml-2">
+                        <button 
+                            type="button" 
+                            class="px-4 py-2 bg-red-500 text-white rounded flex items-center justify-between" 
+                            @click="exportDocumentPDF()"
+                            :class="{ 'opacity-50': isDisabled }"
+                            :disabled="isDisabled"
+                            >
+                            <span>
+                                <i class="pi pi-file-pdf mr-2"></i>
+                                {{'PDF' }}
+                            </span>
+                        </button>
+                    </div>
+
+                    <div class="relative inline-block w-50 ml-2">
+                        <button 
+                            type="button" 
+                            class="px-4 py-2 bg-green-500 text-white rounded flex items-center justify-between" 
+                            @click="saveDocument()"
+                            
+                            >
+                            <span>
+                                <i class="pi pi-upload mr-2"></i>
+                                {{'Save' }}
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="select flex flex-col md:flex-row justify-between">
-                <div class="relative inline-block w-50 mb-4 ml-12">
-                    <button 
-                        type="button" 
-                        class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
-                        @click="selectCompany()"
-                        >
-                        <span>
-                            <i class="pi pi-plus mr-2"></i>
-                            {{'Select companies' }}
-                        </span>
-                    </button>
-                </div>
+            <hr class="linea-grosor">
 
-                <div class="relative inline-block w-50 mb-4 ml-12">
-                    <button 
-                        type="button" 
-                        class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
-                        @click="selectDocument()"
-                        >
-                        <span>
-                            <i class="pi pi-plus mr-2"></i>
-                            {{'Select Documents' }}
-                        </span>
-                    </button>
-                </div>
-                
-                
-            </div>
-
-
-            <div class="selector flex flex-col md:flex-row justify-between items-start ml-12">
+            <div class="selector flex flex-col md:flex-row justify-between items-start mt-4 ml-12">
                 <!-- Foto -->
                 <div class="w-64 h-32 mb-3 md:mb-0 border rounded-lg overflow-hidden relative bg-gray-100 mr-0 md:mr-4">
                     <img
@@ -107,8 +127,8 @@
 
                 <div class="grid md:grid-cols-1 text-sm gap-y-1 mr-28">
                     <div class="flex items-center">
-                        <div class="font-semibold mr-3">Nº Invoice:</div>
-                        <div class="text-gray-700">F-123456</div>
+                        <div class="font-semibold mr-3">Nº {{this.selectedType.name}}:</div>
+                        <div class="text-gray-700">{{this.selectedSerie.serie}}{{this.selectedSerie.number}}</div>
                     </div>
                     <div class="flex items-center">
                         <div class="font-semibold mr-3">Date:</div>
@@ -191,7 +211,7 @@
                 <template #start>
                     <div class="flex items-center justify-between ">
                         <div class="flex items-center">
-                            <Button label="Add" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="addRow" />
+                            <Button label="New concept" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="addRow" />
                             <Button label="Delete" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
                         </div>
                         <div class="flex-grow"></div>
@@ -221,12 +241,12 @@
                 </template>
 
                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox"></Column>
-                <Column field="product" header="Product" sortable class="dateTable">
+                <Column field="product" header="Description" sortable class="dateTable">
                     <template #body="slotProps">
                         <InputText class="input" v-model="slotProps.data.product" />
                     </template>
                 </Column>
-                <Column field="amount" header="Amount" sortable class="dateTable">
+                <Column field="amount" header="Quantity" sortable class="dateTable">
                     <template #body="slotProps">
                         <InputText class="input input-short" v-model="slotProps.data.amount" />
                     </template>
@@ -236,7 +256,7 @@
                         <InputText class="input input-short" v-model="slotProps.data.price" />
                     </template>
                 </Column>
-                <Column field="taxes" header="IVA (%)" sortable class="dateTable">
+                <Column field="taxes" header="Tax (%)" sortable class="dateTable">
                     <template #body="slotProps">
                         <Dropdown class="input-short" v-model="slotProps.data.taxes" :options="taxOptions" optionLabel="label" optionValue="value" />
                     </template>
@@ -256,7 +276,7 @@
             </DataTable>
 
             <div class="flex justify-end mt-4 pr-4">
-                <Button label="Add" icon="pi pi-plus" severity="success" class="success-button" @click="addRow()" />
+                <Button label="New concept" icon="pi pi-plus" severity="success" class="success-button" @click="addRow()" />
             </div>
         </div>
 
@@ -313,9 +333,9 @@
 
         <!-- MODAL DOCUMENT -->
 
-        <Dialog v-model:visible="documentDialog" :style="{width: '450px'}" header="Select document" :modal="true" @change="handleDocumentSelection">
+        <Dialog v-model:visible="documentDialog" :style="{width: '450px'}" header="Select document" :modal="true" @change="handleTypeSelection">
             <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">Select document type</label>
-            <Dropdown v-model="selectedType" :options="documents" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="handleCompanySelection">
+            <Dropdown v-model="selectedType" :options="types" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="handleTypeSelection">
                 <template #value="slotProps">
                     <div v-if="slotProps.value" class="flex align-items-center">
                         <div>{{ slotProps.value.name }}</div>
@@ -384,19 +404,27 @@ export default {
                 { label: '0%', value: 0 },
                 { label: '4%', value: 4 },
                 { label: '5%', value: 5 },
+                { label: '7%', value: 7 },
+                { label: '8%', value: 8 },
                 { label: '10%', value: 10 },
+                { label: '16%', value: 16 },
+                { label: '18%', value: 18 },
                 { label: '21%', value: 21 },
             ],
             imageUrl: 'https://placehold.co/300x300/e2e8f0/e2e8f0',
-            users: [],
             companies: null,
             customers: null,
+            types: [],
+            series: [],
             productDialog: false,
+            documentDialog: false,
             deleteProductDialog: false,
             deleteProductsDialog: false,
             products: [],
             selectedCompany: [],
             selectedCustomer: [],
+            selectedType: [],
+            selectedSerie: [],
             selectedProducts: [],
             filters: {},
             submitted: false,
@@ -429,35 +457,11 @@ export default {
 
     mounted() {
         this.fetchCompanies();
-        
+        this.fetchDocuments();
     },
     
     methods: {
 
-        handleCompanySelection() {
-            
-            axios.get('/customers/'+this.selectedCompany.id)
-                .then(response => {
-            
-                    this.customers = response.data.customers;                 
-                })
-                .catch(error => {
-                    console.error('Error fetching phone data:', error);
-                });
-        },
-
-        handleDocumentSelection() {
-            
-            axios.get('/customers/'+this.selectedCompany.id)
-                .then(response => {
-            
-                    this.customers = response.data.customers;                 
-                })
-                .catch(error => {
-                    console.error('Error fetching phone data:', error);
-                });
-        },
-        
         fetchCompanies() {
             
             axios.get('/companies-invoice')
@@ -470,12 +474,50 @@ export default {
                 });
         },
 
+        handleCompanySelection() {
+            this.selectedCustomer = [];
+            axios.get('/customers/'+this.selectedCompany.id)
+                .then(response => {
+            
+                    this.customers = response.data.customers;                 
+                })
+                .catch(error => {
+                    console.error('Error fetching phone data:', error);
+                });
+        },
+
+        fetchDocuments() {
+            
+            
+            axios.get('/documents-type')
+                .then(response => {
+                    this.types = response.data.types;     
+                
+                })
+                .catch(error => {
+                    console.error('Error fetching phone data:', error);
+                });
+        },
+
+        handleTypeSelection() {
+
+            this.selectedSerie = [];
+            axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id)
+                .then(response => {
+            
+                    this.series = response.data.series;                 
+                })
+                .catch(error => {
+                    console.error('Error fetching phone data:', error);
+                });
+        },
+        
         selectCompany() {
             this.productDialog = true
         },
 
         selectDocument() {
-            this.productDialog = true
+            this.documentDialog = true
         },
 
         openFileInput() {
@@ -647,6 +689,11 @@ export default {
     border-top: #E2E8F0 1px solid;
     border-bottom: #E2E8F0 1px solid;
     min-width: 10rem;
+}
+
+.linea-grosor {
+    border: none;
+    border-top: #E2E8F0 1px solid; /* Grosor aumentado y color ajustado */
 }
 
 @media (max-width: 768px) { 
