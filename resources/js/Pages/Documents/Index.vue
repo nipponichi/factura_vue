@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import Invoice from '@/Pages/Invoices/Partials/Invoices.vue';
+import Invoice from '@/Pages/Documents/Partials/Document.vue';
 
 
 </script>

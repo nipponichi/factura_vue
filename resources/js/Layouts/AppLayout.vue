@@ -53,7 +53,7 @@ const logout = () => {
                                 </NavLink>
                             </div>
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')">
-                                <NavLink :href="route('invoices.index')" :active="route().current('invoices.*')">
+                                <NavLink :href="route('documents.index')" :active="route().current('documents.*')">
                                     Invoice
                                 </NavLink>
                             </div>                       
@@ -238,7 +238,7 @@ const logout = () => {
                         </ResponsiveNavLink>
                     </div>
                     <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view company')">
-                        <ResponsiveNavLink :href="route('invoices.index')" :active="route().current('invoices.*')">
+                        <ResponsiveNavLink :href="route('documents.index')" :active="route().current('documents.*')">
                             Invoices
                         </ResponsiveNavLink>
                     </div>

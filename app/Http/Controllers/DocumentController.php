@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Http\Requests\DocumentRequest;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Auth;
+use Exception;
 class DocumentController extends Controller
 {
 
@@ -21,7 +23,7 @@ class DocumentController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Invoices/Index');
+        return Inertia::render('Documents/Index');
     }
 
     public function documentType()
@@ -60,10 +62,49 @@ class DocumentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(DocumentRequest $request)
     {
-        //
+
+        DB::beginTransaction();
+        $userId = Auth::id();
+
+        try {
+            
+            DB::table('invoice')->insert([
+                'number' => $request->number,
+                'company_id_company' => $request->company_id_company,
+                'company_id_customer' => $request->company_id_customer,
+                'documents_series_id' => $request->documents_series_id,
+                'documents_type_id' => $request->documents_type_id,
+                'date' => $request->date,
+                'amount' => $request->amount,
+                'paid' => $request->paid,
+                'active' => true,
+                'tax' => $request->amount,
+                'subtotal' => $request->amount,
+                'user_who_modified' => $userId,
+                'dt_updated' => now(),
+                'dt_start' => now(),
+            ]);
+
+            
+
+            DB::commit();
+
+            return response()->json(['message' => 'La factura se ha creado correctamente']);
+
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Error al crear la factura ', $e->getMessage()], 500);
+        }
+        
+
+        
+
+        
+
     }
+
 
     /**
      * Display the specified resource.

@@ -400,6 +400,7 @@ export default {
         return {
             fecha: '',
             fechaFormateada: '',
+            isDisabled: true,
             taxOptions: [
                 { label: '0%', value: 0 },
                 { label: '4%', value: 4 },
