@@ -31,6 +31,7 @@
         "datatables.net-vue3": "^3.0.1",
         "flowbite": "^2.3.0",
         "jszip": "^3.10.1",
+        "laravel-vue-i18n": "^2.7.7",
         "pdfmake": "^0.2.10",
         "primeicons": "^7.0.0",
         "primevue": "^3.51.0"

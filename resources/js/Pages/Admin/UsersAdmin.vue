@@ -8,7 +8,7 @@ import TableUsersAdmin from '@/Pages/Admin/Partials/TableUsersAdmin.vue';
     <AppLayout title="Users Admin">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                Users Admin
+                {{ $t('Users') }}
             </h2>
         </template>
         <div class="py-12">

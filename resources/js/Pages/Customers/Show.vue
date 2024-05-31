@@ -2,7 +2,7 @@
     <AppLayout title="Dashboard">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                {{ company.name }}
+                {{ $t('Customer') }}
             </h2>
         </template>
         <div class="py-12">
@@ -26,27 +26,27 @@
                                 </div>
                                 
                                 <div class="py-5 border-t border-slate-200 text-center">
-                                    <h1 class="text-lg text-slate-700 leading-normal mb-1">Company details:</h1>
+                                    <h1 class="text-lg text-slate-700 leading-normal mb-1">{{ $t('Company details') }}:</h1>
                                     <div class="flex flex-wrap justify-center">
                                         <div>
                                             <div class="text-gray-700">
                                                 <div class="grid md:grid-cols-2 text-sm">
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Tax Number:</div>
+                                                        <div class=" py-2 font-semibold">{{ $t('Tax Number') }}:</div>
                                                         <div class=" py-2">{{ company.tax_number }}</div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Email:</div>
+                                                        <div class=" py-2 font-semibold">{{ $t('Email') }}:</div>
                                                         <div class=" py-2">
                                                             <a class="text-blue-800" :href="emailLink">{{ company.email }}</a>
                                                         </div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Phone :</div>
+                                                        <div class=" py-2 font-semibold">{{ $t('Phone') }} :</div>
                                                         <div class=" py-2">{{ company.phone }}</div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Address :</div>
+                                                        <div class=" py-2 font-semibold">{{ $t('Address') }} :</div>
                                                         <div class=" py-2">{{ company.address}} </div>
                                                     </div>
                                                     
@@ -66,19 +66,19 @@
                                 <li class="me-2">
                                     <button @click="changeTab('phone')" :class="{'border-b-2 border-blue-500': activeTab === 'phone'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-phone w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        Phone
+                                        {{ $t('Phone') }}
                                     </button>
                                 </li>
                                 <li class="me-2">
                                     <button @click="changeTab('email')" :class="{'border-b-2 border-blue-500': activeTab === 'email'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-envelope w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        Email
+                                        {{ $t('Email') }}
                                     </button>
                                 </li>
                                 <li class="me-2">
                                     <button @click="changeTab('address')" :class="{'border-b-2 border-blue-500': activeTab === 'address'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
-                                        <i class="pi pi-home w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        Address
+                                        <i class="pi pi-home w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>     
+                                        {{ $t('Address') }}
                                     </button>
                                 </li>
                                 
