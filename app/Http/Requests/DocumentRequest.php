@@ -29,9 +29,9 @@ class DocumentRequest extends FormRequest
             'documents_series_id' => 'string',
             'date' => 'datetime',
             'amount' => 'decimal',
-            'tax' => 'decimal',
-            'subtotal' => 'decimal',
-            //'paid' => 'boolean',
+            'totalTax' => 'decimal',
+            'subTotal' => 'decimal',
+            'paid' => 'boolean',
             //'active' => 'boolean'
         ];
     }

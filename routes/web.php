@@ -6,7 +6,6 @@ use App\Http\Controllers\AdminInvoicesController;
 use App\Http\Controllers\AdminUsersController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\AddressController;
@@ -39,11 +38,11 @@ Route::middleware([
     Route::put('/addresses/{id}', [AddressController::class, 'makeFavourite']);
     Route::get('/addresses/{id}', [AddressController::class, 'index']);
     Route::resource('/address', AddressController::class);
-    Route::resource('/products', ProductController::class);
     Route::get('/has-company', [CompanyController::class, 'hasCompany'])->name('companies.hasCompany');
     Route::resource('/documents', DocumentController::class);
     Route::get('/documents-type', [DocumentController::class, 'documentType']);
     Route::get('/documents-serie/{typeID}/{companyID}', [DocumentController::class, 'documentSerie']);
+    Route::get('/documents-serie/{typeID}/{companyID}/{serie}', [DocumentController::class, 'documentSerieCheck']);
 
     // Admin
     Route::resource('/admin-companies', AdminCompaniesController::class);

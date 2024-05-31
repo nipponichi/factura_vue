@@ -3,20 +3,20 @@
         <div class="card">
             <Toolbar class="mb-4 border border-slate-200 ...">
                 <template #start>
-                    <Button label="New" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
-                    <Button label="Change Status" icon="pi pi-cog" class="status-button" @click="confirmDeleteSelected" :disabled="!selectedAdminUsers || !selectedAdminUsers.length" />
+                    <Button :label="$t('New')" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
+                    <Button :label="$t('Change status')" icon="pi pi-cog" class="status-button" @click="confirmDeleteSelected" :disabled="!selectedAdminUsers || !selectedAdminUsers.length" />
                 </template>
             </Toolbar>
 
             <DataTable ref="dt" :value="users" v-model:selection="selectedAdminUsers" dataKey="id" 
                 :paginator="true" :rows="10" :filters="filters"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users">
+                :currentPageReportTemplate="`${$t('Showing')} {first} ${$t('of')} {last} ${$t('of')} {totalRecords} ${$t('users')}`">
                 <template #header>
                     <div class="flex justify-between items-center mt-2">
-                        <h4>Manage Companies</h4>
+                        <h4>{{ $t('Manage users') }}</h4>
                         <div class="relative rounded-md shadow-sm w-1/4">
-                            <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm" v-model="filters['global'].value" placeholder="Search...">
+                            <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm" v-model="filters['global'].value" :placeholder="$t('Search...')">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
@@ -29,10 +29,10 @@
 
                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox" ></Column>
                 <Column field="id" header="ID" sortable class="dateTable"></Column>
-                <Column field="name" header="Username" sortable class="dateTable"></Column>
-                <Column field="email" header="Email" sortable class="dateTable"></Column>
-                <Column field="role_type" header="Role" sortable class="dateTable"></Column>
-                <Column field="active" header="Status" sortable class="dateTable">
+                <Column field="name" :header="$t('Username')" sortable class="dateTable"></Column>
+                <Column field="email" :header="$t('Email')" sortable class="dateTable"></Column>
+                <Column field="role_type" :header="$t('Role')" sortable class="dateTable"></Column>
+                <Column field="active" :header="$t('Active')" sortable class="dateTable">
                     <template #body="slotProps">
                         <template v-if="slotProps.data.active === null">
                             <Button icon="pi pi-check" outlined rounded class="mr-2 info-active" severity="danger" @click="changeUserState(slotProps.data)"/>
@@ -45,9 +45,8 @@
                 
 
                 
-                <Column :exportable="false" header="Utility" class="dateTable">
+                <Column :exportable="false" :header="$t('Utility')" class="dateTable">
                     <template #body="slotProps">
-                        <!--<Button icon="pi pi-eye" outlined rounded class="mr-2 info-button" @click="handleInfoButtonClick(slotProps.data.id)" />-->
                         <Button icon="pi pi-key" outlined rounded class="mr-2 pass-button" @click="editPass(slotProps.data)" />
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editUser(slotProps.data)" />
                     </template>
@@ -58,27 +57,27 @@
 
         <!-- MODAL -->
 
-        <Dialog v-model:visible="userDialog" :header="myUser.id ? 'Modify user' : 'Create user'" id="titleCompany" :modal="true" class="p-fluid">
+        <Dialog v-model:visible="userDialog" :header="myUser.id ? $t('Modify user') : $t('Create user')" id="titleCompany" :modal="true" class="p-fluid">
             
             <form style="width: 800px;" @submit.prevent="saveUser">
                 <div class="grid gap-3 mb-6 md:grid-cols-2">
                     <div>
-                        <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+                        <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Username') }}</label>
                         <input type="text" id="name" v-model="myUser.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Username" required />
                     </div>
                     <div>
-                        <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email address</label>
+                        <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Email') }} </label>
                         <input type="email" id="email" v-model="myUser.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="info@user.com" required />
                     </div>  
                 </div>
 
                 <div class="grid gap-3 mb-6 md:grid-cols-2">
                     <div v-if="!myUser.id"> <!-- Mostrar solo si no se está modificando -->
-                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Password') }}</label>
                         <input type="password" id="password" v-model="myUser.password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="password" required/>
                     </div>
                     <div v-if="!myUser.id"> <!-- Mostrar solo si no se está modificando -->
-                        <label for="confirmPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
+                        <label for="confirmPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Confirm password') }}</label>
                         <input type="password" id="confirmPassword" v-model="myUser.confirmPassword" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="password" required />
                     </div>  
                 </div>
@@ -86,31 +85,31 @@
                 <div class="grid gap-3 mb-6 md:grid-cols-2">  
                             
                     <div class="mt-4">
-                        <label for="role_type" class="block font-medium text-gray-700">Define the role</label>
+                        <label for="role_type" class="block font-medium text-gray-700">{{ $t('Define the role') }}</label>
                         <div class="mt-2 ml-12 flex justify-center">
                             <label class="inline-flex items-center">
                                 <input type="radio" id="sole_proprietorship" v-model="myUser.role_type" value="freelancer" class="form-radio text-indigo-600" required>
-                                <span class="ml-2">Freelance</span>
+                                <span class="ml-2">{{ $t('Freelance') }}</span>
                             </label>
                             <label class="inline-flex items-center ml-6">
                                 <input type="radio" id="partnership" v-model="myUser.role_type" value="company" class="form-radio text-indigo-600">
-                                <span class="ml-2">Company</span>
+                                <span class="ml-2">{{ $t('Company') }}</span>
                             </label>
                             <label class="inline-flex items-center ml-6">
                                 <input type="radio" id="corporation" v-model="myUser.role_type" value="consulting" class="form-radio text-indigo-600">
-                                <span class="ml-2">Consulting</span>
+                                <span class="ml-2">{{ $t('Consulting') }}</span>
                             </label>
                             <label class="inline-flex items-center ml-6">
                                 <input type="radio" id="corporation" v-model="myUser.role_type" value="admin" class="form-radio text-indigo-600">
-                                <span class="ml-2">Admin</span>
+                                <span class="ml-2">{{ $t('Admin') }}</span>
                             </label>
                         </div>
                     </div>
                 </div>
                 <div class="grid gap-3 md:grid-cols-1 justify-items-end">
                     <div>
-                        <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" text @click="hideDialog">Close</button>
-                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ myUser.id ? 'Modify' : 'Save' }}</button>
+                        <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" text @click="hideDialog">{{ $t('Close') }}</button>
+                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ myUser.id ? $t('Update') : $t('Save') }}</button>
                     </div>    
                 </div>
             </form>
@@ -118,24 +117,24 @@
 
         <!-- MODAL RESET PASSWORD -->
 
-        <Dialog v-model:visible="resetPassDialog" :header="'Reset Password: ' + myUser.name" id="titleCompany" :modal="true" class="p-fluid">
+        <Dialog v-model:visible="resetPassDialog" :header="$t('Reset password') + ': ' + myUser.name" id="titleCompany" :modal="true" class="p-fluid">
             <form style="width: 800px;" @submit.prevent="resetPassUser">
                 
                 <div class="grid gap-3 mb-6 md:grid-cols-2">
                     <div v-if="myUser.id"> <!-- Mostrar solo si se está modificando -->
-                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Password') }}</label>
                         <input type="password" id="password" v-model="myUser.password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="password"/>
                     </div>
                     <div v-if="myUser.id"> <!-- Mostrar solo si se está modificando -->
-                        <label for="confirmPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Confirm password</label>
+                        <label for="confirmPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Confirm password') }}</label>
                         <input type="password" id="confirmPassword" v-model="myUser.confirmPassword" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="password" />
                     </div>  
                 </div>
 
                 <div class="grid gap-3 md:grid-cols-1 justify-items-end">
                     <div>
-                        <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" text @click="hideDialog">Close</button>
-                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ myUser.id ? 'Modify' : 'Save' }}</button>
+                        <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" text @click="hideDialog">{{$t('Close')}}</button>
+                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ myUser.id ? $t('Reset') : $t('Save') }}</button>
                     </div>    
                 </div>
             </form>
@@ -146,11 +145,11 @@
         <Dialog v-model:visible="deleteUserDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="users">Are you sure you want to change company state<b>{{users.name}}</b>?</span>
+                <span v-if="users">{{ $t('Are you sure you want to disable the user? ') }} {{users.name}}</span>
             </div>
             <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteUserDialog = false"/>
-                <Button label="Yes" icon="pi pi-check" text @click="confirmChangeState" />
+                <Button :label="$t('No')" icon="pi pi-times" text @click="deleteUserDialog = false" />
+                <Button :label="$t('Yes')" icon="pi pi-check" text @click="confirmChangeState" />
             </template>
         </Dialog>
 
@@ -158,46 +157,13 @@
         <Dialog v-model:visible="deleteUsersDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="myUser">Are you sure you want to delete the selected users?</span>
+                <span v-if="myUser">{{ $t('Are you sure you want to disable selected users?') }}</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteUsersDialog = false"/>
                 <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedUsers" />
             </template>
         </Dialog>
-
-        
-
-        <!--
-            Toast alertas
-        <div id="toast-success" class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
-            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
-                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
-                </svg>
-                <span class="sr-only">Check icon</span>
-            </div>
-
-            <div class="ms-3 text-sm font-normal">Item moved successfully.</div>
-        </div>
-        <div id="toast-danger" class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
-            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
-                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
-                </svg>
-                <span class="sr-only">Error icon</span>
-            </div>
-            <div class="ms-3 text-sm font-normal">Item has been deleted.</div>
-        </div>
-        <div id="toast-warning" class="flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
-            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-orange-500 bg-orange-100 rounded-lg dark:bg-orange-700 dark:text-orange-200">
-                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5Z"/>
-                </svg>
-                <span class="sr-only">Warning icon</span>
-            </div>
-        </div>-->
-
 
 	</div>
 </template>
@@ -209,11 +175,9 @@ import { FilterMatchMode } from 'primevue/api';
 
 import axios from 'axios';
 
-console.log("Inicio");
 
 export default {
     data() {
-        console.log("PRIMER PASO");
         return {
             users: null, 
             userDialog: false, 
@@ -235,7 +199,6 @@ export default {
         };
     },
     created() {
-        console.log("Created");
         this.filters = {
             'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
         }
@@ -273,14 +236,13 @@ export default {
         },
         
         saveUser() {
-            console.log(this.myUser)
             if(this.checkPassword()){
                 if (!this.myUser.id) {
                     // Realiza la solicitud para guardar el producto
                     axios.post('/admin-users', this.myUser)
                     .then(response => {
 
-                        console.log(response);
+
 
                         // Cierra el diálogo de producto
                         this.userDialog = false;
@@ -360,7 +322,6 @@ export default {
             // Realizar la solicitud de eliminación al servidor
             axios.delete('/admin-users/' + this.myUser.id)
                 .then(response => {
-                    console.log(response);
                     
                     this.fecthUsers()
         
@@ -377,7 +338,6 @@ export default {
     
         
         confirmDeleteSelected() {
-            console.log("CONFIRM DELETE SELECTED")
             this.deleteUsersDialog = true;
         },
         

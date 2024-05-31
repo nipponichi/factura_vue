@@ -5,13 +5,6 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 <template>
     <div>
         
-        <!--{{$page.props}}
-        
-            <div>
-                <button v-if="$page.props.user.permissions.includes('create roles')">Manage Roles</button>
-                <button v-if="$page.props.user.permissions.includes('create company')">Manage Company</button>
-            </div>
-        -->
         <div class="mt-12 p-10">
             <div class="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4 ">
                 <div class="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
@@ -218,16 +211,6 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 
 
         </div>
-
-
         
-
-
-        
-        
-        
-        
-        
-
     </div>
 </template>

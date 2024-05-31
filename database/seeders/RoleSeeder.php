@@ -41,12 +41,12 @@ class RoleSeeder extends Seeder
 
         //Permisos admin
         $permissions_admin = [
-            $permission_create_role, $permission_read_role, $permission_update_role, $permission_delete_role,      
+            $permission_create_role, $permission_read_role, $permission_update_role, $permission_delete_role,
         ];
 
         //Permisos company
         $permissions_company = [
-            $permission_create_company, $permission_read_company, $permission_update_company, $permission_delete_company,  
+            $permission_create_company, $permission_read_company, $permission_update_company, $permission_delete_company,
         ];
 
         

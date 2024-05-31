@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('quantity');
             $table->decimal('tax');
             $table->decimal('price');
+            $table->decimal('total');
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
             $table->foreignId('documents_id')->constrained('documents');
