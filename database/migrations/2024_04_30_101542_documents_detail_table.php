@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        
         Schema::create('documents_details', function (Blueprint $table) {
             $table->id();
+            $table->string('reference');
             $table->string('description');
             $table->decimal('quantity');
             $table->decimal('tax');
@@ -23,7 +23,8 @@ return new class extends Migration
             $table->dateTime('dt_end')->nullable();
             $table->foreignId('documents_id')->constrained('documents');
         });
-    
+        
+
     }
 
     /**

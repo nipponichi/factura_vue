@@ -23,6 +23,7 @@ class DocumentRequest extends FormRequest
     {
         return [
             'number' => 'string',
+            'document_counter' => 'string',
             'company_id_company' => 'string',
             'company_id_customer' => 'string',
             'documents_type_id' => 'string',

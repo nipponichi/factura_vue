@@ -34,8 +34,8 @@
                     
                     <div class="flex items-center ml-2">
                         <label for="link-checkbox" class="ms-2 mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark as paid') }}</label>
-                        <input id="link-checkbox" type="checkbox" v-model="this.myDocument.paid" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        
+                      <!--  <input id="link-checkbox" type="checkbox" v-model="this.myDocument.paid" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                        -->
                     </div>
                 </div>
 
@@ -237,15 +237,14 @@
             </Toolbar>
 
 
-
             <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id"
             :paginator="true" :rows="10" :filters="filters"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
             :currentPageReportTemplate="`${$t('Showing')} {first} ${$t('of')} {last} ${$t('of')} {totalRecords} ${$t('products')}`">
                 <template #header>
-
+                    <!-- Otros contenidos del encabezado -->
                 </template>
-
+            
                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox"></Column>
                 <Column field="reference" :header="$t('Reference')" sortable class="dateTable">
                     <template #body="slotProps">
@@ -254,7 +253,7 @@
                 </Column>
                 <Column field="product" :header="$t('Description')" sortable class="dateTable">
                     <template #body="slotProps">
-                        <InputText class="input" :placeholder="$t('Description')" v-model="slotProps.data.product" />
+                        <InputText class="input" :placeholder="$t('Description')" v-model="slotProps.data.description" />
                     </template>
                 </Column>
                 <Column field="quantity" :header="$t('Quantity')" sortable class="dateTable">
@@ -267,9 +266,9 @@
                         <InputText class="input input-short" v-model="slotProps.data.price" />
                     </template>
                 </Column>
-                <Column field="taxes" :header="$t('Tax (%)')" sortable class="dateTable">
+                <Column field="tax" :header="$t('Tax (%)')" sortable class="dateTable">
                     <template #body="slotProps">
-                        <Dropdown class="input-short" v-model="slotProps.data.taxes" :options="taxOptions" optionLabel="label" optionValue="value" />
+                        <Dropdown class="input-short" v-model="slotProps.data.tax" :options="taxOptions" optionLabel="label" optionValue="value" />
                     </template>
                 </Column>
                 <Column field="total" :header="$t('Total')" sortable class="dateTable">
@@ -277,14 +276,13 @@
                         <InputText class="input input-short" :value="calculateTotal(slotProps.data)" readonly />
                     </template>
                 </Column>
-
-
                 <Column :exportable="false" class="dateTable">
                     <template #body="slotProps">
                         <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteProduct(slotProps.data)" />
                     </template>
                 </Column>
             </DataTable>
+            
 
             <div class="flex justify-end mt-4 pr-4">
                 <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="success-button" @click="addRow()" />
@@ -407,21 +405,22 @@
 import { FilterMatchMode } from 'primevue/api';
 
 export default {
+    props: ['documents', 'concepts','company','customer'],
     data() {
         return {
             fecha: '',
             fechaFormateada: '',
             isDisabled: true,
             taxOptions: [
-                { label: '0%', value: 0 },
-                { label: '4%', value: 4 },
-                { label: '5%', value: 5 },
-                { label: '7%', value: 7 },
-                { label: '8%', value: 8 },
-                { label: '10%', value: 10 },
-                { label: '16%', value: 16 },
-                { label: '18%', value: 18},
-                { label: '21%', value: 21 },
+                { label: '0%', value: 0.00 },
+                { label: '4%', value: 4.00 },
+                { label: '5%', value: 5.00 },
+                { label: '7%', value: 7.00 },
+                { label: '8%', value: 8.00 },
+                { label: '10%', value: 10.00 },
+                { label: '16%', value: 16.00 },
+                { label: '18%', value: 18.00 },
+                { label: '21%', value: 21.00 },
             ],
             imageUrl: 'https://placehold.co/300x300/e2e8f0/e2e8f0',
             companies: null,
@@ -442,7 +441,6 @@ export default {
             filters: {},
             submitted: false,
             myDocument: { 
-                document_counter: '',
                 number: '', 
                 company_id_company: '',
                 company_id_customer: '',
@@ -465,7 +463,7 @@ export default {
             return this.products.reduce((acc, product) => acc + product.quantity * product.price, 0);
         },
         totalIVA() {
-            return this.products.reduce((acc, product) => acc + (product.quantity * product.price * product.taxes / 100), 0);
+            return this.products.reduce((acc, product) => acc + (product.quantity * product.price * product.tax / 100), 0);
         },
         totalConIVA() {
             return this.subtotal + this.totalIVA;
@@ -485,8 +483,22 @@ export default {
     },
 
     mounted() {
+        this.products = this.concepts
+        for (let i = 0; i < this.products.length; i++) {
+            this.products[i].tax = parseFloat(this.concepts[i].tax);
+        }
+
+        console.log("description: " + this.products[0].tax)
+        this.myDocument = this.documents
+        this.selectedCompany = this.company
+        this.selectedCustomer = this.customer
+        this.selectedType = this.documents.document_type_name
+        console.log("description: " + this.documents.document_type_name)
+        this.selectedSerie.serie = this.documents.document_series_serie
+        this.selectedSerie.number = this.documents.document_counter
+        console.log("serie: " + this.documents.document_series_serie)
         this.fetchCompanies();
-        this.fetchDocuments();
+        this.fetchDocuments(); 
     },
     
     methods: {
@@ -562,12 +574,12 @@ export default {
         },
         
         addRow() {
-            let newProduct = {
-                
+            
+            let newProduct = { 
                 product: '',
                 quantity: 0,
                 price: 0,
-                taxes: 21,
+                tax: 21.50,
                 priceTax: 0,
                 total: 0,
                 id: this.products.length + 1,
@@ -629,7 +641,6 @@ export default {
         saveDocument(){
 
             this.myDocument.number = this.selectedSerie.serie + this.selectedSerie.number
-            this.myDocument.document_counter = this.selectedSerie.number
             console.log("numero factura: " + this.myDocument.number)
             this.myDocument.company_id_company = this.selectedCompany.id 
             this.myDocument.company_id_customer = this.selectedCustomer.id
@@ -642,13 +653,15 @@ export default {
 
 
             this.products.forEach(product => {
+
+                console.log("description prueba" + product.description);
                 // Creamos un nuevo objeto con los valores del producto
                 let newProduct = {
                     reference: product.reference,
-                    description: product.product,
+                    description: product.description,
                     quantity: product.quantity,
                     price: product.price,
-                    tax: product.taxes,
+                    tax: product.tax,
                     total: this.calculateTotal(product).toFixed(2)
                 };
                 // Agregamos el nuevo objeto al arreglo concept dentro de myDocument
