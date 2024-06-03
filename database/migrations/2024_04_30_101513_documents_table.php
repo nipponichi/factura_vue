@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-       
+        
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->string('number');
+            $table->string('document_counter');
             $table->foreignId('company_id_company')->constrained();
             $table->foreignId('company_id_customer')->constrained();
             $table->foreignId('documents_type_id')->constrained('documents_type');
             $table->foreignId('documents_series_id')->constrained('documents_series');
-            //$table->foreignId('document_designs_id')->constrained('documents_designs');
-            $table->dateTime('date');
+            $table->date('date');
             $table->decimal('amount', 10, 2);
             $table->boolean('paid');
             $table->boolean('active');
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->decimal('tax', 10, 2)->nullable();
             $table->decimal('subtotal', 10, 2)->nullable();
             $table->dateTime('dt_start')->useCurrent();
-            $table->dateTime('dt_end')->useCurrent();
+            $table->dateTime('dt_end')->nullable();
         });
     }
 

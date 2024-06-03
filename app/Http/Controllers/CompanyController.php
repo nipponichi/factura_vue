@@ -171,11 +171,11 @@ class CompanyController extends Controller
 
             ->where('companies.id', $id)
             ->where('companies_users.user_id', $userId)
-           /* ->where('addresses.favourite', 1)
+            /* ->where('addresses.favourite', 1)
             ->where('phones.favourite', 1)
             ->where('emails.favourite', 1)*/
 
-           /* ->whereNull('companies_names.dt_end')
+            /* ->whereNull('companies_names.dt_end')
             ->whereNull('companies_tax_numbers.dt_end')
             ->whereNull('addresses.dt_end')
             ->whereNull('phones.dt_end')

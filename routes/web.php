@@ -24,25 +24,39 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::get('/dashboard', [RouteController::class, 'dashboard'])->name('dashboard');
+
+    //Companies
     Route::resource('/companies', CompanyController::class);
     Route::get('/companies-invoice', [CompanyController::class, 'companiesInvoice']);
+    Route::get('/has-company', [CompanyController::class, 'hasCompany'])->name('companies.hasCompany');
+
+    //Customers
     Route::resource('/customer', CustomerController::class);
     Route::get('/customers/{id}', [CustomerController::class, 'index']);
     Route::get('/customers/{companyID}/{customerID}', [CustomerController::class, 'show']);
+
+    //Phones
     Route::put('/phones/{id}', [PhoneController::class, 'makeFavourite']);
     Route::get('/phones/{id}', [PhoneController::class, 'index']);
     Route::resource('/phone', PhoneController::class);
+
+    //Emails
     Route::put('/emails/{id}', [EmailController::class, 'makeFavourite']);
     Route::get('/emails/{id}', [EmailController::class, 'index']);
     Route::resource('/email', EmailController::class);
+
+    //Addresses
     Route::put('/addresses/{id}', [AddressController::class, 'makeFavourite']);
     Route::get('/addresses/{id}', [AddressController::class, 'index']);
     Route::resource('/address', AddressController::class);
-    Route::get('/has-company', [CompanyController::class, 'hasCompany'])->name('companies.hasCompany');
+
+    //Documents
+    
     Route::resource('/documents', DocumentController::class);
     Route::get('/documents-type', [DocumentController::class, 'documentType']);
     Route::get('/documents-serie/{typeID}/{companyID}', [DocumentController::class, 'documentSerie']);
     Route::get('/documents-serie/{typeID}/{companyID}/{serie}', [DocumentController::class, 'documentSerieCheck']);
+    Route::get('/documents-serie/{companyID}', [DocumentController::class, 'indexDocuments']);
 
     // Admin
     Route::resource('/admin-companies', AdminCompaniesController::class);
