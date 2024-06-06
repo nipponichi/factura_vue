@@ -70,6 +70,36 @@ class CompanySeeder extends Seeder
         'company_id' => 1,
     ]);
 
+    DB::table('bank_account')->insert([
+        'iban' => 'ES91',
+        'entity' => '2048',
+        'office' => '6032',
+        'control_digit' => '47',
+        'account_number' => '4223364022',
+        'bank_name' => 'Banco Santander',
+        'country' => 'España',
+        'swift' => 'BSCHESMM',
+        'currency' => 'eur',
+        'favourite' =>true,
+        'dt_start' => now(),
+        'company_id' => 1,
+    ]);
+
+    DB::table('bank_account')->insert([
+        'iban' => 'ES56',
+        'entity' => '0049',
+        'office' => '0843',
+        'control_digit' => '21',
+        'account_number' => '5318356484',
+        'bank_name' => 'BBVA',
+        'swift' => 'BBVAESMM',
+        'country' => 'España',
+        'currency' => 'eur',
+        'favourite' =>false,
+        'dt_start' => now(),
+        'company_id' => 1,
+    ]);
+
     
     DB::table('addresses')->insert([
         'company_id' => 1,
@@ -143,6 +173,21 @@ class CompanySeeder extends Seeder
         'phone' => '+34968516060',
         'favourite' =>true,
         'isMobile' =>false,
+        'dt_start' => now(),
+        'company_id' => 2,
+    ]);
+
+    DB::table('bank_account')->insert([
+        'iban' => 'ES40',
+        'entity' => '2048',
+        'office' => '3506',
+        'control_digit' => '36',
+        'account_number' => '9026752232',
+        'bank_name' => 'EVO Banco',
+        'country' => 'España',
+        'swift' => 'EVOBESMM',
+        'currency' => 'eur',
+        'favourite' =>true,
         'dt_start' => now(),
         'company_id' => 2,
     ]);

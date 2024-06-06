@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminUsersController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\PhoneController;
+use App\Http\Controllers\BankController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\DocumentController;
@@ -29,12 +30,13 @@ Route::middleware([
     Route::resource('/companies', CompanyController::class);
     Route::get('/companies-invoice', [CompanyController::class, 'companiesInvoice']);
     Route::get('/has-company', [CompanyController::class, 'hasCompany'])->name('companies.hasCompany');
+    Route::get('/companies/{companyID}/document/{documentID}', [DocumentController::class, 'show']);
+    Route::get('/companies/{companyID}/customer/{customerID}', [CustomerController::class, 'show']);
 
     //Customers
     Route::resource('/customer', CustomerController::class);
     Route::get('/customers/{id}', [CustomerController::class, 'index']);
-    Route::get('/customers/{companyID}/{customerID}', [CustomerController::class, 'show']);
-
+    
     //Phones
     Route::put('/phones/{id}', [PhoneController::class, 'makeFavourite']);
     Route::get('/phones/{id}', [PhoneController::class, 'index']);
@@ -45,13 +47,17 @@ Route::middleware([
     Route::get('/emails/{id}', [EmailController::class, 'index']);
     Route::resource('/email', EmailController::class);
 
+    //Bank account
+    Route::put('/banks/{id}', [BankController::class, 'makeFavourite']);
+    Route::get('/banks/{id}', [BankController::class, 'index']);
+    Route::resource('/bank', BankController::class);
+
     //Addresses
     Route::put('/addresses/{id}', [AddressController::class, 'makeFavourite']);
     Route::get('/addresses/{id}', [AddressController::class, 'index']);
     Route::resource('/address', AddressController::class);
 
     //Documents
-    
     Route::resource('/documents', DocumentController::class);
     Route::get('/documents-type', [DocumentController::class, 'documentType']);
     Route::get('/documents-serie/{typeID}/{companyID}', [DocumentController::class, 'documentSerie']);

@@ -86,16 +86,8 @@
                                         {{ $t('Customers') }}
                                     </button>
                                 </li>
-                                <!--
                                 <li class="me-2">
-                                    <button @click="changeTab('products')" :class="{'border-b-2 border-blue-500': activeTab === 'products'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
-                                        <i class="pi pi-shopping-cart w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        {{ $t('Products') }}
-                                    </button>
-                                </li>
-                                -->
-                                <li class="me-2">
-                                    <button @click="changeTab('invoices')" :class="{'border-b-2 border-blue-500': activeTab === 'invoices'}" class="inline-flex items-center justify-center p-4 border-transparent rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                    <button @click="changeTab('documents')" :class="{'border-b-2 border-blue-500': activeTab === 'documents'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-file w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
                                         {{ $t('Invoices') }}
                                     </button>
@@ -118,6 +110,12 @@
                                         {{ $t('Address') }}
                                     </button>
                                 </li>
+                                <li class="me-2">
+                                    <button @click="changeTab('bank')" :class="{'border-b-2 border-blue-500': activeTab === 'bank'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-wallet w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>     
+                                        {{ $t('Bank account') }}
+                                    </button>
+                                </li>
                                 
 
                             </ul>
@@ -127,10 +125,7 @@
                             <table v-if="activeTab === 'customers'" class="w-full">
                                 <TableCustomers />
                             </table>
-                            <table v-else-if="activeTab === 'products'" class="w-full">
-                                <Tables />
-                            </table>
-                            <table v-else-if="activeTab === 'invoices'" class="w-full">
+                            <table v-else-if="activeTab === 'documents'" class="w-full">
                                 <TableInvoice />
                             </table>
                             <table v-else-if="activeTab === 'phone'" class="w-full">
@@ -141,6 +136,9 @@
                             </table>
                             <table v-else-if="activeTab === 'address'" class="w-full">
                                 <TableAddress />
+                            </table>
+                            <table v-else-if="activeTab === 'bank'" class="w-full">
+                                <TableBank />
                             </table>
                         </div>
 
@@ -154,8 +152,9 @@
 <script setup>
     import AppLayout from '@/Layouts/AppLayout.vue';
     import TableCustomers from '@/Pages/Companies/Partials/TableCustomer.vue';
-    import TableInvoice from '@/Pages/Documents/Partials/TableDocument.vue';
+    import TableInvoice from '@/Pages/Companies/Partials/TableDocument.vue';
     import TablePhone from '@/Pages/Companies/Partials/TablePhone.vue';
+    import TableBank from '@/Pages/Companies/Partials/TableBank.vue';
     import TableEmail from '@/Pages/Companies/Partials/TableEmail.vue';
     import TableAddress from '@/Pages/Companies/Partials/TableAddress.vue';
     

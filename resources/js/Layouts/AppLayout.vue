@@ -25,6 +25,8 @@ const switchToTeam = (team) => {
 const logout = () => {
     router.post(route('logout'));
 };
+
+
 </script>
 
 <template>
@@ -56,14 +58,17 @@ const logout = () => {
                                 <NavLink :href="route('documents.index')" :active="route().current('documents.*')">
                                     {{ $t('Invoice') }}
                                 </NavLink>
-                            </div>                       
+                            </div>  
+                            
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')" >
                                 <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
                                     {{ $t('My Company') }}
                                 </NavLink>
                             </div>
+
+                            
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view consulting')">
-                                <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
+                                <NavLink :href="route('companies.index')">
                                     {{ $t('Consulting') }}
                                 </NavLink>
                             </div>
