@@ -144,6 +144,7 @@ export default {
                 iban: '',
                 entity: '',
                 office: '',
+                complete: '',
                 control_digit: '',
                 account_number: '',
                 bank_name: '',
@@ -200,21 +201,24 @@ export default {
 
         processIBAN() {
 
-            
-            let countryCode = this.myBank.iban.substring(0, 2).toUpperCase();
-            let controlCode = this.myBank.iban.substring(2, 4);
+            console.log(" Process Iban" + this.myBank.iban.length)
+    
+            let cleanedIban = this.myBank.iban.replace(/\s+/g, '');
+            console.log(cleanedIban);
+
+            let countryCode = cleanedIban.substring(0, 2).toUpperCase();
+            let controlCode = cleanedIban.substring(2, 4);
             let iban = countryCode + controlCode;
-            let entity = this.myBank.iban.substring(4, 8);
-            let office = this.myBank.iban.substring(8, 12);
-            let controlDigit = this.myBank.iban.substring(12, 14);
-            let accountNumber = this.myBank.iban.substring(14, 24);
+            let entity = cleanedIban.substring(4, 8);
+            let office = cleanedIban.substring(8, 12);
+            let controlDigit = cleanedIban.substring(12, 14);
+            let accountNumber = cleanedIban.substring(14, 24);
             this.myBank.iban = iban;
             this.myBank.entity = entity;
             this.myBank.office = office;
             this.myBank.control_digit = controlDigit;
             this.myBank.account_number = accountNumber;
-            
-            
+            this.myBank.complete = this.myBank.iban + this.myBank.entity + this.myBank.office + this.myBank.control_digit + this.myBank.account_number
         },
 
 
@@ -222,16 +226,14 @@ export default {
             if (this.myBank.favourite == null) {
                 this.myBank.favourite = false;
             }
-
-            this.processIBAN();
-
             
-            if (this.myBank.iban.length != 24) {
+            this.processIBAN(); 
+
+            if (this.myBank.complete.length != 24) {
                 window.alert("Ingresa un IBAN que sea correcto");
                 return;
             }
             
-
             if (!this.myBank.id) {
                 axios.post('/bank', this.myBank)
                 .then(response => {
@@ -247,8 +249,7 @@ export default {
             }
         },
 
-        editMyBank(slotProps) {
-            
+        editMyBank(slotProps) {    
             this.myBank.iban = slotProps.ibanComplete;
             this.myBank.bank_name = slotProps.bank_name;
             this.myBank.country = slotProps.country;
