@@ -45,6 +45,7 @@ class DocumentController extends Controller
         ->select('id','serie','number')
         ->where('documents_type_id',$type_id)
         ->where('company_id',$company_id)
+        ->whereNull('dt_end')
         ->get();
 
 
@@ -75,12 +76,20 @@ class DocumentController extends Controller
         ->orderBy('date', 'desc')
         ->first();
 
+        $counter = DB::table('documents')
+        ->select('document_counter')
+        ->where('documents_type_id', $type_id)
+        ->where('company_id_company', $company_id)
+        ->whereNull('dt_end')
+        ->orderByDesc('document_counter')
+        ->first();
+
         if ($date == null) {
             $date = today()->format('d/m/Y');
         }
         
         
-        return response()->json(['message' => 'Document series', 'serie' => $serie, 'date' => $date]);
+        return response()->json(['message' => 'Document series', 'serie' => $serie, 'date' => $date, 'counter' => $counter]);
 
     }
 
@@ -107,6 +116,7 @@ class DocumentController extends Controller
             $repatedInvoice = DB::table('documents')
             ->select('id')
             ->where('number',$request->documentData['number'])
+            ->whereNull('dt_end')
             ->first();
 
             if($repatedInvoice) {
@@ -132,6 +142,8 @@ class DocumentController extends Controller
                 'dt_start' => now(),
             ]);
 
+            dd($documentsId);
+
             foreach ($request->documentData['concept'] as $item) {
                 DB::table('documents_details')->insert([
                     'reference' => $item['reference'],
@@ -143,7 +155,21 @@ class DocumentController extends Controller
                     'documents_id' => $documentsId
                 ]);
             }
+
+            $oldInvoiceSerieNumber = DB::table('documents_series')
+            ->select('number')
+            ->where('company_id',$request->documentData['company_id_company'])
+            ->where('documents_type_id',$request->documentData['documents_type_id'])
+            ->whereNull('dt_end')
+            ->first();
+
+            if ($oldInvoiceSerieNumber->number > $request->documentData['document_counter']) {
+            
+                return response()->json(['message' => 'La factura se ha creado correctamente']);
+
+            }
         
+            
             DB::table('documents_series')
             ->where('company_id', $request->documentData['company_id_company'])
             ->where('documents_type_id', $request->documentData['documents_type_id'])
@@ -163,23 +189,23 @@ class DocumentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($companyId, $documentId)
     {
 
         $userId = Auth::id();
-        
-        $companyId = DB::table('documents')
-        ->select('company_id_company')
-        ->where('id', $id)
-        ->first();
+
 
         $invoiceUser = DB::table('companies_users')
         ->select('user_id')
-        ->where('company_id', $companyId->company_id_company)
+        ->where('company_id', $companyId)
         ->first();
 
+        if ($invoiceUser == null) {
+            return Redirect::to('/dashboard')->with('error', 'No se encontró la factura');
+        }
+        
         if ($userId != $invoiceUser->user_id) {
-            return Redirect::to('companies/' . $id)->with('error', 'No se encontró la factura');
+            return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
         }
 
         $documents = DB::table('documents')
@@ -201,12 +227,15 @@ class DocumentController extends Controller
         ->leftJoin('documents_type', 'documents.documents_type_id', '=', 'documents_type.id')
         ->leftJoin('documents_series', 'documents.documents_series_id', '=', 'documents_series.id')
         ->leftJoin('companies_names', 'documents.company_id_customer', '=', 'companies_names.company_id')
-        ->where('documents.company_id_company', $companyId->company_id_company)
-        ->where('documents_series.company_id', $companyId->company_id_company)
-        ->where('documents.id', $id)
+        ->where('documents.company_id_company', $companyId)
+        ->where('documents_series.company_id', $companyId)
+        ->where('documents.id', $documentId)
         ->whereNull('documents.dt_end')
         ->first();
         
+        if ($documents == null) {
+            return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
+        }
     
         $concepts = DB::table('documents_details')
         ->select(
@@ -219,10 +248,12 @@ class DocumentController extends Controller
             'total',
         )
         ->whereNull('dt_end')
-        ->where('documents_id',$id)
+        ->where('documents_id',$documentId)
         ->get();
 
-        //dd($concepts);
+        if ($concepts == null) {
+            return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
+        }
 
         $company = DB::table('companies')
         ->select(
@@ -244,9 +275,13 @@ class DocumentController extends Controller
         ->leftJoin('emails', 'companies.id', '=', 'emails.company_id')
         ->leftJoin('phones', 'companies.id', '=', 'phones.company_id')
         ->leftJoin('addresses', 'companies.id', '=', 'addresses.company_id')
-        ->where('companies.id', $companyId->company_id_company)
+        ->where('companies.id', $companyId)
         ->where('companies_users.user_id', $userId)
         ->first();
+
+        if ($company == null) {
+            return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
+        }
 
         $customer = DB::table('companies')
         ->select(
@@ -271,10 +306,11 @@ class DocumentController extends Controller
         ->where('companies.id', $documents->company_id_customer)
         ->first();
         
+        if ($customer == null) {
+            return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
+        }
 
-
-
-        return Inertia::render('Documents/Partials/DocumentEdit', ['documents' => $documents, 'concepts' => $concepts, 'company'=>$company, 'customer'=>$customer]);
+        return Inertia::render('Companies/Documents/DocumentEdit', ['documents' => $documents, 'concepts' => $concepts, 'company'=>$company, 'customer'=>$customer]);
     }
     
 
@@ -321,8 +357,105 @@ class DocumentController extends Controller
      */
     public function update(DocumentRequest $request, string $id)
     {
-       // return response()->json(['message' => 'La factura se ha eliminado correctamente']);
-        return Inertia::render('Documents/Index');
+        
+        DB::beginTransaction();
+        
+        try {
+
+            $userId = Auth::id();
+
+            $invoiceUser = DB::table('companies_users')
+            ->select('user_id')
+            ->where('company_id', $request->documentData['company_id_company'])
+            ->first();
+    
+            if ($invoiceUser == null) {
+                return Redirect::to('/dashboard')->with('error', 'No se encontró la factura');
+            }
+            
+            if ($userId != $invoiceUser->user_id) {
+                return Redirect::to('companies/' . $request->documentData['company_id_company'])->with('error', 'No se encontró la factura');
+            }
+            
+            // comprobar tipo documento para actualizar el counter si hay cambios en el tipo
+
+            $oldInvoiceTypeId = DB::table('documents')
+            ->select('documents_type_id')
+            ->where('id', $id)
+            ->first();
+            
+            if ($oldInvoiceTypeId->documents_type_id != $request->documentData['documents_type_id']) {
+                $companyTypeCounter = DB::table('documents')
+                    ->where('documents_type_id', $request->documentData['documents_type_id'])
+                    ->orderByDesc('document_counter')
+                    ->value('document_counter');
+            
+                // Si no hay documentos previos, inicializar el contador a 0
+                if (is_null($companyTypeCounter)) {
+                    $companyTypeCounter = 0;
+                }
+            
+                $documentData = $request->documentData;
+            
+                $documentData['document_counter'] = $companyTypeCounter + 1;
+            
+                $request->merge(['documentData' => $documentData]);
+
+                DB::table('documents_series')
+                ->where('company_id', $request->documentData['company_id_company'])
+                ->where('documents_type_id', $request->documentData['documents_type_id'])
+                ->increment('number');
+
+            }
+
+
+            $documentsId = DB::table('documents')->insertGetId([
+                'number' => $request->documentData['number'],
+                'document_counter' => $request->documentData['document_counter'],
+                'company_id_company' => $request->documentData['company_id_company'],
+                'company_id_customer' => $request->documentData['company_id_customer'],
+                'documents_series_id' => $request->documentData['documents_series_id'],
+                'documents_type_id' => $request->documentData['documents_type_id'],
+                'date' => $request->documentData['date'],
+                'amount' => $request->documentData['amount'],
+                'paid' => $request->documentData['paid'],
+                'active' => true,
+                'tax' => $request->documentData['totalTax'],
+                'subtotal' => $request->documentData['subTotal'],
+                'user_who_modified' => $userId,
+                'dt_updated' => now(),
+                'dt_start' => now(),
+            ]);
+
+            foreach ($request->documentData['concept'] as $item) {
+                DB::table('documents_details')->insert([
+                    'reference' => $item['reference'],
+                    'description' => $item['description'],
+                    'quantity' => $item['quantity'],
+                    'tax' => $item['tax'],
+                    'price' => $item['price'],
+                    'total' => $item['total'],
+                    'documents_id' => $documentsId
+                ]);
+            }
+        
+            DB::table('documents')
+            ->where('id', $id)
+            ->update([
+                'dt_end' => now(),
+            ]);
+
+
+            DB::commit();
+
+            return Inertia::render('Documents/Index');
+            //return response()->json(['message' => 'La factura se ha creado correctamente']);
+
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Error al crear la factura ', $e->getMessage()], 500);
+        }
+       
     }
 
     /**
@@ -337,5 +470,10 @@ class DocumentController extends Controller
         ]);
 
         return response()->json(['message' => 'La factura se ha eliminado correctamente']);
+    }
+
+
+    public function pdf() {
+
     }
 }

@@ -338,7 +338,7 @@ export default {
 
         handleInfoButtonClick(customerID) {
             let companyID = window.location.pathname.split('/').pop();
-            this.$inertia.get(`/customers/${companyID}/${customerID}`);
+            this.$inertia.get(`/companies/${companyID}/customer/${customerID}`);
         }
 
     }

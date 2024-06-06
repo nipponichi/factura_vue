@@ -40,6 +40,22 @@
                 </div>
 
                 <div class="flex justify-end">
+
+                    <div class="relative inline-block w-50 ml-2">
+                        <button 
+                            type="button" 
+                            class="px-4 py-2 bg-purple-500 text-white rounded flex items-center justify-between" 
+                            @click="cleanDocument()"
+                            :class="{ 'opacity-50': isDisabled }"
+                            :disabled="isDisabled"
+                            >
+                            <span>
+                                <i class="pi pi-sync mr-2"></i>
+                                {{ $t('Clean fields') }}
+                            </span>
+                        </button>
+                    </div>
+                    
                     <div class="relative inline-block w-50 ml-2">
                         <button 
                             type="button" 
@@ -75,8 +91,9 @@
                             type="button" 
                             class="px-4 py-2 bg-green-500 text-white rounded flex items-center justify-between" 
                             @click="checkDocument()"
-                            
-                            >
+                            :class="{ 'opacity-50': !selectedCompany.id || !selectedSerie.id}"
+                            :disabled="!selectedCompany.id || !selectedSerie.id "
+                        >
                             <span>
                                 <i class="pi pi-upload mr-2"></i>
                                 {{ $t('Save') }}
@@ -272,6 +289,7 @@
                         <Dropdown class="input-short" v-model="slotProps.data.taxes" :options="taxOptions" optionLabel="label" optionValue="value" />
                     </template>
                 </Column>
+                
                 <Column field="total" :header="$t('Total')" sortable class="dateTable">
                     <template #body="slotProps">
                         <InputText class="input input-short" :value="calculateTotal(slotProps.data)" readonly />
@@ -429,6 +447,7 @@ export default {
             types: [],
             series: [],
             serie: '',
+            counter: '',
             productDialog: false,
             documentDialog: false,
             deleteProductDialog: false,
@@ -562,6 +581,7 @@ export default {
         },
         
         addRow() {
+
             let newProduct = {
                 
                 product: '',
@@ -585,15 +605,35 @@ export default {
                 this.serie = response.data.serie.number;
                 console.log("Serie "+ this.serie);
                 console.log("selectedSerie "+ this.selectedSerie.number );
+                //this.counter = response.data.counter.document_counter;
+                //console.log("Counter "+ this.counter);
 
                 if (this.selectedSerie.number <= this.serie) {
                     
-                    let respuesta = confirm("El número de documento ya existe, ¿deseas asignarle el siguiente valor disponible?");
+                   /* let respuesta = confirm("El número de documento ya existe, ¿deseas asignarle el siguiente valor disponible?");
                     if (respuesta) {
                         this.selectedSerie.number = ++this.serie
                         alert("Se ha asignado un número disponible: "+ this.selectedSerie.number);
                         this.serie = '';
                         this.saveDocument();
+                    }*/
+
+                    let respuesta = prompt("El número de documento ya existe. ¿Qué deseas hacer?\n1. Conservar el número ingresado\n2. Asignar el siguiente valor disponible\n3. Cancelar");
+
+                    if (respuesta === '1') {
+                        // Conservar el número ingresado por el cliente
+                        alert("Se conservará el número ingresado: " + this.selectedSerie.number);
+                        this.serie = '';
+                        this.saveDocument();
+                    } else if (respuesta === '2') {
+                        // Asignar el siguiente valor disponible
+                        this.selectedSerie.number = ++this.serie;
+                        alert("Se ha asignado el siguiente número disponible: " + this.selectedSerie.number);
+                        this.serie = '';
+                        this.saveDocument();
+                    } else {
+                        // Cancelar la operación
+                        alert("Operación cancelada.");
                     }
 
 
@@ -659,14 +699,21 @@ export default {
             axios.post('/documents', {documentData: this.myDocument})
             .then(response => {
                 
-                this.resetData();
+                //this.isDisabled=false;
+                //this.resetData();
 
             })
             .catch(error => {
                 console.error('Error al guardar los datos del documento:', error.response);
-                console.log("ha mal pasao");
                 // Puedes manejar el error aquí si es necesario
             });
+        },
+
+        cleanDocument(){
+
+            this.isDisabled=true;
+            
+
         },
 
         resetData() {

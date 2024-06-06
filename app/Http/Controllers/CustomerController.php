@@ -232,7 +232,7 @@ class CustomerController extends Controller
             ->first();
 
             
-            return Inertia::render('Customers/Show', ['company' => $companies]);
+            return Inertia::render('Companies/Customers/Show', ['company' => $companies]);
             
         }catch (Exception $e) {
                 
