@@ -35,15 +35,25 @@
                 <Column field="document_type_name" :header="$t('Type')" sortable class="dateTable"></Column>
                 <Column :exportable="false" class="dateTable">
                     <template #body="slotProps">
-                        <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="handleInfoButtonClick(slotProps.data)" />
-                        <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteProduct(slotProps.data)" />
+                        <Button icon="pi pi-file-check" outlined rounded class="mr-2 simpleInvoice-button" 
+                            :disabled="slotProps.data.document_type_name !== 'Presupuesto'" 
+                            @click="slotProps.data.document_type_name === 'Presupuesto' ? checkDocument() : null" />
+                    
+                        <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" 
+                            @click="handleInfoButtonClick(slotProps.data)" />
+                    
+                        <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" 
+                            @click="confirmDeleteProduct(slotProps.data)" />
                     </template>
+                    
+                    
+                    
                 </Column>
             </DataTable>
         </div>
 
         <!-- MODAL DELETE SIMPLE -->
-        <Dialog v-model:visible="deleteDocumentDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deleteDocumentDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
                 <span v-if="document">{{$t('Are you sure you want to delete')}}<b>{{document.number}}</b>?</span>
@@ -55,7 +65,7 @@
         </Dialog>
 
         <!-- MODAL DELETE MULTIPLE -->
-        <Dialog v-model:visible="deleteDocumentsDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deleteDocumentsDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
                 <span v-if="myDocument">{{$t('Are you sure you want to delete the selected documents?')}}</span>
@@ -83,6 +93,8 @@ export default {
             documents: null,
             deleteDocumentDialog: false,
             deleteDocumentsDialog: false,
+            serie: '',
+            date: '',
             myDocument: {
                 id: '',
                 number: '',
@@ -106,6 +118,12 @@ export default {
         this.filters = {
             'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
         }
+
+        const today = new Date();
+            const year = today.getFullYear();
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const day = today.getDate().toString().padStart(2, '0');
+            this.fecha = `${year}-${month}-${day}`;
     },
     mounted() {
         // Asigna los datos de la compañía pasados desde Laravel a una variable local
@@ -183,7 +201,106 @@ export default {
         
             this.$inertia.get(`/companies/${companyID}/document/${this.myDocument.id}`);
         },
-    }
+
+
+        checkDocument() {
+            
+            axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
+            .then(response => {             
+                this.date = response.data.date.date
+                console.log("date "+ this.date);
+                console.log("fecha "+ this.fecha);
+                this.serie = response.data.serie.number;
+                console.log("Serie "+ this.serie);
+                console.log("selectedSerie "+ this.selectedSerie.number );
+
+                if (this.date > this.fecha) {
+                    let respuesta = confirm("La fecha seleccionada es anterior a la de la última factura, ¿deseas asignarle la fecha actual?");
+                    if (respuesta) {
+                        
+                        alert("Se ha asignado la fecha actual");
+                        this.makeInvoice();
+                    }
+                
+                }else{
+
+                    this.fecha = this.date
+                    this.makeInvoice();
+                }
+            })
+            .catch(error => {
+                console.error('Error al guardar los datos del documento:', error.response);
+                // Puedes manejar el error aquí si es necesario
+            });
+
+                
+            
+        },
+
+        makeInvoice() {
+            
+            // TERMINAR con asignacion slotprops
+            let companyID = window.location.pathname.split('/').pop();
+            this.myDocument.id = slotProps.id;
+            this.myDocument.number = slotProps.number;
+            this.myDocument.company_id_company = slotProps.company_id_company;
+            this.myDocument.company_id_customer = slotProps.company_id_customer;
+            this.myDocument.documents_type_id = slotProps.documents_type_id;
+            this.myDocument.documents_series_id = slotProps.documents_series_id;
+            this.myDocument.date = slotProps.date;
+            this.myDocument.subTotal = slotProps.subTotal;
+            this.myDocument.amount = slotProps.amount;
+            this.myDocument.totalTax = slotProps.totalTax;
+            this.myDocument.paid = slotProps.paid;
+            this.myDocument.customer_name = slotProps.customer_name;
+
+            console.log("Fecha factura: " + this.fecha)
+            //console.log("Numero factura: " + this.myDocument.number)
+            this.myDocument.document_counter = this.number
+            console.log("numero factura: " + this.myDocument.document_counter)
+            this.myDocument.company_id_company = this.selectedCompany.id 
+            this.myDocument.company_id_customer = this.selectedCustomer.id
+            this.myDocument.documents_type_id = 1
+            this.myDocument.number = slotProps.document_series_serie + this.number
+            this.myDocument.documents_series_id = 1
+            this.myDocument.date = this.fecha
+            this.myDocument.subTotal = this.subtotal.toFixed(2)
+            this.myDocument.totalTax = this.totalIVA.toFixed(2)
+            this.myDocument.amount = this.totalConIVA.toFixed(2)
+
+            this.products.forEach(product => {
+                // Creamos un nuevo objeto con los valores del producto
+                let newProduct = {
+                    reference: product.reference,
+                    description: product.product,
+                    quantity: product.quantity,
+                    price: product.price,
+                    tax: product.taxes,
+                    total: this.calculateTotal(product).toFixed(2)
+                };
+                // Agregamos el nuevo objeto al arreglo concept dentro de myDocument
+                this.myDocument.concept.push(newProduct);
+
+            });
+
+            axios.post('/documents', {documentData: this.myDocument})
+            .then(response => {
+                console.log("ha pasao")
+                
+                //this.resetData();
+
+            })
+            .catch(error => {
+                console.log("ha fallao")
+                console.error('Error al guardar los datos del documento:', error.response);
+               // this.resetData();
+                
+            });
+            },
+
+
+        }
+
 }
 
 
@@ -246,6 +363,17 @@ export default {
     }
 
     .simpleDelete-button:hover {
+        background-color:rgb(245, 229, 229);
+        transition-duration: 0.5s;
+        padding:7px;
+    }
+
+    .simpleInvoice-button {
+        color:rgb(111, 0, 255);
+        border: 1px solid;
+    }
+
+    .simpleInvoice-button:hover {
         background-color:rgb(245, 229, 229);
         transition-duration: 0.5s;
         padding:7px;

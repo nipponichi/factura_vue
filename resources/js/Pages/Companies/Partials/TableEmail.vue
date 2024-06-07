@@ -84,7 +84,7 @@
         <Dialog v-model:visible="deleteEmailDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="myEmail">{{ $t('Are you sure you want to delete') }} <b>{{myEmail.email}}</b>?</span>
+                <span v-if="myEmail">{{ $t('Are you sure you want to delete') }} <b>{{emails.email}}</b>?</span>
             </div>
             <template #footer>
                 <Button :label="$t('No')" icon="pi pi-times" text @click="deleteEmailDialog = false"/>
@@ -93,7 +93,7 @@
         </Dialog>
 
         <!-- MODAL DELETE MULTIPLE -->
-        <Dialog v-model:visible="deleteEmailsDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deleteEmailsDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
                 <span v-if="myEmail">{{ $t('Are you sure you want to delete the selected emails?') }}</span>
