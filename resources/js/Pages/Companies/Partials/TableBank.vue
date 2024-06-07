@@ -29,8 +29,8 @@
 
                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox w-16" ></Column>
                 
-                <Column field="ibanComplete" :header="$t('Bank account')" sortable class="dateTable"></Column>
-                <Column field="bank_name" :header="$t('Bank Name')" sortable class="dateTable"></Column>
+                <Column field="complete_bank_account" :header="$t('Bank account')" sortable class="dateTable"></Column>
+                <Column field="bank_name" :header="$t('Bank name')" sortable class="dateTable"></Column>
                 <Column field="swift" :header="$t('SWIFT')" sortable class="dateTable"></Column>
                 <Column field="currency" :header="$t('Currency')" sortable class="dateTable"></Column>
                 
@@ -65,7 +65,7 @@
                     <div class="grid gap-3 mb-6 md:grid-cols-1">
                         <div>
                             <label for="iban" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('IBAN') }}</label>
-                            <input type="text" id="ibanComplete" v-model="myBank.iban" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('ES12 3456 7890 90 1234567890')" pattern="[A-Za-z]{2}[0-9\s]*" required />
+                            <input type="text" id="complete_bank_account" v-model="myBank.complete_bank_account" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('ES12 3456 7890 90 1234567890')" pattern="[A-Za-z]{2}[0-9\s]*" required />
                         </div>
                         <div>
                             <label for="bank_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Bank Name') }}</label>
@@ -100,10 +100,10 @@
             
 
         <!-- MODAL DELETE SIMPLE -->
-        <Dialog v-model:visible="deleteBankDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deleteBankDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="myBank">{{ $t('Are you sure you want to delete') }}<b>{{myBank.bank}}</b>?</span>
+                <span v-if="myBank">{{ $t('Are you sure you want to delete') }}<b>{{myBank.complete_bank_account}}</b>?</span>
             </div>
             <template #footer>
                 <Button :label="$t('No')" icon="pi pi-times" text @click="deleteBankDialog = false"/>
@@ -112,7 +112,7 @@
         </Dialog>
 
         <!-- MODAL DELETE MULTIPLE -->
-        <Dialog v-model:visible="deleteBanksDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deleteBanksDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
                 <span v-if="myBank">{{ $t('Are you sure you want to delete the selected banks?') }}</span>
@@ -138,13 +138,11 @@ export default {
             bankDialog: false, 
             deleteBankDialog: false, 
             deleteBanksDialog: false, 
-            ibanComplete: [],
             myBank: { 
                 id: '',             
                 iban: '',
                 entity: '',
                 office: '',
-                complete: '',
                 control_digit: '',
                 account_number: '',
                 bank_name: '',
@@ -152,6 +150,7 @@ export default {
                 swift: '',
                 currency: '',
                 favourite: '',
+                complete_bank_account: '',
                 companyID: window.location.pathname.split('/').pop(),
             },
 
@@ -176,11 +175,8 @@ export default {
             axios.get('/banks/' + myCompanyId)
             .then(response => {
                 this.banks = response.data.accounts;
-                
-                this.banks.forEach(account => {
-                    account.ibanComplete = `${account.iban}${account.entity}${account.office}${account.control_digit}${account.account_number}`;
-                });
-                
+                console.log("cuenta 1 id: " + this.banks[0].id)
+                console.log("cuenta 1 id: " + this.banks[0].id)
             })
             .catch(error => {
                 console.error('Error fetching bank data:', error);
@@ -199,72 +195,74 @@ export default {
             this.submitted = false;
         },
 
-        processIBAN() {
-
-            console.log(" Process Iban" + this.myBank.iban.length)
-    
-            let cleanedIban = this.myBank.iban.replace(/\s+/g, '');
-            console.log(cleanedIban);
-
-            let countryCode = cleanedIban.substring(0, 2).toUpperCase();
-            let controlCode = cleanedIban.substring(2, 4);
-            let iban = countryCode + controlCode;
-            let entity = cleanedIban.substring(4, 8);
-            let office = cleanedIban.substring(8, 12);
-            let controlDigit = cleanedIban.substring(12, 14);
-            let accountNumber = cleanedIban.substring(14, 24);
-            this.myBank.iban = iban;
-            this.myBank.entity = entity;
-            this.myBank.office = office;
-            this.myBank.control_digit = controlDigit;
-            this.myBank.account_number = accountNumber;
-            this.myBank.complete = this.myBank.iban + this.myBank.entity + this.myBank.office + this.myBank.control_digit + this.myBank.account_number
-        },
-
-
         saveMyBank() {
             if (this.myBank.favourite == null) {
                 this.myBank.favourite = false;
             }
             
-            this.processIBAN(); 
+            
+            let cleanedIban = this.myBank.complete_bank_account.replace(/\s+/g, '');
+            console.log("ID: " + this.myBank.id)
 
-            if (this.myBank.complete.length != 24) {
-                window.alert("Ingresa un IBAN que sea correcto");
-                return;
+
+            if(cleanedIban.length == 24) {
+                let countryCode = cleanedIban.substring(0, 2).toUpperCase();
+                let controlCode = cleanedIban.substring(2, 4);
+                let iban = countryCode + controlCode;
+                let entity = cleanedIban.substring(4, 8);
+                let office = cleanedIban.substring(8, 12);
+                let controlDigit = cleanedIban.substring(12, 14);
+                let accountNumber = cleanedIban.substring(14, 24);
+                this.myBank.iban = iban;
+                this.myBank.entity = entity;
+                this.myBank.office = office;
+                this.myBank.control_digit = controlDigit;
+                this.myBank.account_number = accountNumber;
+                this.myBank.complete_bank_account = iban + ' ' + entity + ' ' + office + ' ' + controlDigit + ' ' + accountNumber;
+                console.log(" Process Iban limpio " + this.myBank.complete_bank_account.length)
             }
             
-            if (!this.myBank.id) {
-                axios.post('/bank', this.myBank)
-                .then(response => {
-                    this.fetchBanks();
-                    this.bankDialog = false;
-                })
-                .catch(error => {
-                    console.error('Error saving bank data:', error.response);
-                    this.bankDialog = false;
-                });
-            } else {
-                this.updateMyBank();
-            }
+            let value = cleanedIban.length
+            console.log('value: ', value);
+
+            switch (true) {
+                case value > 24:
+                    alert("El número de cuenta introducido es demasiado largo")
+                    break;
+                case value < 24:
+                    alert("El número de cuenta introducido es demasiado corto")
+                    break;
+                case value == 24:
+                if (!this.myBank.id) {
+                    axios.post('/bank', this.myBank)
+                    .then(response => {
+                        this.fetchBanks();
+                        this.bankDialog = false;
+                    })
+                    .catch(error => {
+                        console.error('Error saving bank data:', error.response);
+                        this.bankDialog = false;
+                    });
+                }else {
+                    this.updateMyBank();
+                }
+                break;
+            }     
         },
 
         editMyBank(slotProps) {    
-            this.myBank.iban = slotProps.ibanComplete;
+
+            this.myBank.id = slotProps.id;
+            this.myBank.complete_bank_account = slotProps.complete_bank_account;
             this.myBank.bank_name = slotProps.bank_name;
             this.myBank.country = slotProps.country;
             this.myBank.swift = slotProps.swift;
             this.myBank.currency = slotProps.currency;
+            this.myBank.favourite = slotProps.favourite;
             this.bankDialog = true;
         },
 
         updateMyBank() {
-            
-            this.processIBAN();
-            if (ibanInput.length != 24) {
-                window.alert("Ingresa un IBAN que sea correcto");
-                return;
-            }
 
             axios.put('/bank/' + this.myBank.id, this.myBank)
             .then(response => {

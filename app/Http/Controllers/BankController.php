@@ -24,7 +24,7 @@ class BankController extends Controller
 
         try {
             $accounts = DB::table('bank_account')
-                ->select('id', 'iban', 'entity', 'office', 'control_digit', 'account_number', 'bank_name', 'country', 'swift', 'currency', 'favourite')
+                ->select('id', 'iban', 'entity', 'office', 'control_digit', 'account_number', 'bank_name', 'country', 'swift', 'currency', 'favourite','complete_bank_account')
                 ->where('company_id', $companyId)
                 ->whereNull('dt_end')
                 ->orderByDesc('favourite')
@@ -72,11 +72,12 @@ class BankController extends Controller
                 'favourite' => $request->favourite,
                 'dt_start' => now(),
                 'company_id' => $companyId,
+                'complete_bank_account' => $request->complete_bank_account,
             ]);
 
             // Obtener la nueva cuenta bancaria creada
             $account = DB::table('bank_account')
-                ->select('iban', 'entity', 'office', 'control_digit', 'account_number', 'bank_name', 'country', 'swift', 'currency', 'id', 'company_id', 'favourite')
+                ->select('iban', 'entity', 'office', 'control_digit', 'account_number', 'bank_name', 'country', 'swift', 'currency', 'id', 'company_id', 'favourite', 'complete_bank_account')
                 ->where('id', $newAccountId)
                 ->whereNull('dt_end')
                 ->first();
@@ -101,8 +102,8 @@ class BankController extends Controller
     {
         DB::beginTransaction();
 
-
         try {
+        
             // Insertar en la tabla bank_account
             $newAccountId = DB::table('bank_account')->insertGetId([
                 'iban' => $request->iban,
@@ -117,14 +118,16 @@ class BankController extends Controller
                 'favourite' => $request->favourite,
                 'dt_start' => now(),
                 'company_id' => $request->companyID,
+                'complete_bank_account' => $request->complete_bank_account,
             ]);
+            
 
             if ($request->favourite === true) {
                 $this->makeFavourite($newAccountId);
             }
 
             $account = DB::table('bank_account')
-                ->select('iban', 'entity', 'office', 'control_digit', 'account_number', 'bank_name', 'country', 'swift', 'currency', 'id', 'company_id', 'favourite')
+                ->select('iban', 'entity', 'office', 'control_digit', 'account_number', 'bank_name', 'country', 'swift', 'currency', 'id', 'company_id', 'favourite','complete_bank_account')
                 ->where('id', $newAccountId)
                 ->whereNull('dt_end')
                 ->first();

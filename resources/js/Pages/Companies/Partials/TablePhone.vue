@@ -81,7 +81,7 @@
             
 
         <!-- MODAL DELETE SIMPLE -->
-        <Dialog v-model:visible="deletePhoneDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deletePhoneDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
                 <span v-if="myPhone">{{ $t('Are you sure you want to delete') }}<b>{{myPhone.phone}}</b>?</span>
@@ -93,7 +93,7 @@
         </Dialog>
 
         <!-- MODAL DELETE MULTIPLE -->
-        <Dialog v-model:visible="deletePhonesDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
+        <Dialog v-model:visible="deletePhonesDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
                 <span v-if="myPhone">{{ $t('Are you sure you want to delete the selected phones?') }}</span>

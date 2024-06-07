@@ -142,7 +142,7 @@ class DocumentController extends Controller
                 'dt_start' => now(),
             ]);
 
-            dd($documentsId);
+            
 
             foreach ($request->documentData['concept'] as $item) {
                 DB::table('documents_details')->insert([
@@ -427,6 +427,8 @@ class DocumentController extends Controller
                 'dt_start' => now(),
             ]);
 
+
+
             foreach ($request->documentData['concept'] as $item) {
                 DB::table('documents_details')->insert([
                     'reference' => $item['reference'],
@@ -445,6 +447,11 @@ class DocumentController extends Controller
                 'dt_end' => now(),
             ]);
 
+            DB::table('documents_details')
+                ->where('documents_id', $id)
+                ->update([
+                    'dt_end' => now(),
+            ]);
 
             DB::commit();
 

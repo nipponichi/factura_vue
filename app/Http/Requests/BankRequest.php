@@ -34,6 +34,7 @@ class BankRequest extends FormRequest
             'currency' => 'string|max:255',
             'favorite' => 'boolean',
             'CompanyID' => 'string|max:255',
+            'complete_bank_account' => 'string|max:28',
         ];
         
     }

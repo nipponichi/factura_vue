@@ -699,12 +699,13 @@ export default {
             axios.post('/documents', {documentData: this.myDocument})
             .then(response => {
                 
-                //this.isDisabled=false;
-                //this.resetData();
+                
+                this.resetData();
 
             })
             .catch(error => {
                 console.error('Error al guardar los datos del documento:', error.response);
+                this.resetData();
                 // Puedes manejar el error aquí si es necesario
             });
         },
@@ -717,7 +718,7 @@ export default {
         },
 
         resetData() {
-            location.reload()
+            this.myDocument.concept = [];
         },
 
         
