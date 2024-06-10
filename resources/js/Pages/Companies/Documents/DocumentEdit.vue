@@ -88,6 +88,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                             type="button" 
                                             class="px-4 py-2 bg-green-500 text-white rounded flex items-center justify-between" 
                                             @click="updateDocument()"
+                                            :class="{ 'opacity-50': isDisabled=true}"
+                                            :disabled="isDisabled=true"
                                             
                                             >
                                             <span>

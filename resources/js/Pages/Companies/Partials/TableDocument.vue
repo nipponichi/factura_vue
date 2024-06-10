@@ -34,10 +34,10 @@
                 <Column field="amount" :header="$t('Amount')" sortable class="dateTable"></Column>
                 <Column field="document_type_name" :header="$t('Type')" sortable class="dateTable"></Column>
                 <Column :exportable="false" class="dateTable">
-                    <template #body="slotProps">
-                        <Button icon="pi pi-file-check" outlined rounded class="mr-2 simpleInvoice-button" 
+                     <template #body="slotProps">
+                       <!--  <Button icon="pi pi-file-check" outlined rounded class="mr-2 simpleInvoice-button" 
                             :disabled="slotProps.data.document_type_name !== 'Presupuesto'" 
-                            @click="slotProps.data.document_type_name === 'Presupuesto' ? checkDocument() : null" />
+                            @click="slotProps.data.document_type_name === 'Presupuesto' ? checkDocument() : null" />-->
                     
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" 
                             @click="handleInfoButtonClick(slotProps.data)" />
