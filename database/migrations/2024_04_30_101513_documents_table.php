@@ -24,6 +24,7 @@ return new class extends Migration
             $table->decimal('amount', 10, 2);
             $table->boolean('paid');
             $table->boolean('active');
+            $table->boolean('invoiced');
             $table->dateTime('dt_updated')->nullable();
             $table->foreignId('user_who_modified')->nullable()->constrained('users');
             $table->decimal('tax', 10, 2)->nullable();

@@ -29,15 +29,16 @@
 
                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox" ></Column>
                 <Column field="number" :header="$t('Number')" sortable class="dateTable"></Column>
+                <Column field="document_type_name" :header="$t('Type')" sortable class="dateTable"></Column>
                 <Column field="customer_name" :header="$t('Receiver')" sortable class="dateTable"></Column>
                 <Column field="date"  :header="$t('Date')" sortable class="dateTable"></Column>
                 <Column field="amount" :header="$t('Amount')" sortable class="dateTable"></Column>
-                <Column field="document_type_name" :header="$t('Type')" sortable class="dateTable"></Column>
+
                 <Column :exportable="false" class="dateTable">
-                     <template #body="slotProps">
-                       <!--  <Button icon="pi pi-file-check" outlined rounded class="mr-2 simpleInvoice-button" 
+                    <template #body="slotProps">
+                        <Button icon="pi pi-file-check" outlined rounded class="mr-2 simpleInvoice-button" 
                             :disabled="slotProps.data.document_type_name !== 'Presupuesto'" 
-                            @click="slotProps.data.document_type_name === 'Presupuesto' ? checkDocument() : null" />-->
+                            @click="slotProps.data.document_type_name === 'Presupuesto' ? checkDocument(slotProps.data) : null" />
                     
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" 
                             @click="handleInfoButtonClick(slotProps.data)" />
@@ -107,7 +108,8 @@ export default {
                 totalTax: '',
                 amount: '',
                 paid: '',
-                customer_name: ''
+                customer_name: '',
+                invoiced: '',
             },
             selectedDocuments: [],
             filters: {},
@@ -197,25 +199,28 @@ export default {
             this.myDocument.amount = slotProps.amount;
             this.myDocument.totalTax = slotProps.totalTax;
             this.myDocument.paid = slotProps.paid;
+            this.myDocument.invoiced = slotProps.invoiced;
             this.myDocument.customer_name = slotProps.customer_name;
         
             this.$inertia.get(`/companies/${companyID}/document/${this.myDocument.id}`);
         },
 
 
-        checkDocument() {
-            
-            axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
-            .then(response => {             
-                this.date = response.data.date.date
-                console.log("date "+ this.date);
-                console.log("fecha "+ this.fecha);
-                this.serie = response.data.serie.number;
-                console.log("Serie "+ this.serie);
-                console.log("selectedSerie "+ this.selectedSerie.number );
+        checkDocument(slotProps) {
+            let companyID = window.location.pathname.split('/').pop();
+            console.log("checkDocument")
+            this.myDocument.id = slotProps.id;
+            this.myDocument.company_id_company = companyID;
+            console.log("SelectedType " +  this.myDocument.id)
+            console.log("SelectedCompany " + this.myDocument.company_id_company)
 
-                if (this.date > this.fecha) {
-                    let respuesta = confirm("La fecha seleccionada es anterior a la de la última factura, ¿deseas asignarle la fecha actual?");
+            
+            axios.get('/documents-series/'+this.myDocument.company_id_company + '/' + this.myDocument.id)
+            .then(response => {   
+                console.log("checkDocument2")
+
+                if (response.data.date.date > this.fecha) {
+                    let respuesta = confirm("La fecha seleccionada es anterior a la de la última factura, ¿deseas mantener la fecha actual?");
                     if (respuesta) {
                         
                         alert("Se ha asignado la fecha actual");
@@ -224,13 +229,13 @@ export default {
                 
                 }else{
 
-                    this.fecha = this.date
+                    // Asigna la fecha de la última factura
+                    this.fecha = response.data.date.date
                     this.makeInvoice();
                 }
             })
             .catch(error => {
                 console.error('Error al guardar los datos del documento:', error.response);
-                // Puedes manejar el error aquí si es necesario
             });
 
                 
@@ -239,51 +244,13 @@ export default {
 
         makeInvoice() {
             
+            console.log("MAke invoice")
             // TERMINAR con asignacion slotprops
             let companyID = window.location.pathname.split('/').pop();
-            this.myDocument.id = slotProps.id;
-            this.myDocument.number = slotProps.number;
-            this.myDocument.company_id_company = slotProps.company_id_company;
-            this.myDocument.company_id_customer = slotProps.company_id_customer;
-            this.myDocument.documents_type_id = slotProps.documents_type_id;
-            this.myDocument.documents_series_id = slotProps.documents_series_id;
-            this.myDocument.date = slotProps.date;
-            this.myDocument.subTotal = slotProps.subTotal;
-            this.myDocument.amount = slotProps.amount;
-            this.myDocument.totalTax = slotProps.totalTax;
-            this.myDocument.paid = slotProps.paid;
-            this.myDocument.customer_name = slotProps.customer_name;
 
             console.log("Fecha factura: " + this.fecha)
-            //console.log("Numero factura: " + this.myDocument.number)
-            this.myDocument.document_counter = this.number
-            console.log("numero factura: " + this.myDocument.document_counter)
-            this.myDocument.company_id_company = this.selectedCompany.id 
-            this.myDocument.company_id_customer = this.selectedCustomer.id
-            this.myDocument.documents_type_id = 1
-            this.myDocument.number = slotProps.document_series_serie + this.number
-            this.myDocument.documents_series_id = 1
-            this.myDocument.date = this.fecha
-            this.myDocument.subTotal = this.subtotal.toFixed(2)
-            this.myDocument.totalTax = this.totalIVA.toFixed(2)
-            this.myDocument.amount = this.totalConIVA.toFixed(2)
 
-            this.products.forEach(product => {
-                // Creamos un nuevo objeto con los valores del producto
-                let newProduct = {
-                    reference: product.reference,
-                    description: product.product,
-                    quantity: product.quantity,
-                    price: product.price,
-                    tax: product.taxes,
-                    total: this.calculateTotal(product).toFixed(2)
-                };
-                // Agregamos el nuevo objeto al arreglo concept dentro de myDocument
-                this.myDocument.concept.push(newProduct);
-
-            });
-
-            axios.post('/documents', {documentData: this.myDocument})
+            axios.post('/documents-serie/' + this.myDocument.id +'/'+this.fecha)
             .then(response => {
                 console.log("ha pasao")
                 

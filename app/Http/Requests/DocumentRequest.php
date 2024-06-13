@@ -33,6 +33,7 @@ class DocumentRequest extends FormRequest
             'totalTax' => 'decimal',
             'subTotal' => 'decimal',
             'paid' => 'boolean',
+            'invoiced' => 'boolean',
             //'active' => 'boolean'
         ];
     }

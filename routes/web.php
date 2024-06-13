@@ -30,8 +30,10 @@ Route::middleware([
     Route::resource('/companies', CompanyController::class);
     Route::get('/companies-invoice', [CompanyController::class, 'companiesInvoice']);
     Route::get('/has-company', [CompanyController::class, 'hasCompany'])->name('companies.hasCompany');
+    Route::get('/companies/{documentId}{date}', [DocumentController::class, 'fromBudgetToInvoice']);
     Route::get('/companies/{companyID}/document/{documentID}', [DocumentController::class, 'show']);
     Route::get('/companies/{companyID}/customer/{customerID}', [CustomerController::class, 'show']);
+    
 
     //Customers
     Route::resource('/customer', CustomerController::class);
@@ -62,7 +64,9 @@ Route::middleware([
     Route::get('/documents-type', [DocumentController::class, 'documentType']);
     Route::get('/documents-serie/{typeID}/{companyID}', [DocumentController::class, 'documentSerie']);
     Route::get('/documents-serie/{typeID}/{companyID}/{serie}', [DocumentController::class, 'documentSerieCheck']);
+    Route::get('/documents-series/{companyID}/{typeID}', [DocumentController::class, 'documentDateCheck']);
     Route::get('/documents-serie/{companyID}', [DocumentController::class, 'indexDocuments']);
+    Route::post('/documents-serie/{documentID}/{date}', [DocumentController::class, 'fromBudgetToInvoice']);
 
     // Admin
     Route::resource('/admin-companies', AdminCompaniesController::class);
