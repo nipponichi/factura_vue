@@ -201,9 +201,11 @@ export default {
             this.myDocument.paid = slotProps.paid;
             this.myDocument.invoiced = slotProps.invoiced;
             this.myDocument.customer_name = slotProps.customer_name;
-        
-            this.$inertia.get(`/companies/${companyID}/document/${this.myDocument.id}`);
+
+            let url = `/companies/${companyID}/document/${this.myDocument.id}`;
+            window.open(url, '_blank'); // Abre la URL en una nueva pestaña
         },
+
 
 
         checkDocument(slotProps) {

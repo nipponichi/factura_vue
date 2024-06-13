@@ -7,9 +7,10 @@
                 <div class="flex justify-start md:justify-end mb-3 md:mb-0">
                     <div class="relative inline-block w-50">
                         <button 
+                            v-if="!loading && ((companies && companies.length > 1) || (customers && customers.length > 1))"
                             type="button" 
                             class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
-                            @click="selectCompany()"
+                            @click="selectCompany"
                             >
                             <span>
                                 <i class="pi pi-plus mr-2"></i>
@@ -40,21 +41,6 @@
                 </div>
 
                 <div class="flex justify-end">
-
-                    <div class="relative inline-block w-50 ml-2">
-                        <button 
-                            type="button" 
-                            class="px-4 py-2 bg-purple-500 text-white rounded flex items-center justify-between" 
-                            @click="cleanDocument()"
-                            :class="{ 'opacity-50': isDisabled }"
-                            :disabled="isDisabled"
-                            >
-                            <span>
-                                <i class="pi pi-sync mr-2"></i>
-                                {{ $t('Clean fields') }}
-                            </span>
-                        </button>
-                    </div>
                     
                     <div class="relative inline-block w-50 ml-2">
                         <button 
@@ -164,6 +150,9 @@
                             />
                         </div>
                     </div>
+                    <div class="mt-2 ml-10">
+                        <Button :label="$t('Customer')" icon="pi pi-plus" severity="success" class="success-button" @click="openNew()" />
+                    </div>
                 </div>  
                 
 
@@ -202,9 +191,12 @@
                         </div>
                     
                     </div>
-                    
+                    <div>
+                        
+                    </div>
 
-                    <div class="showCustomer" style="width: 21rem;"> <!-- Establece el ancho fijo -->
+
+                    <div class="showCustomer" style="width: 21rem;"> 
                         <div class="grid md:grid-cols-1 text-m gap-y-1">
                             <div class="flex items-center">
                                 <div class="font-semibold mr-2">{{ $t('Customer name') }}:</div>
@@ -418,6 +410,62 @@
             </template>
         </Dialog>
     </div>
+
+
+    <!-- MODAL NEW CUSTOMER -->
+    <Dialog v-model:visible="customerDialog" :header="$t('Create company')" id="titleCompany" :modal="true" class="p-fluid">
+        <form style="width: 800px;" @submit.prevent="saveCustomer">
+            <div class="grid gap-3 mb-6 md:grid-cols-2">
+                <div>
+                <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Company name') }}</label>
+                <input type="text" id="name" v-model="customer.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Company name')" required />
+                </div>
+                <div>
+                <label for="tax_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Tax number') }}</label>
+                <input type="text" id="tax_number" v-model="customer.tax_number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Tax number')" required />
+                </div>
+            </div>
+        
+            <div class="mb-6">
+                <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Address') }}</label>
+                <input type="text" id="address1" v-model="customer.address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Address')" required />
+            </div>
+        
+            <div class="grid gap-3 mb-6 md:grid-cols-2"> 
+                <div>
+                <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Town') }}</label>
+                <input type="text" id="town" v-model="customer.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Town')" required />
+                </div>  
+                <div>
+                <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Province') }}</label>
+                <input type="text" id="province" v-model="customer.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Province')" required />
+                </div>  
+                <div>
+                <label for="post_code" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Post code') }}</label>
+                <input type="text" id="post_code" v-model="customer.post_code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Post code')" pattern="^\d+$" required />
+                </div>
+                <div>
+                <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Country') }}</label>
+                <input type="text" id="country" v-model="customer.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Country')" required />
+                </div>
+                <div>
+                <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Email') }}</label>
+                <input type="email" id="email" v-model="customer.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('info@mycompany.com')" required />
+                </div>    
+                <div>
+                <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Phone') }}</label>
+                <input type="tel" id="phone" v-model="customer.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Phone')" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
+                </div>
+            </div>
+        
+            <div class="grid gap-3 md:grid-cols-1 justify-items-end">
+                <div>
+                <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog">{{ $t('Close') }}</button>
+                <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ $t('Save') }}</button>
+                </div>    
+            </div>
+        </form>
+    </Dialog>
 </template>
 
 
@@ -430,6 +478,7 @@ export default {
             fecha: '',
             fechaFormateada: '',
             isDisabled: true,
+            loading: true,
             taxOptions: [
                 { label: '0%', value: 0 },
                 { label: '4%', value: 4 },
@@ -450,6 +499,7 @@ export default {
             counter: '',
             productDialog: false,
             documentDialog: false,
+            customerDialog: false,
             deleteProductDialog: false,
             deleteProductsDialog: false,
             products: [],
@@ -471,10 +521,22 @@ export default {
                 amount: '',
                 totalTax: '',
                 subTotal: '',
-                paid: false,                
+                paid: false, 
+                invoiced: false,               
                 concept: [],
-                
-
+            
+            },
+            customer: {
+                id:'',
+                name: '',
+                tax_number: '',
+                email: '',
+                phone: '',
+                address: '',
+                post_code: '',
+                town: '',
+                province: '',
+                country: ''
             },
         };
     },
@@ -511,23 +573,70 @@ export default {
     methods: {
 
         fetchCompanies() {
-            
             axios.get('/companies-invoice')
+            .then(response => {
+            this.companies = response.data.companies;
+
+            if (this.companies.length === 1) {
+                this.selectedCompany = this.companies[0];
+                return axios.get('/customers/' + this.selectedCompany.id);
+            } else {
+                this.loading = false; // Datos de empresas cargados
+                return Promise.resolve(null); // Continuar sin error
+            }
+            })
+            .then(response => {
+            if (response) {
+                this.customers = response.data.customers;
+
+                if (this.customers.length === 1) {
+                this.selectedCustomer = this.customers[0];
+                }
+            }
+            this.loading = false; // Datos de clientes cargados
+            })
+            .catch(error => {
+            console.error('Error fetching data:', error);
+            this.loading = false; // Manejo de error
+            });
+        },
+
+        openNew() {
+            this.customer = {
+                companyID: this.selectedCompany.id,
+            };
+            console.log("Prueba cogiendo compañia " +this.customer.companyID)
+            this.submitted = false;
+            this.customerDialog = true;
+        },
+
+        saveCustomer() {
+
+                axios.post('/customer', this.customer)
                 .then(response => {
-                    this.companies = response.data.companies;     
-                
+                    this.customerDialog = false;
+                    this.selectedCustomer = this.customer;
+                    this.fetchCustomer();
                 })
                 .catch(error => {
-                    console.error('Error fetching phone data:', error);
-                });
+                    console.log(error.response);
+                    this.customerDialog = false;
+                });   
+
         },
+
 
         handleCompanySelection() {
             this.selectedCustomer = [];
             axios.get('/customers/'+this.selectedCompany.id)
                 .then(response => {
             
-                    this.customers = response.data.customers;                 
+                    this.customers = response.data.customers;   
+                    
+                    if (this.customers.length === 1) {
+                        this.selectedCustomer = this.customers[0];
+                    }
+
                 })
                 .catch(error => {
                     console.error('Error fetching phone data:', error);
@@ -676,10 +785,14 @@ export default {
             this.myDocument.documents_type_id = this.selectedType.id
             this.myDocument.documents_series_id = this.selectedSerie.id
             this.myDocument.date = this.fecha
+            
             this.myDocument.subTotal = this.subtotal.toFixed(2)
             this.myDocument.totalTax = this.totalIVA.toFixed(2)
             this.myDocument.amount = this.totalConIVA.toFixed(2)
-
+            
+            if(this.selectedDocument.id == 1 ) {
+                this.myDocument.invoiced = true
+            }
 
             this.products.forEach(product => {
                 // Creamos un nuevo objeto con los valores del producto
@@ -691,34 +804,27 @@ export default {
                     tax: product.taxes,
                     total: this.calculateTotal(product).toFixed(2)
                 };
-                // Agregamos el nuevo objeto al arreglo concept dentro de myDocument
+
                 this.myDocument.concept.push(newProduct);
 
             });
             
             axios.post('/documents', {documentData: this.myDocument})
             .then(response => {
-                
-                
+        
                 this.resetData();
 
             })
             .catch(error => {
                 console.error('Error al guardar los datos del documento:', error.response);
                 this.resetData();
-                // Puedes manejar el error aquí si es necesario
+                
             });
         },
 
-        cleanDocument(){
-
-            this.isDisabled=true;
-            
-
-        },
 
         resetData() {
-            this.myDocument.concept = [];
+            window.reload()
         },
 
         
