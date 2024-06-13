@@ -71,6 +71,7 @@ class CompanySeeder extends Seeder
     ]);
 
     DB::table('bank_account')->insert([
+        'complete_bank_account' => 'ES91 2048 6032 47 4223364022',
         'iban' => 'ES91',
         'entity' => '2048',
         'office' => '6032',
@@ -86,6 +87,7 @@ class CompanySeeder extends Seeder
     ]);
 
     DB::table('bank_account')->insert([
+        'complete_bank_account' => 'ES56 0049 0843 21 5318356484',
         'iban' => 'ES56',
         'entity' => '0049',
         'office' => '0843',
@@ -127,7 +129,7 @@ class CompanySeeder extends Seeder
 
     DB::table('documents_series')->insert([
         'serie' => 'F',
-        'number' => 1,
+        'number' => 0,
         'company_id' => 1,
         'documents_type_id' => 1,
         'dt_start' => now(),
@@ -135,8 +137,8 @@ class CompanySeeder extends Seeder
 
     
     DB::table('documents_series')->insert([
-        'serie' => 'P',
-        'number' => 23,
+        'serie' => 'F',
+        'number' => 0,
         'company_id' => 1,
         'documents_type_id' => 2,
         'dt_start' => now(),
@@ -178,6 +180,7 @@ class CompanySeeder extends Seeder
     ]);
 
     DB::table('bank_account')->insert([
+        'complete_bank_account' => 'ES40 2048 3506 36 9026752232',
         'iban' => 'ES40',
         'entity' => '2048',
         'office' => '3506',
@@ -191,6 +194,7 @@ class CompanySeeder extends Seeder
         'dt_start' => now(),
         'company_id' => 2,
     ]);
+
 
     DB::table('addresses')->insert([
         'company_id' => 2,
@@ -226,7 +230,7 @@ class CompanySeeder extends Seeder
 
     
     DB::table('documents_series')->insert([
-        'serie' => 'P24',
+        'serie' => 'F24',
         'number' => 1,
         'company_id' => 2,
         'documents_type_id' => 2,

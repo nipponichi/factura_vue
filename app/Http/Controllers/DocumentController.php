@@ -38,6 +38,26 @@ class DocumentController extends Controller
         return response()->json(['message' => 'Document types', 'types' => $types]);
     }
 
+    public function documentDateCheck($company_id, $type_id)
+    {
+
+        $date = DB::table('documents')
+        ->select('date')
+        ->where('documents_type_id', $type_id)
+        ->where('company_id_company', $company_id)
+        ->whereNull('dt_end')
+        ->orderBy('date', 'desc')
+        ->first();
+
+        if ($date == null) {
+            $date = today()->format('d/m/Y');
+        }
+        
+    
+        return response()->json(['message' => 'Document series', 'date' => $date]);
+
+    }
+
     //Saca la serie del documento elegido
     public function documentSerie($type_id,$company_id)
     {
@@ -53,7 +73,7 @@ class DocumentController extends Controller
             $serie->number += 1;
         }
         
-        return response()->json(['message' => 'Document series', 'series' => $series]);
+        return response()->json(['message' => 'Document series1', 'series' => $series]);
     }
 
     // Trae fecha y numero de documento para comprobar si existe uno posterior al que se quiere guardar
@@ -88,10 +108,12 @@ class DocumentController extends Controller
             $date = today()->format('d/m/Y');
         }
         
-        
-        return response()->json(['message' => 'Document series', 'serie' => $serie, 'date' => $date, 'counter' => $counter]);
+    
+        return response()->json(['message' => 'Document series check', 'serie' => $serie, 'date' => $date, 'counter' => $counter]);
 
     }
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -113,9 +135,12 @@ class DocumentController extends Controller
 
             $userId = Auth::id();
 
+            // Buscamos si un documento coincide en tipo y numero con uno ya existente para la misma empresa
             $repatedInvoice = DB::table('documents')
             ->select('id')
-            ->where('number',$request->documentData['number'])
+            ->where('number', $request->documentData['number'])
+            ->where('documents_type_id', $request->documentData['documents_type_id'])
+            ->where('company_id_company', $request->documentData['company_id_company'])
             ->whereNull('dt_end')
             ->first();
 
@@ -123,7 +148,7 @@ class DocumentController extends Controller
                 return response()->json(['message' => 'El número de factura ya existe, puedes modificarla desde el listado de facturas']);
             }
 
-
+            // Guarda la nueva factura
             $documentsId = DB::table('documents')->insertGetId([
                 'number' => $request->documentData['number'],
                 'document_counter' => $request->documentData['document_counter'],
@@ -134,6 +159,7 @@ class DocumentController extends Controller
                 'date' => $request->documentData['date'],
                 'amount' => $request->documentData['amount'],
                 'paid' => $request->documentData['paid'],
+                'invoiced' => $request->documentData['invoiced'],
                 'active' => true,
                 'tax' => $request->documentData['totalTax'],
                 'subtotal' => $request->documentData['subTotal'],
@@ -143,7 +169,7 @@ class DocumentController extends Controller
             ]);
 
             
-
+            // Asigna los conceptos en el detalle de factura
             foreach ($request->documentData['concept'] as $item) {
                 DB::table('documents_details')->insert([
                     'reference' => $item['reference'],
@@ -156,20 +182,7 @@ class DocumentController extends Controller
                 ]);
             }
 
-            $oldInvoiceSerieNumber = DB::table('documents_series')
-            ->select('number')
-            ->where('company_id',$request->documentData['company_id_company'])
-            ->where('documents_type_id',$request->documentData['documents_type_id'])
-            ->whereNull('dt_end')
-            ->first();
-
-            if ($oldInvoiceSerieNumber->number > $request->documentData['document_counter']) {
-            
-                return response()->json(['message' => 'La factura se ha creado correctamente']);
-
-            }
-        
-            
+            // Incrementa el contador de documentos en su respectivo tipo
             DB::table('documents_series')
             ->where('company_id', $request->documentData['company_id_company'])
             ->where('documents_type_id', $request->documentData['documents_type_id'])
@@ -219,6 +232,7 @@ class DocumentController extends Controller
             'documents.date',
             'documents.amount',
             'documents.paid',
+            'documents.invoiced',
             'documents.active',
             'documents_type.name as document_type_name',
             'documents_series.serie as document_series_serie',
@@ -327,6 +341,7 @@ class DocumentController extends Controller
             'documents.date',
             'documents.amount',
             'documents.paid',
+            'documents.invoiced',
             'documents.active',
             'documents_type.name as document_type_name',
             'documents_series.serie as document_series_serie',
@@ -419,6 +434,7 @@ class DocumentController extends Controller
                 'date' => $request->documentData['date'],
                 'amount' => $request->documentData['amount'],
                 'paid' => $request->documentData['paid'],
+                'invoiced' => $request->documentData['invoiced'],
                 'active' => true,
                 'tax' => $request->documentData['totalTax'],
                 'subtotal' => $request->documentData['subTotal'],
@@ -480,7 +496,97 @@ class DocumentController extends Controller
     }
 
 
-    public function pdf() {
+    public function fromBudgetToInvoice ($documentId, $date)
+    {
+        
+        DB::beginTransaction();
+        
+        try {
 
+            $userId = Auth::id();
+            
+            $document = DB::table('documents')
+            ->select('company_id_company','company_id_customer','documents_series_id', 'amount', 'tax', 'subtotal')
+            ->where('id', $documentId)
+            ->first();
+
+            $concepts = DB::table('documents_details')
+            ->select('reference','description', 'quantity', 'tax', 'price', 'total')
+            ->where ('documents_id', $documentId)
+            ->get();
+
+            // Traemos la serie del documentp
+            $serie = DB::table('documents_series')
+            ->select('serie')
+            ->where('id',$document->documents_series_id)
+            ->where('company_id', $document->company_id_company)
+            ->whereNull('dt_end')
+            ->first();
+
+            // Trae el numero de factura segun la serie del presupuesto
+            $documentSerie = DB::table('documents_series')
+            ->select('id','number')
+            ->where('serie',$serie->serie)
+            ->where('documents_type_id', 1)
+            ->first();
+
+            ++$documentSerie->number;
+
+            $number = $serie->serie.$documentSerie->number;
+
+            // Guarda la nueva factura
+            $documentsId = DB::table('documents')->insertGetId([
+                'number' => $number,
+                'document_counter' => $documentSerie->number,
+                'company_id_company' => $document->company_id_company,
+                'company_id_customer' => $document->company_id_customer,
+                'documents_series_id' => $documentSerie->id,
+                'documents_type_id' => 1,
+                'date' => $date,
+                'amount' => $document->amount,
+                'paid' => false,
+                'active' => true,
+                'tax' => $document->tax,
+                'subtotal' => $document->subtotal,
+                'user_who_modified' => $userId,
+                'dt_updated' => now(),
+                'dt_start' => now(),
+            ]);
+            
+            // Asigna los conceptos en el detalle de factura
+            foreach ($concepts as $item) {
+                DB::table('documents_details')->insert([
+                    'reference' => $item->reference,
+                    'description' => $item->description,
+                    'quantity' => $item->quantity,
+                    'tax' => $item->tax,
+                    'price' => $item->price,
+                    'total' => $item->total,
+                    'documents_id' => $documentsId,
+                    'dt_start' => now()
+                ]);
+            }
+
+            // Incrementa el contador de documentos en su respectivo tipo
+            DB::table('documents_series')
+            ->where('company_id', $document->company_id_company)
+            ->where('documents_type_id', 1)
+            ->increment('number');
+
+            // Marca el documento como facturado
+            DB::table('documents')
+            ->where('company_id', $document->company_id_company)
+            ->where('documents_id', $documentId)
+            ->update(['invoiced' => true]);
+
+            DB::commit();
+
+            return response()->json(['message' => 'La factura se ha creado correctamente']);
+
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Error al crear la factura ', $e->getMessage()], 500);
+        }
+        
     }
 }
