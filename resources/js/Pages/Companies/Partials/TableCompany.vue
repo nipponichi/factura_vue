@@ -57,8 +57,12 @@ export default {
         }
     },
     mounted() {
-        
+
         this.companies = this.$page.props.companies;
+        
+        if (this.companies && this.companies.length === 1) {
+            this.handleInfoButtonClick(this.companies[0].id);
+        }
         
     },
 
