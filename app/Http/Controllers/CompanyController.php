@@ -85,11 +85,13 @@ class CompanyController extends Controller
             'addresses.post_code',
             'addresses.province',
             'addresses.town',
-            'addresses.country'
+            'addresses.country',
+            'bank_account.complete_bank_account'
         )
         ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
         ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
         ->leftJoin('companies_tax_numbers', 'companies.id', '=', 'companies_tax_numbers.company_id')
+        ->leftJoin('bank_account', 'companies.id', '=', 'bank_account.company_id')
         ->leftJoin('emails', 'companies.id', '=', 'emails.company_id')
         ->leftJoin('phones', 'companies.id', '=', 'phones.company_id')
         ->leftJoin('addresses', 'companies.id', '=', 'addresses.company_id')
@@ -98,6 +100,7 @@ class CompanyController extends Controller
         ->where('addresses.favourite', 1)
         ->where('phones.favourite', 1)
         ->where('emails.favourite', 1)
+        ->where('bank_account.favourite', 1)
         ->whereNull('companies_users.dt_end')
         ->whereNull('companies_names.dt_end')
         ->whereNull('companies_tax_numbers.dt_end')

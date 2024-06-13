@@ -1,7 +1,3 @@
-<script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-</script>
-
 <template>
     <div class="no-imprimir">
                         

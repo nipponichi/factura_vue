@@ -15,7 +15,7 @@ class DocumentController extends Controller
     public function __construct()
     {
 
-        $this->middleware(['can:read company'])->only(['index', 'show','indexDocuments','documentType','documentSerieCheck','documentSerie']);
+        $this->middleware(['can:read company'])->only(['index', 'show','indexDocuments','documentType','documentSerieCheck','documentSerie','documentDateCheck','fromBudgetToInvoice']);
         $this->middleware(['can:create company'])->only(['create', 'store']);
         $this->middleware(['can:update company'])->only(['edit', 'update']);
         $this->middleware(['can:delete company'])->only('destroy');
@@ -25,7 +25,7 @@ class DocumentController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Documents/Index');
+        return Inertia::render('Documents/Document');
     }
 
     //Saca los tipos de documentos para empresa
