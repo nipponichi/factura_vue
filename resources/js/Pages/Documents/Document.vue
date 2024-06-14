@@ -1,3 +1,6 @@
+<script setup>
+import AppLayout from '@/Layouts/AppLayout.vue';
+</script>
 <template>
     <div class="no-imprimir">
         <AppLayout title="Document">
@@ -587,24 +590,23 @@
 <script>
 import { FilterMatchMode } from 'primevue/api';
 
-
 export default {
     data() {
         return {
             fecha: '',
             fechaFormateada: '',
-            isDisabled: false,
+            loading: true,
             showTable: false,
             taxOptions: [
-                { label: '0%', value: 0.00 },
-                { label: '4%', value: 4.00 },
-                { label: '5%', value: 5.00 },
-                { label: '7%', value: 7.00 },
-                { label: '8%', value: 8.00 },
-                { label: '10%', value: 10.00 },
-                { label: '16%', value: 16.00 },
-                { label: '18%', value: 18.00 },
-                { label: '21%', value: 21.00 },
+                { label: '0%', value: 0 },
+                { label: '4%', value: 4 },
+                { label: '5%', value: 5 },
+                { label: '7%', value: 7 },
+                { label: '8%', value: 8 },
+                { label: '10%', value: 10 },
+                { label: '16%', value: 16 },
+                { label: '18%', value: 18},
+                { label: '21%', value: 21 },
             ],
             imageUrl: 'https://placehold.co/300x300/e2e8f0/e2e8f0',
             companies: null,
@@ -612,8 +614,10 @@ export default {
             types: [],
             series: [],
             serie: '',
+            counter: '',
             productDialog: false,
             documentDialog: false,
+            customerDialog: false,
             deleteProductDialog: false,
             deleteProductsDialog: false,
             products: [],
@@ -625,19 +629,33 @@ export default {
             filters: {},
             submitted: false,
             myDocument: { 
+                document_counter: '',
                 number: '', 
                 company_id_company: '',
                 company_id_customer: '',
                 documents_type_id: '',
                 documents_series_id: '',
-                banck_account_id: '',
+                bank_account_id: '',
                 date: '',
                 amount: '',
                 totalTax: '',
                 subTotal: '',
-                paid: false,                
-                concept: []
-                
+                paid: false, 
+                invoiced: false,               
+                concept: [],
+            
+            },
+            customer: {
+                id:'',
+                name: '',
+                tax_number: '',
+                email: '',
+                phone: '',
+                address: '',
+                post_code: '',
+                town: '',
+                province: '',
+                country: ''
             },
         };
     },
@@ -647,13 +665,12 @@ export default {
             return this.products.reduce((acc, product) => acc + product.quantity * product.price, 0);
         },
         totalIVA() {
-            return this.products.reduce((acc, product) => acc + (product.quantity * product.price * product.tax / 100), 0);
+            return this.products.reduce((acc, product) => acc + (product.quantity * product.price * product.taxes / 100), 0);
         },
         totalConIVA() {
             return this.subtotal + this.totalIVA;
         }
     },
-    
     created() {
         this.filters = {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -668,46 +685,77 @@ export default {
     },
 
     mounted() {
-        
-        this.products = this.concepts
-        for (let i = 0; i < this.products.length; i++) {
-            this.products[i].tax = parseFloat(this.concepts[i].tax);
-        }
-
-        this.myDocument = this.documents
-        this.myDocument.concept = [];
-        this.selectedCompany = this.company
-        this.selectedCustomer = this.customer
-        this.selectedType.name = this.documents.document_type_name
-        this.selectedType.id = this.documents.documents_type_id
-        this.selectedSerie.id = this.documents.documents_series_id
-        this.selectedSerie.serie = this.documents.document_series_serie
-        this.selectedSerie.number = this.documents.document_counter
-        this.fecha = this.documents.date
         this.fetchCompanies();
-        this.fetchDocuments(); 
+        this.fetchDocuments();
     },
     
     methods: {
 
         fetchCompanies() {
-            
             axios.get('/companies-invoice')
+            .then(response => {
+            this.companies = response.data.companies;
+
+            if (this.companies.length === 1) {
+                this.selectedCompany = this.companies[0];
+                return axios.get('/customers/' + this.selectedCompany.id);
+            } else {
+                this.loading = false;
+                return Promise.resolve(null);
+            }
+            })
+            .then(response => {
+            if (response) {
+                this.customers = response.data.customers;
+
+                if (this.customers.length === 1) {
+                    this.selectedCustomer = this.customers[0];
+                }
+            }
+            this.loading = false;
+            })
+            .catch(error => {
+            console.error('Error fetching data:', error);
+            this.loading = false;
+            });
+        },
+
+        openNew() {
+            this.customer = {
+                companyID: this.selectedCompany.id,
+            };
+            console.log("Prueba cogiendo compañia " +this.customer.companyID)
+            this.submitted = false;
+            this.customerDialog = true;
+        },
+
+        saveCustomer() {
+
+                axios.post('/customer', this.customer)
                 .then(response => {
-                    this.companies = response.data.companies;     
-                
+                    this.customerDialog = false;
+                    this.selectedCustomer = this.customer;
+                    this.fetchCustomer();
                 })
                 .catch(error => {
-                    console.error('Error fetching phone data:', error);
-                });
+                    console.log(error.response);
+                    this.customerDialog = false;
+                });   
+
         },
+
 
         handleCompanySelection() {
             this.selectedCustomer = [];
             axios.get('/customers/'+this.selectedCompany.id)
                 .then(response => {
             
-                    this.customers = response.data.customers;                 
+                    this.customers = response.data.customers;   
+                    
+                    if (this.customers.length === 1) {
+                        this.selectedCustomer = this.customers[0];
+                    }
+
                 })
                 .catch(error => {
                     console.error('Error fetching phone data:', error);
@@ -718,19 +766,32 @@ export default {
             axios.get('/documents-type')
                 .then(response => {
                     this.types = response.data.types;     
-                
+                    this.selectedType = this.types[0];
+                    return axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id)
                 })
                 .catch(error => {
                     console.error('Error fetching phone data:', error);
+                })
+                .then(response => {
+                    if (response) {
+                        this.series = response.data.series;
+                        this.selectedSerie = this.series[0];
+                    }
+                })
+                .catch(error => {
+                console.error('Error fetching data:', error);
+                this.loading = false;
                 });
-        },
+            },
+
 
         handleTypeSelection() {
             this.selectedSerie = [];
             axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id)
                 .then(response => {
             
-                    this.series = response.data.series;                 
+                    this.series = response.data.series; 
+                
                 })
                 .catch(error => {
                     console.error('Error fetching phone data:', error);
@@ -761,12 +822,13 @@ export default {
         },
         
         addRow() {
-            
-            let newProduct = { 
+
+            let newProduct = {
+                
                 product: '',
                 quantity: 0,
                 price: 0,
-                tax: 21.50,
+                taxes: 21,
                 priceTax: 0,
                 total: 0,
                 id: this.products.length + 1,
@@ -774,55 +836,132 @@ export default {
             this.products.push(newProduct);
         },
 
-        updateDocument(){
-            console.log("serie id update: " + this.selectedSerie.id)
+        checkDocument() {
             
+            axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
+            .then(response => {             
+                this.date = response.data.date.date
+                console.log("date "+ this.date);
+                console.log("fecha "+ this.fecha);
+                this.serie = response.data.serie.number;
+                console.log("Serie "+ this.serie);
+                console.log("selectedSerie "+ this.selectedSerie.number );
+                //this.counter = response.data.counter.document_counter;
+                //console.log("Counter "+ this.counter);
+
+                if (this.selectedSerie.number <= this.serie) {
+                    
+                   /* let respuesta = confirm("El número de documento ya existe, ¿deseas asignarle el siguiente valor disponible?");
+                    if (respuesta) {
+                        this.selectedSerie.number = ++this.serie
+                        alert("Se ha asignado un número disponible: "+ this.selectedSerie.number);
+                        this.serie = '';
+                        this.saveDocument();
+                    }*/
+
+                    let respuesta = prompt("El número de documento ya existe. ¿Qué deseas hacer?\n1. Conservar el número ingresado\n2. Asignar el siguiente valor disponible\n3. Cancelar");
+
+                    if (respuesta === '1') {
+                        // Conservar el número ingresado por el cliente
+                        alert("Se conservará el número ingresado: " + this.selectedSerie.number);
+                        this.serie = '';
+                        this.saveDocument();
+                    } else if (respuesta === '2') {
+                        // Asignar el siguiente valor disponible
+                        this.selectedSerie.number = ++this.serie;
+                        alert("Se ha asignado el siguiente número disponible: " + this.selectedSerie.number);
+                        this.serie = '';
+                        this.saveDocument();
+                    } else {
+                        // Cancelar la operación
+                        alert("Operación cancelada.");
+                    }
+
+
+                } else if (this.date > this.fecha) {
+                    let respuesta = confirm("La fecha seleccionada es anterior a la de la última factura, ¿deseas asignarle la fecha actual?");
+                    if (respuesta) {
+                        
+                        const today = new Date();
+                        const year = today.getFullYear();
+                        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+                        const day = today.getDate().toString().padStart(2, '0');
+                        this.fecha = `${year}-${month}-${day}`;
+                        
+                        alert("Se ha asignado la fecha actual");
+
+                        this.saveDocument();
+                    }
+                
+                
+                }else{
+                    this.saveDocument();
+                }
+            })
+            .catch(error => {
+                console.error('Error al guardar los datos del documento:', error.response);
+                // Puedes manejar el error aquí si es necesario
+            });
+
+                
+            
+        },
+
+        saveDocument(){
+
             this.myDocument.number = this.selectedSerie.serie + this.selectedSerie.number
-            console.log("numero factura update: " + this.myDocument.number)
+            this.myDocument.document_counter = this.selectedSerie.number
+            
             this.myDocument.company_id_company = this.selectedCompany.id 
             this.myDocument.company_id_customer = this.selectedCustomer.id
             this.myDocument.documents_type_id = this.selectedType.id
             this.myDocument.documents_series_id = this.selectedSerie.id
             this.myDocument.date = this.fecha
+
+            this.myDocument.bank_account_id = this.selectedCompany.bank_account_id
+            
+            
             this.myDocument.subTotal = this.subtotal.toFixed(2)
             this.myDocument.totalTax = this.totalIVA.toFixed(2)
             this.myDocument.amount = this.totalConIVA.toFixed(2)
+            
+            if(this.selectedType.id == 1 ) {
+                this.myDocument.invoiced = true
+            }
 
-            console.log("concept: " + this.myDocument.concept);
+            
             this.products.forEach(product => {
-                console.log("description update producto: "+ product.description);
                 // Creamos un nuevo objeto con los valores del producto
                 let newProduct = {
                     reference: product.reference,
                     description: product.description,
                     quantity: product.quantity,
                     price: product.price,
-                    tax: product.tax,
+                    taxes: product.taxes,
                     total: this.calculateTotal(product).toFixed(2)
                 };
 
-                // Agregamos el nuevo objeto al arreglo concept dentro de myDocument
                 this.myDocument.concept.push(newProduct);
-                console.log("description update con objeto: "+ this.myDocument.concept[0].description);
+
             });
-
-            console.log("description update");
-
-            axios.put('/documents/'+ this.myDocument.id, {documentData: this.myDocument})
+            console.log("numero factura: " + this.myDocument.number)
+            axios.post('/documents', {documentData: this.myDocument})
             .then(response => {
-                console.log("ha pasao");
-                //this.resetData();
+        
+                this.resetData();
 
             })
             .catch(error => {
                 console.error('Error al guardar los datos del documento:', error.response);
-                console.log("ha mal pasao");
-                // Puedes manejar el error aquí si es necesario
+                
             });
         },
 
+
         resetData() {
-            location.reload()
+            console.log("reload")
+            window.location.reload();
+
         },
 
         
@@ -849,7 +988,6 @@ export default {
             this.deleteProductsDialog = false;
             
         },
-
         exportToPDF(){
             this.showTable = !this.showTable;
             window.print()
@@ -981,6 +1119,7 @@ export default {
     display: none;
 }
 
+
 .linea-grosor {
     border: none;
     border-top: #E2E8F0 1px solid; /* Grosor aumentado y color ajustado */
@@ -993,12 +1132,13 @@ export default {
     }
 }
 
-
 @media print {
 
     .no-imprimir {
         display: none;
     }
+
+
     ::-webkit-scrollbar {
         display: none;
     }
@@ -1006,12 +1146,17 @@ export default {
     .p-paginator {
         display: none;
     }
+
     .imprimir{
         display: block;
     }
+
+    
 }
 
+
 </style>
+
 
 <style scoped>
 
