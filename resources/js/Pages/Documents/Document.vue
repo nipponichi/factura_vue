@@ -278,7 +278,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 </Column>
                                 <Column field="product" :header="$t('Description')" sortable class="dateTable">
                                     <template #body="slotProps">
-                                        <InputText class="input" :placeholder="$t('Description')" v-model="slotProps.data.product" />
+                                        <InputText class="input" :placeholder="$t('Description')" v-model="slotProps.data.description" />
                                     </template>
                                 </Column>
                                 <Column field="quantity" :header="$t('Quantity')" sortable class="dateTable">
@@ -319,7 +319,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         <!-- Totals section -->
                         <div class="flex justify-between mt-4 pr-4 mb-4">
                             <div class="totals-container w-1/3">
-                                <div class="ml mt-12 totals bg-gray-100 p-4 rounded-md">
+                                <div class="ml-4 mt-12 totals bg-gray-100 p-4 rounded-md">
                                     <div class="totals-item flex justify-between">
                                         <span class="text-gray-600">{{ $t('Bank account') }}:</span>
                                         <span>{{ this.selectedCompany.complete_bank_account }}</span>
@@ -416,8 +416,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <span v-if="companies"> {{ $t('Are you sure you want to delete') }}<b>{{companies.name}}</b>?</span>
                             </div>
                             <template #footer>
-                                <Button label="No" icon="pi pi-times" text @click="deleteProductDialog = false" />
-                                <Button label="Yes" icon="pi pi-check" text @click="deleteProduct" />
+                                <Button :label="$t('No')" icon="pi pi-times" text @click="deleteProductDialog = false" />
+                                <Button :label="$t('Yes')" icon="pi pi-check" text @click="deleteProduct" />
                             </template>
                         </Dialog>
 
@@ -428,8 +428,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <span v-if="companies">{{ $t('Are you sure you want to delete the selected concepts?') }}</span>
                             </div>
                             <template #footer>
-                                <Button label="No" icon="pi pi-times" text @click="deleteProductsDialog = false" />
-                                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedProducts" />
+                                <Button :label="$t('No')" icon="pi pi-times" text @click="deleteProductsDialog = false" />
+                                <Button :label="$t('Yes')" icon="pi pi-check" text @click="deleteSelectedProducts" />
                             </template>
                         </Dialog>
                     </div>
@@ -497,103 +497,92 @@ import AppLayout from '@/Layouts/AppLayout.vue';
     <!-- PDF -->
 
     <div class="imprimir">
+    
         <div class="invoice">
-            <div class="invoiceHeader flex justify-end mb-6 mt-6">
-                <div class="invoiceDetails flex justify-end text-right">
-                    <div class="mr-5">
-                        <p>{{ selectedType.name }}:</p>
-                        <p>{{ $t('Date') }}:</p>
+                <div class="invoice-header">
+                    <div class="logo">
+                        <img src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/company-logo-design-template-e089327a5c476ce5c70c74f7359c5898_screen.jpg?ts=1672291305" alt="Logo de la empresa" />
                     </div>
-                    <div>
-                        <p>{{ selectedSerie.serie }} {{ selectedSerie.number }}</p>
-                        <p>{{ fecha }}</p>
+                    <div class="invoice_details">
+                        <h3>{{ selectedType.name }}</h3>
+                        <p><strong>{{ $t('Date') }}: </strong>{{ fecha }}</p>
+                        <p><strong>{{ $t('Number of') }} {{ selectedType.name }}:</strong> {{ selectedSerie.serie }} {{ selectedSerie.number }}</p>
                     </div>
-                </div> 
-            </div>
-            <div class="company-customer">
-                <div class="company">
-                    <h2>{{ $t('Company') }}</h2>
-                    <p class="name"> {{ selectedCompany.name }}</p>
-                    <div class="taxNumber">
-                        <p> {{ selectedCompany.tax_number }}</p>
-                    </div>
-                    <div class="address">
-                        <p> {{ selectedCompany.address }}<br> {{ selectedCompany.post_code }}, {{ selectedCompany.town}}<br> {{ selectedCompany.province }}, {{'(' }} {{ selectedCompany.country }} {{ ')' }}</p>
-                    </div>
-                    <div class="contact">
+                </div>
+                <div class="invoice-info">
+                    <div class="company-details">
+                        <h3><strong>{{ $t('Company') }}</strong></h3>
+                        <p class="name">{{ selectedCompany.name }}</p>
+                        <p>{{ selectedCompany.tax_number }}</p>
+                        <p> {{ selectedCompany.address }}<br> {{ selectedCompany.post_code }}, {{ selectedCompany.town}}, {{ selectedCompany.province }}, {{'(' }} {{ selectedCompany.country }} {{ ')' }}</p>
+                        <p> {{ selectedCompany.email }}</p>   
                         <p> {{ selectedCompany.phone }}</p>
-                        <p> {{ selectedCompany.email }}</p>         
+                    </div>
+                    <div class="customer-details">
+                        <h3><strong>{{ $t('Customer') }}</strong></h3>
+                        <p class="name">{{ selectedCustomer.name }}</p>
+                        <p>{{ selectedCustomer.tax_number }}</p>
+                        <p> {{ selectedCustomer.address }}<br> {{ selectedCustomer.post_code }}, {{ selectedCustomer.town}}, {{ selectedCustomer.province }}, {{'(' }} {{ selectedCustomer.country }} {{ ')' }}</p>
+                        <p> {{ selectedCustomer.email }}</p>   
+                        <p> {{ selectedCustomer.phone }}</p>
                     </div>
                 </div>
 
-                <div class="customer">
-                    <h2>{{ $t('Customer') }}</h2>
-                    <p class="name"> {{ selectedCustomer.name }}</p>
-                    <div class="taxNumber">
-                        <p>{{ selectedCustomer.tax_number }}</p>
+                <table class="invoice-table">
+                    <thead>
+                        <tr class="header">
+                            <th>{{ $t('Reference') }}</th>
+                            <th>{{ $t('Description') }}</th>
+                            <th>{{ $t('Quantity') }}</th>
+                            <th>{{ $t('Price') }}</th>
+                            <th>{{ $t('Tax (%)') }}</th>
+                            <th>{{ $t('Total') }}</th>                      
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="product in products" :key="product.id">
+                            <td>{{ product.reference }}</td>
+                            <td>{{ product.description}}</td>
+                            <td>{{ product.quantity }}</td>
+                            <td>{{ product.price }}</td>
+                            <td>{{ product.taxes }}</td>
+                            <td>{{ calculateTotal(product) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="table-break">
+                    <div class="table-container">
+                        <table class="totals">  
+                            <tr>
+                            <td class="title">{{ $t('Subtotal (excluding Tax)') }}</td>
+                            <td>{{ subtotal.toFixed(2) }}€</td>
+                            </tr>
+                            <tr>
+                            <td class="title">{{ $t('Total Tax') }}</td>
+                            <td>{{ totalIVA.toFixed(2) }}€</td>
+                            </tr>
+                            <tr>
+                            <td class="title"><strong>{{ $t('Total (with IVA)') }}</strong></td>
+                            <td><strong>{{ totalConIVA.toFixed(2) }}€</strong></td>
+                            </tr>
+                        </table>
+
                     </div>
-                    <div class="address">
-                        <p>{{ selectedCustomer.address }}<br> {{ selectedCustomer.post_code }}, {{ selectedCustomer.town}}<br> {{ selectedCustomer.province }}, {{'(' }} {{ selectedCustomer.country }} {{ ')' }}</p>
-                    </div>
-                    <div class="contact">
-                        <p>{{ selectedCustomer.phone }}</p>
-                        <p>{{ selectedCustomer.email }}</p>  
-                    </div>         
+                    <table class="bank">  
+                        <tr>
+                            <td>{{ this.selectedCompany.bank_name }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ this.selectedCompany.swift }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ this.selectedCompany.complete_bank_account }}</td>
+                        </tr>
+                    </table>
                 </div>
-            </div>
-            
-            <table class="tablaImprimir">
-                <thead>
-                    <tr>
-                        <th>{{ $t('Reference') }}</th>
-                        <th>{{ $t('Description') }}</th>
-                        <th>{{ $t('Quantity') }}</th>
-                        <th>{{ $t('Price') }}</th>
-                        <th>{{ $t('Tax (%)') }}</th>
-                        <th>{{ $t('Total') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="product in products" :key="product.id">
-                        <td>{{ product.reference }}</td>
-                        <td>{{ product.description }}</td>
-                        <td>{{ product.quantity }}</td>
-                        <td>{{ product.price }}</td>
-                        <td>{{ product.tax }}</td>
-                        <td>{{ calculateTotal(product) }}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="total mt-5">
-                <div class="flex justify-between">
-                    <div class="totals-container w-2/3">
-                        <div class="mr-4 total bg-gray-100 p-4 rounded-md">
-                            <div class="total-item flex justify-between">
-                                <span>{{ $t('Bank account') }}:</span>
-                                <span>{{ this.selectedCompany.complete_bank_account }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="totals-container w-1/3">
-                        <div class="total bg-gray-100 p-4 rounded-md">
-                            <div class="total-item flex justify-between">
-                                <span>{{ $t('Subtotal (excluding Tax)') }}:</span>
-                                <span>{{ subtotal.toFixed(2) }}€</span>
-                            </div>
-                            <div class="total-item flex justify-between">
-                                <span>{{ $t('Total Tax') }}:</span>
-                                <span>{{ totalIVA.toFixed(2) }}€</span>
-                            </div>
-                            <div class="total-item flex justify-between">
-                                <span>{{ $t('Total (with IVA)') }}:</span>
-                                <span>{{ totalConIVA.toFixed(2) }}€</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
+
     
 </template>
 
@@ -646,6 +635,7 @@ export default {
                 company_id_customer: '',
                 documents_type_id: '',
                 documents_series_id: '',
+                bank_account_id: '',
                 date: '',
                 amount: '',
                 totalTax: '',
@@ -927,6 +917,8 @@ export default {
             this.myDocument.documents_type_id = this.selectedType.id
             this.myDocument.documents_series_id = this.selectedSerie.id
             this.myDocument.date = this.fecha
+
+            this.myDocument.bank_account_id = this.selectedCompany.bank_account_id
             
             
             this.myDocument.subTotal = this.subtotal.toFixed(2)
@@ -942,10 +934,10 @@ export default {
                 // Creamos un nuevo objeto con los valores del producto
                 let newProduct = {
                     reference: product.reference,
-                    description: product.product,
+                    description: product.description,
                     quantity: product.quantity,
                     price: product.price,
-                    tax: product.taxes,
+                    taxes: product.taxes,
                     total: this.calculateTotal(product).toFixed(2)
                 };
 
@@ -1165,94 +1157,110 @@ export default {
 
 </style>
 
+
 <style scoped>
 
 .invoice {
-    margin: 20px; 
+    max-width: 1280px;
+    margin: 0 auto;
     padding: 20px;
-    width: calc(100% - 40px);
-    height: calc(100vh - 40px); 
-    box-sizing: border-box;
-}
-.invoiceDetails {
-    padding: 15px;
-    font-weight: 500;
-    color: #000000;
-    margin: 20px;
-    font-size: 11px;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+
 }
 
-.company-customer {
+.invoice-header {
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo img {
+    max-width: 150px;
+}
+
+.invoice_details {
+    text-align: right;
+}
+
+.invoice-info {
+    margin: 0;
     display: flex;
     justify-content: space-between;
 }
-.company {
-    font-size: 11px;
-    font-weight: 500;
-    padding: 10px;
-    width: 45%;
-}
 
-.customer {
-    font-weight: 500;
-    font-size: 11px;
-    padding: 10px;
-    width: 45%;
-}
-.name {
-    font-weight:bold;
-    font-weight: 800;
-    font-size:11px;
-    margin-bottom: 10px;
-    color:#000000; 
-}
-
-.taxNumber {
-
-}
-
-.address {
-
-}
-
-.contact {
-
-}
-
-.total {
-    font-size: 11px;
-    font-weight: bold;
-}
-
-.company h2, .customer h2 {
-    color: #333;
-    margin-bottom: 10px;
-}
-.tablaImprimir {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 75px;
-}
-
-.tablaImprimir th,
-.tablaImprimir td {
-    border: none;
-    padding: 8px;
+.company-details {
     text-align: left;
 }
 
-.tablaImprimir th {
-    background-color: #000000;
-    color: #ffffff;
+.customer-details {
+    text-align: left;
 }
 
-.tablaImprimir tr:nth-child(even) td {
+.invoice-table {
+    margin: 50px 0 40px 0;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+.invoice-table th,
+.invoice-table td {
+
+    padding: 10px;
+    text-align: left;
+}
+
+.invoice-table th {
+    background-color: #f2f2f2;
+}
+
+.invoice-table tfoot td {
+    font-weight: bold;
+    background-color: #f2f2f2;
+}
+
+.invoice-table tfoot tr:last-child td {
+    background-color: #e6e6e6;
+    color: #333;
+}
+
+.invoice-table tr:nth-child(even) td {
     background-color: #f0f0f0;
 }
 
-.tablaImprimir tr:nth-child(odd) td {
+.invoice-table tr:nth-child(odd) td {
     background-color: #ffffff;
 }
 
+.header th {
+    background-color:black;
+    color:white;
+}
 
+.table-container {
+    background-color: #f0f0f0;
+    padding:10px;
+    text-align: right;
+    float:right;
+    display:block;
+
+}
+
+.table-container .totals {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.table-container .totals .title {
+    padding-right: 20px;
+}
+.table-break {
+    page-break-inside: avoid;
+}
+.name {
+    font-size: 18px;
+    font-weight: 700;
+}
 </style>

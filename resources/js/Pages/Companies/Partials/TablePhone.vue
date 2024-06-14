@@ -57,7 +57,7 @@
 
         <!-- MODAL -->
             <template>
-                <Dialog v-model:visible="phoneDialog" :header="myPhone.id ? $t('Update phone') : $t('Update phone') " id="titlePhone" :modal="true" class="p-fluid">
+                <Dialog v-model:visible="phoneDialog" :header="myPhone.id ? $t('Update phone') : $t('Create phone') " id="titlePhone" :modal="true" class="p-fluid">
                 <form style="width: 800px;" @submit.prevent="saveMyPhone">
                     <div class="grid gap-3 mb-6 md:grid-cols-1">
                     <div>

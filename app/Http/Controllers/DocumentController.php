@@ -163,6 +163,7 @@ class DocumentController extends Controller
                 'active' => true,
                 'tax' => $request->documentData['totalTax'],
                 'subtotal' => $request->documentData['subTotal'],
+                'bank_account_id' => $request->documentData['bank_account_id'],
                 'user_who_modified' => $userId,
                 'dt_updated' => now(),
                 'dt_start' => now(),
@@ -175,7 +176,7 @@ class DocumentController extends Controller
                     'reference' => $item['reference'],
                     'description' => $item['description'],
                     'quantity' => $item['quantity'],
-                    'tax' => $item['tax'],
+                    'tax' => $item['taxes'],
                     'price' => $item['price'],
                     'total' => $item['total'],
                     'documents_id' => $documentsId
