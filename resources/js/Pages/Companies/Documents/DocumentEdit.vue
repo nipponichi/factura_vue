@@ -727,13 +727,13 @@ export default {
             axios.put('/documents/'+ this.myDocument.id, {documentData: this.myDocument})
             .then(response => {
                 console.log("ha pasao");
-                //this.resetData();
+                
 
             })
             .catch(error => {
                 console.error('Error al guardar los datos del documento:', error.response);
                 console.log("ha mal pasao");
-                // Puedes manejar el error aquí si es necesario
+                this.myDocument.concept = []
             });
         },
 

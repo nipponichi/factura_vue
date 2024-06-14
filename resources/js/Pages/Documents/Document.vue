@@ -953,7 +953,7 @@ export default {
             })
             .catch(error => {
                 console.error('Error al guardar los datos del documento:', error.response);
-                
+                this.myDocument.concept = []
             });
         },
 
