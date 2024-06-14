@@ -86,7 +86,10 @@ class CompanyController extends Controller
             'addresses.province',
             'addresses.town',
             'addresses.country',
-            'bank_account.complete_bank_account'
+            'bank_account.complete_bank_account',
+            'bank_account.swift',
+            'bank_account.bank_name',
+            'bank_account.id as bank_account_id'
         )
         ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
         ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
@@ -140,15 +143,17 @@ class CompanyController extends Controller
             // Obtener el usuario autenticado
             $userId = Auth::id();
 
-            $company = DB::table('companies_users')
-            ->select('company_id')
-            ->where('user_id', $userId)
-            ->first();
+            $companies = DB::table('companies_users')
+                ->select('company_id')
+                ->where('user_id', $userId)
+                ->get()
+                ->pluck('company_id');
 
-            // Comprobar si se encontró una 'epresa y si company_id tiene un valor
-            if ($company->company_id != $id) {
-                return Redirect::route('companies.index')->with('error', 'No se encontró la empresa');
+            // Verificar si el ID de la empresa está entre las empresas asociadas al usuario
+            if (!$companies->contains($id)) {
+                return Redirect::route('companies.index')->with('error', 'No se encontró la empresa o no tiene permisos suficientes');
             }
+                
 
             
             $companies = DB::table('companies')
@@ -174,15 +179,6 @@ class CompanyController extends Controller
 
             ->where('companies.id', $id)
             ->where('companies_users.user_id', $userId)
-            /* ->where('addresses.favourite', 1)
-            ->where('phones.favourite', 1)
-            ->where('emails.favourite', 1)*/
-
-            /* ->whereNull('companies_names.dt_end')
-            ->whereNull('companies_tax_numbers.dt_end')
-            ->whereNull('addresses.dt_end')
-            ->whereNull('phones.dt_end')
-            ->whereNull('emails.dt_end')*/
             ->first();
 
             
