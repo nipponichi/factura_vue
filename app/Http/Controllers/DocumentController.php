@@ -168,7 +168,7 @@ class DocumentController extends Controller
                 'dt_updated' => now(),
                 'dt_start' => now(),
             ]);
-
+           
             
             // Asigna los conceptos en el detalle de factura
             foreach ($request->documentData['concept'] as $item) {
@@ -205,7 +205,6 @@ class DocumentController extends Controller
      */
     public function show($companyId, $documentId)
     {
-
         $userId = Auth::id();
 
 
@@ -237,11 +236,16 @@ class DocumentController extends Controller
             'documents.active',
             'documents_type.name as document_type_name',
             'documents_series.serie as document_series_serie',
-            'companies_names.name as customer_name'
+            'companies_names.name as customer_name',
+            'documents.bank_account_id as banck_account_id',
+            'bank_account.complete_bank_account',
+            'bank_account.swift',
+            'bank_account.bank_name'
         )
         ->leftJoin('documents_type', 'documents.documents_type_id', '=', 'documents_type.id')
         ->leftJoin('documents_series', 'documents.documents_series_id', '=', 'documents_series.id')
         ->leftJoin('companies_names', 'documents.company_id_customer', '=', 'companies_names.company_id')
+        ->leftJoin('bank_account', 'documents.bank_account_id', '=', 'bank_account.id')
         ->where('documents.company_id_company', $companyId)
         ->where('documents_series.company_id', $companyId)
         ->where('documents.id', $documentId)
@@ -266,6 +270,7 @@ class DocumentController extends Controller
         ->where('documents_id',$documentId)
         ->get();
 
+      
         if ($concepts == null) {
             return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
         }
@@ -294,6 +299,8 @@ class DocumentController extends Controller
         ->where('companies_users.user_id', $userId)
         ->first();
 
+
+
         if ($company == null) {
             return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
         }
@@ -320,7 +327,7 @@ class DocumentController extends Controller
         ->leftJoin('addresses', 'companies.id', '=', 'addresses.company_id')
         ->where('companies.id', $documents->company_id_customer)
         ->first();
-        
+
         if ($customer == null) {
             return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
         }

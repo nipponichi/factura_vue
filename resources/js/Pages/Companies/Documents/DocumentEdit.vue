@@ -630,6 +630,7 @@ export default {
                 company_id_customer: '',
                 documents_type_id: '',
                 documents_series_id: '',
+                banck_account_id: '',
                 date: '',
                 amount: '',
                 totalTax: '',
@@ -652,6 +653,7 @@ export default {
             return this.subtotal + this.totalIVA;
         }
     },
+    
     created() {
         this.filters = {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -666,12 +668,12 @@ export default {
     },
 
     mounted() {
+        
         this.products = this.concepts
         for (let i = 0; i < this.products.length; i++) {
             this.products[i].tax = parseFloat(this.concepts[i].tax);
         }
 
-    
         this.myDocument = this.documents
         this.myDocument.concept = [];
         this.selectedCompany = this.company
