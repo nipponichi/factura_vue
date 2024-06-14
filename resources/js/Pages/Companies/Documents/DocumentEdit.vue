@@ -48,7 +48,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         <button 
                             type="button" 
                             class="px-4 py-2 bg-purple-500 text-white rounded flex items-center justify-between" 
-                            @click="exportDocument()"
+                            @click="exportToXML()"
                             :class="{ 'opacity-50': isDisabled }"
                             :disabled="isDisabled"
                             >
@@ -64,8 +64,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             type="button" 
                             class="px-4 py-2 bg-red-500 text-white rounded flex items-center justify-between" 
                             @click="exportToPDF()"
-                            :class="{ 'opacity-50': isDisabled }"
-                            :disabled="isDisabled"
                             >
                             <span>
                                 <i class="pi pi-file-pdf mr-2"></i>
@@ -79,8 +77,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             type="button" 
                             class="px-4 py-2 bg-green-500 text-white rounded flex items-center justify-between" 
                             @click="updateDocument()"
-                            :class="{ 'opacity-50': isDisabled=true}"
-                            :disabled="isDisabled=true"
                             
                             >
                             <span>
@@ -292,7 +288,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
         <!-- Totals section -->
         <div class="flex justify-between mt-4 pr-4 mb-4">
             <div class="totals-container w-1/3">
-                <div class="ml-4 mt-12 totals bg-gray-100 p-4 rounded-md">
+                <div class="ml-10 mt-12 totals bg-gray-100 p-4 rounded-md">
                     <div class="totals-item flex justify-between">
                         <span class="text-gray-600">{{ $t('Bank account') }}:</span>
                         <span>{{ this.myDocument.complete_bank_account }}</span>
@@ -460,7 +456,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             <td>{{ product.description}}</td>
                             <td>{{ product.quantity }}</td>
                             <td>{{ product.price }}</td>
-                            <td>{{ product.taxes }}</td>
+                            <td>{{ product.tax }}%</td>
                             <td>{{ calculateTotal(product) }}</td>
                         </tr>
                     </tbody>
@@ -513,7 +509,6 @@ export default {
         return {
             fecha: '',
             fechaFormateada: '',
-            isDisabled: false,
             showTable: false,
             taxOptions: [
                 { label: '0%', value: 0.00 },
@@ -595,7 +590,6 @@ export default {
             this.products[i].tax = parseFloat(this.concepts[i].tax);
         }
 
-        console.log(this.documents)
         this.myDocument = this.documents
         this.myDocument.concept = [];
         this.selectedCompany = this.company
@@ -775,10 +769,109 @@ export default {
         exportToPDF(){
             this.showTable = !this.showTable;
             window.print()
-
-            
             
         },
+        exportToXML() {
+           
+            const data = {
+                company: this.company,
+                customer: this.customer,
+                document: this.myDocument
+            };
+            
+            const xmlContent = this.convertToFacturaeXML(data);
+            console.log("documento generado")
+            this.downloadXML(xmlContent, 'facturae.xml');
+            
+        },
+    
+        convertToFacturaeXML(data) {
+            
+            const { company, customer, document } = data;
+            console.log(company)
+            console.log(customer)
+            console.log(document)
+            const xml = `<?xml version="1.0" encoding="UTF-8"?>
+            <Facturae xmlns="http://www.facturae.es/Facturae/2014/v3.2.2/Facturae">
+            <FileHeader>
+                <SchemaVersion>3.2.2</SchemaVersion>
+                <Modality>I</Modality>
+                <InvoiceIssuerType>EM</InvoiceIssuerType>
+            </FileHeader>
+            <Parties>
+                <SellerParty>
+                <TaxIdentification>
+                    <PersonTypeCode>J</PersonTypeCode>
+                    <ResidenceTypeCode>R</ResidenceTypeCode>
+                    <TaxIdentificationNumber>${company.tax_number}</TaxIdentificationNumber>
+                </TaxIdentification>
+                <LegalEntity>
+                    <CorporateName>${company.name}</CorporateName>
+                    <AddressInSpain>
+                    <Address>${company.address}</Address>
+                    <PostCode>${company.post_code}</PostCode>
+                    <Town>${company.town}</Town>
+                    <Province>${company.province}</Province>
+                    <CountryCode>${company.country}</CountryCode>
+                    </AddressInSpain>
+                </LegalEntity>
+                </SellerParty>
+                <BuyerParty>
+                <TaxIdentification>
+                    <PersonTypeCode>F</PersonTypeCode>
+                    <ResidenceTypeCode>R</ResidenceTypeCode>
+                    <TaxIdentificationNumber>${customer.tax_number}</TaxIdentificationNumber>
+                </TaxIdentification>
+                <Individual>
+                    <Name>${customer.name}</Name>
+                    <AddressInSpain>
+                    <Address>${customer.address}</Address>
+                    <PostCode>${customer.post_code}</PostCode>
+                    <Town>${customer.town}</Town>
+                    <Province>${customer.province}</Province>
+                    <CountryCode>${customer.country}</CountryCode>
+                    </AddressInSpain>
+                </Individual>
+                </BuyerParty>
+            </Parties>
+            <Invoices>
+                <Invoice>
+                    <InvoiceHeader>
+                        <InvoiceNumber>${document.number}</InvoiceNumber>
+                        <InvoiceSeriesCode>${this.selectedSerie.serie}</InvoiceSeriesCode>
+                        <InvoiceDocumentType>FC</InvoiceDocumentType>
+                        <InvoiceClass>OO</InvoiceClass>
+                    </InvoiceHeader>
+                    <InvoiceIssueData>
+                        <IssueDate>${document.date}</IssueDate>
+                        <InvoiceCurrencyCode>EUR?</InvoiceCurrencyCode>
+                        <TaxCurrencyCode>EUR?</TaxCurrencyCode>
+                        <LanguageName>es</LanguageName>
+                    </InvoiceIssueData>
+                    <InvoiceTotals>
+                        <TotalGrossAmount>${document.amount}</TotalGrossAmount>
+                        <TotalTaxOutputs>${document.tax}</TotalTaxOutputs>
+                        <TotalTaxesWithheld>${document.tax}</TotalTaxesWithheld>
+                        <InvoiceTotal>${document.amount}</InvoiceTotal>
+                        <TotalOutstandingAmount>${document.amount}</TotalOutstandingAmount>
+                        <TotalExecutableAmount>${document.amount}</TotalExecutableAmount>
+                        <TotalPaid>${document.amount}</TotalPaid>
+                    </InvoiceTotals>
+                    
+                </Invoice>
+            </Invoices>
+            </Facturae>`;
+            return xml;
+        },
+        
+        downloadXML(content, filename) {
+            const blob = new Blob([content], { type: 'application/xml' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
     },
 }
 </script>
