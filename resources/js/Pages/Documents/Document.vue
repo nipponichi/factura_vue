@@ -724,7 +724,7 @@ export default {
             this.customer = {
                 companyID: this.selectedCompany.id,
             };
-            console.log("Prueba cogiendo compañia " +this.customer.companyID)
+            console.log("Prueba cogiendo compañia " + this.customer.companyID)
             this.submitted = false;
             this.customerDialog = true;
         },
@@ -733,9 +733,9 @@ export default {
 
                 axios.post('/customer', this.customer)
                 .then(response => {
-                    this.customerDialog = false;
+                    this.customer.id = response.data.companyId;
                     this.selectedCustomer = this.customer;
-                    this.fetchCustomer();
+                    this.customerDialog = false;      
                 })
                 .catch(error => {
                     console.log(error.response);
@@ -743,7 +743,6 @@ export default {
                 });   
 
         },
-
 
         handleCompanySelection() {
             this.selectedCustomer = [];
@@ -900,7 +899,6 @@ export default {
             })
             .catch(error => {
                 console.error('Error al guardar los datos del documento:', error.response);
-                // Puedes manejar el error aquí si es necesario
             });
 
                 

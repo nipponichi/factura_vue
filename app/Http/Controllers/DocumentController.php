@@ -446,6 +446,7 @@ class DocumentController extends Controller
                 'active' => true,
                 'tax' => $request->documentData['totalTax'],
                 'subtotal' => $request->documentData['subTotal'],
+                'bank_account_id' => $request->documentData['bank_account_id'],
                 'user_who_modified' => $userId,
                 'dt_updated' => now(),
                 'dt_start' => now(),

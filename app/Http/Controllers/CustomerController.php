@@ -155,9 +155,10 @@ class CustomerController extends Controller
                 'isConsulting' => false,
             ]);
 
+
             DB::commit();
 
-            return response()->json(['message' => 'La compañía se ha creado correctamente']);
+            return response()->json(['message' => 'La compañía se ha creado correctamente', 'companyId' => $companyId]);
             // Confirma la transacción si todas las operaciones son exitosas
         } catch (Exception $e) {
             DB::rollback();
@@ -334,5 +335,4 @@ class CustomerController extends Controller
             return response()->json(['message' => 'Error al desactivar la compañía: ' . $id . $e->getMessage()], 500);
         }
     }
-
 }
