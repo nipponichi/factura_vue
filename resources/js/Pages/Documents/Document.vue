@@ -92,7 +92,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                             type="button" 
                                             class="px-4 py-2 bg-green-500 text-white rounded flex items-center justify-between" 
                                             @click="checkDocument()"
-                                            :class="{ 'opacity-50': totalConIVA <= 0 }"
+                                            :class="{ 'opacity-50': totalConIVA <= 0}"
                                             :disabled="totalConIVA <= 0"
                                         >
                                             <span>
@@ -823,7 +823,8 @@ export default {
         addRow() {
 
             let newProduct = {
-                
+                reference: '',
+                description: '',
                 product: '',
                 quantity: 0,
                 price: 0,

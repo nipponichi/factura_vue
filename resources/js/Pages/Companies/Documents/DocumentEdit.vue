@@ -1,408 +1,410 @@
-<script setup>
-import AppLayout from '@/Layouts/AppLayout.vue';
-</script>
-
 <template>
     <div class="no-imprimir">
-                        
-        <div class="card">
+        
+        <div class="py-12">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-4">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
+                    <div class="card">
 
-            <div class="select flex flex-col md:flex-row justify-between mb-4">
+                        <div class="select flex flex-col md:flex-row justify-between mb-4">
 
-                <div class="flex justify-start md:justify-end mb-3 md:mb-0">
-                    <div class="relative inline-block w-50">
-                        <button 
-                            type="button" 
-                            class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
-                            @click="selectCompany()"
-                            >
-                            <span>
-                                <i class="pi pi-plus mr-2"></i>
-                                {{ $t('Companies') }}
-                            </span>
-                        </button>
-                    </div>
-                    <div class="relative inline-block w-50 ml-2">
-                        <button 
-                            type="button" 
-                            class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
-                            @click="selectDocument()"
-                            :class="{ 'opacity-50': !this.selectedCompany.id }"
-                            :disabled="!this.selectedCompany.id"
-                            >
-                            <span>
-                                <i class="pi pi-plus mr-2"></i>
-                                {{ $t('Document type') }}
-                            </span>
-                        </button>
-                    </div>
-                    
-                    <div class="flex items-center ml-2">
-                        <label for="link-checkbox" class="ms-2 mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark as paid') }}</label>
-                        <input id="link-checkbox" type="checkbox" v-model="this.myDocument.paid" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                    </div>
-                </div>
+                            <div class="flex justify-start md:justify-end mb-3 md:mb-0">
+                                <div class="relative inline-block w-50">
+                                    <button 
+                                        type="button" 
+                                        class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
+                                        @click="selectCompany()"
+                                        >
+                                        <span>
+                                            <i class="pi pi-plus mr-2"></i>
+                                            {{ $t('Companies') }}
+                                        </span>
+                                    </button>
+                                </div>
+                                <div class="relative inline-block w-50 ml-2">
+                                    <button 
+                                        type="button" 
+                                        class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
+                                        @click="selectDocument()"
+                                        :class="{ 'opacity-50': !this.selectedCompany.id }"
+                                        :disabled="!this.selectedCompany.id"
+                                        >
+                                        <span>
+                                            <i class="pi pi-plus mr-2"></i>
+                                            {{ $t('Document type') }}
+                                        </span>
+                                    </button>
+                                </div>
+                                
+                                <div class="flex items-center ml-2">
+                                    <label for="link-checkbox" class="ms-2 mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark as paid') }}</label>
+                                    <input id="link-checkbox" type="checkbox" v-model="this.myDocument.paid" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                </div>
+                            </div>
 
-                <div class="flex justify-end">
-                    <div class="relative inline-block w-50 ml-2">
-                        <button 
-                            type="button" 
-                            class="px-4 py-2 bg-purple-500 text-white rounded flex items-center justify-between" 
-                            @click="exportToXML()"
-                            :class="{ 'opacity-50': isDisabled }"
-                            :disabled="isDisabled"
-                            >
-                            <span>
-                                <i class="pi pi-file-export mr-2"></i>
-                                {{ $t('Export') }}
-                            </span>
-                        </button>
-                    </div>
-                    
-                    <div class="relative inline-block w-50 ml-2">
-                        <button 
-                            type="button" 
-                            class="px-4 py-2 bg-red-500 text-white rounded flex items-center justify-between" 
-                            @click="exportToPDF()"
-                            >
-                            <span>
-                                <i class="pi pi-file-pdf mr-2"></i>
-                                {{ $t('PDF') }}
-                            </span>
-                        </button>
-                    </div>
+                            <div class="flex justify-end">
+                                <div class="relative inline-block w-50 ml-2">
+                                    <button 
+                                        type="button" 
+                                        class="px-4 py-2 bg-purple-500 text-white rounded flex items-center justify-between" 
+                                        @click="exportToXML()"
+                                        :class="{ 'opacity-50': isDisabled }"
+                                        :disabled="isDisabled"
+                                        >
+                                        <span>
+                                            <i class="pi pi-file-export mr-2"></i>
+                                            {{ $t('Export') }}
+                                        </span>
+                                    </button>
+                                </div>
+                                
+                                <div class="relative inline-block w-50 ml-2">
+                                    <button 
+                                        type="button" 
+                                        class="px-4 py-2 bg-red-500 text-white rounded flex items-center justify-between" 
+                                        @click="exportToPDF()"
+                                        >
+                                        <span>
+                                            <i class="pi pi-file-pdf mr-2"></i>
+                                            {{ $t('PDF') }}
+                                        </span>
+                                    </button>
+                                </div>
 
-                    <div class="relative inline-block w-50 ml-2">
-                        <button 
-                            type="button" 
-                            class="px-4 py-2 bg-green-500 text-white rounded flex items-center justify-between" 
-                            @click="updateDocument()"
+                                <div class="relative inline-block w-50 ml-2">
+                                    <button 
+                                        type="button" 
+                                        class="px-4 py-2 bg-green-500 text-white rounded flex items-center justify-between" 
+                                        @click="updateDocument()"
+                                        
+                                        >
+                                        <span>
+                                            <i class="pi pi-upload mr-2"></i>
+                                            {{ $t('Save') }}
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr class="linea-grosor">
+
+                        <div class="selector flex flex-col md:flex-row justify-between items-start mt-4 ml-12">
+                            <!-- Foto -->
+                            <div class="w-64 h-32 mb-3 md:mb-0 border rounded-lg overflow-hidden relative bg-gray-100 mr-0 md:mr-4">
+                                <img
+                                    alt="Company Logo"
+                                    :src="imageUrl"
+                                    class="object-cover w-full h-48 cursor-pointer"
+                                    @click="openFileInput"
+                                />
+                                <div class="absolute top-0 left-0 right-0 bottom-0 w-full block cursor-pointer flex items-center justify-center">
+                                    <button
+                                    type="button"
+                                    style="background-color: rgba(255, 255, 255, 0.65)"
+                                    class="hover:bg-gray-100 text-gray-700 font-semibold py-2 px-4 text-sm border border-gray-300 rounded-lg shadow-sm"
+                                    @click="openFileInput"
+                                    >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        class="icon icon-tabler icon-tabler-camera"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="2"
+                                        stroke="currentColor"
+                                        fill="none"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <rect x="0" y="0" width="24" height="24" stroke="none"></rect>
+                                        <path
+                                        d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"
+                                        />
+                                        <circle cx="12" cy="13" r="3" />
+                                    </svg>
+                                    <input type="file" ref="fileInput" @change="handleFileChange" style="display: none" />
+                                    </button>
+                                </div>
+
+
+                            </div>
+
+                            <div class="grid md:grid-cols-1 text-sm gap-y-1 mr-28">
+                                <div class="flex items-center">
+                                    <div class="font-semibold mr-3">Nº {{this.selectedType.name}}:</div>
+                                    <div class="text-gray-700">{{this.selectedSerie.serie}}</div>
+                                    <input type="text" class="border border-gray-300 rounded-md ml-3 px-3 py-2 focus:outline-none focus:border-blue-400" v-model="this.selectedSerie.number">
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="font-semibold mr-3">{{ $t('Date') }}:</div>
+                                    <div>
+                                        <input
+                                            type="date"
+                                            v-model="fecha"
+                                            @change="cambiarFormatoFecha"
+                                            class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-400"
+                                        />
+                                    </div>
+                                </div>
+                            </div>  
                             
-                            >
-                            <span>
-                                <i class="pi pi-upload mr-2"></i>
-                                {{ $t('Save') }}
-                            </span>
-                        </button>
-                    </div>
-                </div>
 
-            </div>
+                        </div>
+                    
+                        <div class="selector flex flex-col md:flex-row justify-between mt-6 ml-12">
+                            <div class="showCompany" >
 
-            <hr class="linea-grosor">
+                                <div class="flex justify-center">
+                                    
+                                    </div>
+                                        <div class="grid md:grid-cols-1 text-m gap-y-1">
+                                        <div class="flex items-center">
+                                            <div class="font-semibold mr-3">{{ $t('Company name') }}:</div>
+                                            <div class="text-gray-700">{{this.selectedCompany.name}}</div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="font-semibold mr-3">{{ $t('Tax Number') }}:</div>
+                                            <div class="text-gray-700">{{this.selectedCompany.tax_number}}</div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="font-semibold mr-3">{{ $t('Phone') }}:</div>
+                                            <div class="text-gray-700">{{this.selectedCompany.phone}}</div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="font-semibold mr-3">{{ $t('Email') }}:</div>
+                                            <div class="text-gray-700">{{ this.selectedCompany.email }}</div>
+                                        </div>
+                                        
+                                        <div class="flex items-center">
+                                            <p><strong>{{ $t('Address') }}:</strong>  {{ selectedCompany.address }}<br> {{ selectedCompany.post_code }}, {{ selectedCompany.town}}<br> {{ selectedCompany.province }}, {{'(' }} {{ selectedCompany.country }} {{ ')' }}</p>
+                                        
+                                        </div>
+                                    
+                                    </div>
+                                
+                                </div>
+                                
 
-            <div class="selector flex flex-col md:flex-row justify-between items-start mt-4 ml-12">
-                <!-- Foto -->
-                <div class="w-64 h-32 mb-3 md:mb-0 border rounded-lg overflow-hidden relative bg-gray-100 mr-0 md:mr-4">
-                    <img
-                        alt="Company Logo"
-                        :src="imageUrl"
-                        class="object-cover w-full h-48 cursor-pointer"
-                        @click="openFileInput"
-                    />
-                    <div class="absolute top-0 left-0 right-0 bottom-0 w-full block cursor-pointer flex items-center justify-center">
-                        <button
-                        type="button"
-                        style="background-color: rgba(255, 255, 255, 0.65)"
-                        class="hover:bg-gray-100 text-gray-700 font-semibold py-2 px-4 text-sm border border-gray-300 rounded-lg shadow-sm"
-                        @click="openFileInput"
-                        >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="icon icon-tabler icon-tabler-camera"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            stroke-width="2"
-                            stroke="currentColor"
-                            fill="none"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <rect x="0" y="0" width="24" height="24" stroke="none"></rect>
-                            <path
-                            d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"
-                            />
-                            <circle cx="12" cy="13" r="3" />
-                        </svg>
-                        <input type="file" ref="fileInput" @change="handleFileChange" style="display: none" />
-                        </button>
-                    </div>
+                                <div class="showCustomer" style="width: 21rem;"> <!-- Establece el ancho fijo -->
+                                    <div class="grid md:grid-cols-1 text-m gap-y-1">
+                                        <div class="flex items-center">
+                                            <div class="font-semibold mr-2">{{ $t('Customer name') }}:</div>
+                                            <div class="text-gray-700">{{ this.selectedCustomer.name }}</div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="font-semibold mr-2">{{ $t('Tax number') }}:</div>
+                                            <div class="text-gray-700">{{ this.selectedCustomer.tax_number }}</div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="font-semibold mr-2">{{ $t('Phone') }}:</div>
+                                            <div class="text-gray-700">{{ this.selectedCustomer.phone }}</div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="font-semibold mr-2">{{ $t('Email') }}:</div>
+                                            <div class="text-gray-700">{{ this.selectedCustomer.email }}</div>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <p><strong>{{ $t('Address') }}:</strong> {{ selectedCustomer.address }}<br> {{ selectedCustomer.post_code }}, {{ selectedCustomer.town}}<br> {{ selectedCustomer.province }}, {{'(' }} {{ selectedCustomer.country }} {{ ')' }}</p>
+                                        </div>
+                                    </div>
+                                </div>
 
+                        </div>  
+                        <Toolbar class="mb-4 mt-8 border border-slate-200 ... ">
+                            <template #start>
+                                <div class="flex items-center justify-between ">
+                                    <div class="flex items-center">
+                                        <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="addRow" />
+                                        <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
+                                    </div>
+                                    <div class="flex-grow"></div>
+                                </div>
+                            </template>
 
-                </div>
+                            <template #end>
+                                <div class="relative rounded-md shadow-sm">
+                                    <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm" v-model="filters['global'].value" :placeholder="$t('Search...')">
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </template>
+                        </Toolbar>
 
-                <div class="grid md:grid-cols-1 text-sm gap-y-1 mr-28">
-                    <div class="flex items-center">
-                        <div class="font-semibold mr-3">Nº {{this.selectedType.name}}:</div>
-                        <div class="text-gray-700">{{this.selectedSerie.serie}}</div>
-                        <input type="text" class="border border-gray-300 rounded-md ml-3 px-3 py-2 focus:outline-none focus:border-blue-400" v-model="this.selectedSerie.number">
-                    </div>
-                    <div class="flex items-center">
-                        <div class="font-semibold mr-3">{{ $t('Date') }}:</div>
-                        <div>
-                            <input
-                                type="date"
-                                v-model="fecha"
-                                @change="cambiarFormatoFecha"
-                                class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-400"
-                            />
+                        <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id" class=""
+                        :paginator="true" :rows="10" :filters="filters"
+                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
+                        :currentPageReportTemplate="`${$t('Showing')} {first} ${$t('of')} {last} ${$t('of')} {totalRecords} ${$t('products')}`">
+                        
+                            <Column selectionMode="multiple" :exportable="false" class="datetable checkbox"></Column>
+                            <Column field="reference" :header="$t('Reference')" sortable class="dateTable">
+                                <template #body="slotProps">
+                                    <InputText class="input" :placeholder="$t('Reference')" v-model="slotProps.data.reference" />
+                                </template>
+                            </Column>
+                            <Column field="product" :header="$t('Description')" sortable class="dateTable">
+                                <template #body="slotProps">
+                                    <InputText class="input" :placeholder="$t('Description')" v-model="slotProps.data.description" />
+                                </template>
+                            </Column>
+                            <Column field="quantity" :header="$t('Quantity')" sortable class="dateTable">
+                                <template #body="slotProps">
+                                    <InputText class="input input-short" v-model="slotProps.data.quantity" />
+                                </template>
+                            </Column>
+                            <Column field="price" :header="$t('Price')" sortable class="dateTable">
+                                <template #body="slotProps">
+                                    <InputText class="input input-short" v-model="slotProps.data.price" />
+                                </template>
+                            </Column>
+                            <Column field="tax" :header="$t('Tax (%)')" sortable class="dateTable">
+                                <template #body="slotProps">
+                                    <Dropdown class="input-short" v-model="slotProps.data.tax" :options="taxOptions" optionLabel="label" optionValue="value" />
+                                </template>
+                            </Column>
+                            <Column field="total" :header="$t('Total')" sortable class="dateTable">
+                                <template #body="slotProps">
+                                    <InputText class="input input-short" :value="calculateTotal(slotProps.data)" readonly />
+                                </template>
+                            </Column>
+                            <Column :exportable="false" class="dateTable">
+                                <template #body="slotProps">
+                                    <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button " severity="danger" @click="confirmDeleteProduct(slotProps.data)" />
+                                </template>
+                            </Column>
+                        </DataTable>
+                        
+
+                        <div class="flex justify-end mt-4 pr-4 ">
+                            <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="success-button" @click="addRow()" />
                         </div>
                     </div>
-                </div>  
+
+                    <!-- Totals section -->
+                    <div class="flex justify-between mt-4 pr-4 mb-4">
+                        <div class="totals-container w-1/3">
+                            <div class="ml-10 mt-12 totals bg-gray-100 p-4 rounded-md">
+                                <div class="totals-item flex justify-between">
+                                    <span class="text-gray-600">{{ $t('Bank account') }}:</span>
+                                    <span>{{ this.myDocument.complete_bank_account }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="totals-container w-1/3">
+                            <div class="totals bg-gray-100 p-4 rounded-md">
+                                <div class="totals-item flex justify-between">
+                                    <span class="text-gray-600">{{ $t('Subtotal (excluding Tax)') }}:</span>
+                                    <span>{{ subtotal.toFixed(2) }}€</span>
+                                </div>
+                                <div class="totals-item flex justify-between">
+                                    <span class="text-gray-600">{{ $t('Total Tax') }}:</span>
+                                    <span>{{ totalIVA.toFixed(2) }}€</span>
+                                </div>
+                                <div class="totals-item flex justify-between">
+                                    <span class="text-gray-600">{{ $t('Total (with IVA)') }}:</span>
+                                    <span>{{ totalConIVA.toFixed(2) }}€</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MODAL COMPANY -->
+                    <Dialog v-model:visible="productDialog" :style="{width: '450px'}" :header="$t('Select companies')" :modal="true" @change="handleCompanySelection">
+                        <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select your company') }}:</label>
+                        <Dropdown v-model="selectedCompany" :options="companies" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="handleCompanySelection">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value" class="flex align-items-center">
+                                    <div>{{ slotProps.value.name }}</div>
+                                </div>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="flex align-items-center">
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                        <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select a customer') }}:</label>
+                        <Dropdown v-model="selectedCustomer" :options="this.customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value" class=" flex align-items-center ">
+                                    <div>{{ slotProps.value.name }}</div>
+                                </div>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="flex align-items-center">
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>  
+
+                    </Dialog>
+
+                    <!-- MODAL DOCUMENT -->
+
+                    <Dialog v-model:visible="documentDialog" :style="{width: '450px'}" :header="$t('Select document')" :modal="true" @change="handleTypeSelection">
+                        <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select document type') }}</label>
+                        <Dropdown v-model="selectedType" :options="types" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="handleTypeSelection">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value" class="flex align-items-center">
+                                    <div>{{ slotProps.value.name }}</div>
+                                </div>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="flex align-items-center">
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                        <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select document serie') }}</label>
+                        <Dropdown v-model="selectedSerie" :options="this.series" filter optionLabel="serie" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value" class=" flex align-items-center ">
+                                    <div>{{ slotProps.value.serie }}</div>
+                                </div>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="flex align-items-center">
+                                    <div>{{ slotProps.option.serie }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>  
+
+                    </Dialog>
+
+
+
+                    <!-- MODAL DELETE SIMPLE -->
+                    <Dialog v-model:visible="deleteProductDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
+                        <div class="confirmation-content">
+                            <i class="pi pi-exclamation-triangle mr-3 " style="font-size: 2rem" />
+                            <span v-if="companies"> {{ $t('Are you sure you want to delete') }}<b>{{companies.name}}</b>?</span>
+                        </div>
+                        <template #footer>
+                            <Button label="No" icon="pi pi-times" text @click="deleteProductDialog = false" />
+                            <Button label="Yes" icon="pi pi-check" text @click="deleteProduct" />
+                        </template>
+                    </Dialog>
+
+                    <!-- MODAL DELETE MULTIPLE -->
+                    <Dialog v-model:visible="deleteProductsDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
+                        <div class="confirmation-content">
+                            <i class="pi pi-exclamation-triangle mr-3 " style="font-size: 2rem" />
+                            <span v-if="companies">{{ $t('Are you sure you want to delete the selected concepts?') }}</span>
+                        </div>
+                        <template #footer>
+                            <Button label="No" icon="pi pi-times" text @click="deleteProductsDialog = false" />
+                            <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedProducts" />
+                        </template>
+                    </Dialog>
+                    
                 
-
-            </div>
-        
-            <div class="selector flex flex-col md:flex-row justify-between mt-6 ml-12">
-                <div class="showCompany" >
-
-                    <div class="flex justify-center">
-                        
-                        </div>
-                            <div class="grid md:grid-cols-1 text-m gap-y-1">
-                            <div class="flex items-center">
-                                <div class="font-semibold mr-3">{{ $t('Company name') }}:</div>
-                                <div class="text-gray-700">{{this.selectedCompany.name}}</div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="font-semibold mr-3">{{ $t('Tax Number') }}:</div>
-                                <div class="text-gray-700">{{this.selectedCompany.tax_number}}</div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="font-semibold mr-3">{{ $t('Phone') }}:</div>
-                                <div class="text-gray-700">{{this.selectedCompany.phone}}</div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="font-semibold mr-3">{{ $t('Email') }}:</div>
-                                <div class="text-gray-700">{{ this.selectedCompany.email }}</div>
-                            </div>
-                            
-                            <div class="flex items-center">
-                                <p><strong>{{ $t('Address') }}:</strong>  {{ selectedCompany.address }}<br> {{ selectedCompany.post_code }}, {{ selectedCompany.town}}<br> {{ selectedCompany.province }}, {{'(' }} {{ selectedCompany.country }} {{ ')' }}</p>
-                            
-                            </div>
-                        
-                        </div>
-                    
-                    </div>
-                    
-
-                    <div class="showCustomer" style="width: 21rem;"> <!-- Establece el ancho fijo -->
-                        <div class="grid md:grid-cols-1 text-m gap-y-1">
-                            <div class="flex items-center">
-                                <div class="font-semibold mr-2">{{ $t('Customer name') }}:</div>
-                                <div class="text-gray-700">{{ this.selectedCustomer.name }}</div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="font-semibold mr-2">{{ $t('Tax number') }}:</div>
-                                <div class="text-gray-700">{{ this.selectedCustomer.tax_number }}</div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="font-semibold mr-2">{{ $t('Phone') }}:</div>
-                                <div class="text-gray-700">{{ this.selectedCustomer.phone }}</div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="font-semibold mr-2">{{ $t('Email') }}:</div>
-                                <div class="text-gray-700">{{ this.selectedCustomer.email }}</div>
-                            </div>
-                            <div class="flex items-center">
-                                <p><strong>{{ $t('Address') }}:</strong> {{ selectedCustomer.address }}<br> {{ selectedCustomer.post_code }}, {{ selectedCustomer.town}}<br> {{ selectedCustomer.province }}, {{'(' }} {{ selectedCustomer.country }} {{ ')' }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-            </div>  
-            <Toolbar class="mb-4 mt-8 border border-slate-200 ... ">
-                <template #start>
-                    <div class="flex items-center justify-between ">
-                        <div class="flex items-center">
-                            <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="addRow" />
-                            <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
-                        </div>
-                        <div class="flex-grow"></div>
-                    </div>
-                </template>
-
-                <template #end>
-                    <div class="relative rounded-md shadow-sm">
-                        <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm" v-model="filters['global'].value" :placeholder="$t('Search...')">
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                    </div>
-                </template>
-            </Toolbar>
-
-            <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id" class=""
-            :paginator="true" :rows="10" :filters="filters"
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
-            :currentPageReportTemplate="`${$t('Showing')} {first} ${$t('of')} {last} ${$t('of')} {totalRecords} ${$t('products')}`">
-            
-                <Column selectionMode="multiple" :exportable="false" class="datetable checkbox"></Column>
-                <Column field="reference" :header="$t('Reference')" sortable class="dateTable">
-                    <template #body="slotProps">
-                        <InputText class="input" :placeholder="$t('Reference')" v-model="slotProps.data.reference" />
-                    </template>
-                </Column>
-                <Column field="product" :header="$t('Description')" sortable class="dateTable">
-                    <template #body="slotProps">
-                        <InputText class="input" :placeholder="$t('Description')" v-model="slotProps.data.description" />
-                    </template>
-                </Column>
-                <Column field="quantity" :header="$t('Quantity')" sortable class="dateTable">
-                    <template #body="slotProps">
-                        <InputText class="input input-short" v-model="slotProps.data.quantity" />
-                    </template>
-                </Column>
-                <Column field="price" :header="$t('Price')" sortable class="dateTable">
-                    <template #body="slotProps">
-                        <InputText class="input input-short" v-model="slotProps.data.price" />
-                    </template>
-                </Column>
-                <Column field="tax" :header="$t('Tax (%)')" sortable class="dateTable">
-                    <template #body="slotProps">
-                        <Dropdown class="input-short" v-model="slotProps.data.tax" :options="taxOptions" optionLabel="label" optionValue="value" />
-                    </template>
-                </Column>
-                <Column field="total" :header="$t('Total')" sortable class="dateTable">
-                    <template #body="slotProps">
-                        <InputText class="input input-short" :value="calculateTotal(slotProps.data)" readonly />
-                    </template>
-                </Column>
-                <Column :exportable="false" class="dateTable">
-                    <template #body="slotProps">
-                        <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button " severity="danger" @click="confirmDeleteProduct(slotProps.data)" />
-                    </template>
-                </Column>
-            </DataTable>
-            
-
-            <div class="flex justify-end mt-4 pr-4 ">
-                <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="success-button" @click="addRow()" />
-            </div>
-        </div>
-
-        <!-- Totals section -->
-        <div class="flex justify-between mt-4 pr-4 mb-4">
-            <div class="totals-container w-1/3">
-                <div class="ml-10 mt-12 totals bg-gray-100 p-4 rounded-md">
-                    <div class="totals-item flex justify-between">
-                        <span class="text-gray-600">{{ $t('Bank account') }}:</span>
-                        <span>{{ this.myDocument.complete_bank_account }}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="totals-container w-1/3">
-                <div class="totals bg-gray-100 p-4 rounded-md">
-                    <div class="totals-item flex justify-between">
-                        <span class="text-gray-600">{{ $t('Subtotal (excluding Tax)') }}:</span>
-                        <span>{{ subtotal.toFixed(2) }}€</span>
-                    </div>
-                    <div class="totals-item flex justify-between">
-                        <span class="text-gray-600">{{ $t('Total Tax') }}:</span>
-                        <span>{{ totalIVA.toFixed(2) }}€</span>
-                    </div>
-                    <div class="totals-item flex justify-between">
-                        <span class="text-gray-600">{{ $t('Total (with IVA)') }}:</span>
-                        <span>{{ totalConIVA.toFixed(2) }}€</span>
-                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- MODAL COMPANY -->
-        <Dialog v-model:visible="productDialog" :style="{width: '450px'}" :header="$t('Select companies')" :modal="true" @change="handleCompanySelection">
-            <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select your company') }}:</label>
-            <Dropdown v-model="selectedCompany" :options="companies" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="handleCompanySelection">
-                <template #value="slotProps">
-                    <div v-if="slotProps.value" class="flex align-items-center">
-                        <div>{{ slotProps.value.name }}</div>
-                    </div>
-                </template>
-                <template #option="slotProps">
-                    <div class="flex align-items-center">
-                        <div>{{ slotProps.option.name }}</div>
-                    </div>
-                </template>
-            </Dropdown>
-            <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select a customer') }}:</label>
-            <Dropdown v-model="selectedCustomer" :options="this.customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
-                <template #value="slotProps">
-                    <div v-if="slotProps.value" class=" flex align-items-center ">
-                        <div>{{ slotProps.value.name }}</div>
-                    </div>
-                </template>
-                <template #option="slotProps">
-                    <div class="flex align-items-center">
-                        <div>{{ slotProps.option.name }}</div>
-                    </div>
-                </template>
-            </Dropdown>  
-
-        </Dialog>
-
-        <!-- MODAL DOCUMENT -->
-
-        <Dialog v-model:visible="documentDialog" :style="{width: '450px'}" :header="$t('Select document')" :modal="true" @change="handleTypeSelection">
-            <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select document type') }}</label>
-            <Dropdown v-model="selectedType" :options="types" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="handleTypeSelection">
-                <template #value="slotProps">
-                    <div v-if="slotProps.value" class="flex align-items-center">
-                        <div>{{ slotProps.value.name }}</div>
-                    </div>
-                </template>
-                <template #option="slotProps">
-                    <div class="flex align-items-center">
-                        <div>{{ slotProps.option.name }}</div>
-                    </div>
-                </template>
-            </Dropdown>
-            <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select document serie') }}</label>
-            <Dropdown v-model="selectedSerie" :options="this.series" filter optionLabel="serie" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
-                <template #value="slotProps">
-                    <div v-if="slotProps.value" class=" flex align-items-center ">
-                        <div>{{ slotProps.value.serie }}</div>
-                    </div>
-                </template>
-                <template #option="slotProps">
-                    <div class="flex align-items-center">
-                        <div>{{ slotProps.option.serie }}</div>
-                    </div>
-                </template>
-            </Dropdown>  
-
-        </Dialog>
-
-
-
-        <!-- MODAL DELETE SIMPLE -->
-        <Dialog v-model:visible="deleteProductDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
-            <div class="confirmation-content">
-                <i class="pi pi-exclamation-triangle mr-3 " style="font-size: 2rem" />
-                <span v-if="companies"> {{ $t('Are you sure you want to delete') }}<b>{{companies.name}}</b>?</span>
-            </div>
-            <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteProductDialog = false" />
-                <Button label="Yes" icon="pi pi-check" text @click="deleteProduct" />
-            </template>
-        </Dialog>
-
-        <!-- MODAL DELETE MULTIPLE -->
-        <Dialog v-model:visible="deleteProductsDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
-            <div class="confirmation-content">
-                <i class="pi pi-exclamation-triangle mr-3 " style="font-size: 2rem" />
-                <span v-if="companies">{{ $t('Are you sure you want to delete the selected concepts?') }}</span>
-            </div>
-            <template #footer>
-                <Button label="No" icon="pi pi-times" text @click="deleteProductsDialog = false" />
-                <Button label="Yes" icon="pi pi-check" text @click="deleteSelectedProducts" />
-            </template>
-        </Dialog>
-        
-    
     </div>
 
     <!-- PDF -->
@@ -493,6 +495,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                 </div>
         </div>
     </div>
+
     
     
     
@@ -683,6 +686,8 @@ export default {
         addRow() {
             
             let newProduct = { 
+                reference: '',
+                description: '',
                 product: '',
                 quantity: 0,
                 price: 0,
@@ -776,7 +781,6 @@ export default {
             
         },
         exportToXML() {
-           
             const data = {
                 company: this.company,
                 customer: this.customer,
@@ -804,38 +808,38 @@ export default {
             </FileHeader>
             <Parties>
                 <SellerParty>
-                <TaxIdentification>
-                    <PersonTypeCode>J</PersonTypeCode>
-                    <ResidenceTypeCode>R</ResidenceTypeCode>
-                    <TaxIdentificationNumber>${company.tax_number}</TaxIdentificationNumber>
-                </TaxIdentification>
-                <LegalEntity>
-                    <CorporateName>${company.name}</CorporateName>
-                    <AddressInSpain>
-                    <Address>${company.address}</Address>
-                    <PostCode>${company.post_code}</PostCode>
-                    <Town>${company.town}</Town>
-                    <Province>${company.province}</Province>
-                    <CountryCode>${company.country}</CountryCode>
-                    </AddressInSpain>
-                </LegalEntity>
+                    <TaxIdentification>
+                        <PersonTypeCode>J</PersonTypeCode>
+                        <ResidenceTypeCode>R</ResidenceTypeCode>
+                        <TaxIdentificationNumber>${company.tax_number}</TaxIdentificationNumber>
+                    </TaxIdentification>
+                    <LegalEntity>
+                        <CorporateName>${company.name}</CorporateName>
+                        <AddressInSpain>
+                            <Address>${company.address}</Address>
+                            <PostCode>${company.post_code}</PostCode>
+                            <Town>${company.town}</Town>
+                            <Province>${company.province}</Province>
+                            <CountryCode>${company.country}</CountryCode>
+                        </AddressInSpain>
+                    </LegalEntity>
                 </SellerParty>
                 <BuyerParty>
-                <TaxIdentification>
-                    <PersonTypeCode>F</PersonTypeCode>
-                    <ResidenceTypeCode>R</ResidenceTypeCode>
-                    <TaxIdentificationNumber>${customer.tax_number}</TaxIdentificationNumber>
-                </TaxIdentification>
-                <Individual>
-                    <Name>${customer.name}</Name>
-                    <AddressInSpain>
-                    <Address>${customer.address}</Address>
-                    <PostCode>${customer.post_code}</PostCode>
-                    <Town>${customer.town}</Town>
-                    <Province>${customer.province}</Province>
-                    <CountryCode>${customer.country}</CountryCode>
-                    </AddressInSpain>
-                </Individual>
+                    <TaxIdentification>
+                        <PersonTypeCode>F</PersonTypeCode>
+                        <ResidenceTypeCode>R</ResidenceTypeCode>
+                        <TaxIdentificationNumber>${customer.tax_number}</TaxIdentificationNumber>
+                    </TaxIdentification>
+                    <Individual>
+                        <Name>${customer.name}</Name>
+                        <AddressInSpain>
+                        <Address>${customer.address}</Address>
+                        <PostCode>${customer.post_code}</PostCode>
+                        <Town>${customer.town}</Town>
+                        <Province>${customer.province}</Province>
+                        <CountryCode>${customer.country}</CountryCode>
+                        </AddressInSpain>
+                    </Individual>
                 </BuyerParty>
             </Parties>
             <Invoices>
