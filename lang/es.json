@@ -155,6 +155,7 @@
     "Add bank":"Añadir cuenta bancaria",
     "Update bank":"Actualizar cuenta bancaria",
     "Banks accounts":"Cuentas bancarias",
+    "Save and create new":"Guardar y crear nueva",
     "Are you sure you want to delete the selected banks?":"¿Desea eliminar las cuentas bancarias seleccionadas?",
     "Are you sure you want to delete the selected emails?":"¿Desea eliminar los emails seleccionados?",
     "The :attribute must be a valid role.": ":Attribute debe ser un rol válido.",

@@ -24,7 +24,9 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', [RouteController::class, 'dashboard'])->name('dashboard');
+
+
+    Route::get('/', [RouteController::class, 'documents'])->name('dashboard');
 
     //Companies
     Route::resource('/companies', CompanyController::class);
