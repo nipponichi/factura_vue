@@ -593,6 +593,10 @@ export default {
         this.myDocument = this.documents
         this.myDocument.concept = [];
         this.selectedCompany = this.company
+        this.selectedCompany.bank_account_id = this.myDocument.bank_account_id
+        this.selectedCompany.bank_name = this.myDocument.bank_name
+        this.selectedCompany.swift = this.myDocument.swift
+        this.selectedCompany.complete_bank_account = this.myDocument.complete_bank_account
         this.selectedCustomer = this.customer
         this.selectedType.name = this.documents.document_type_name
         this.selectedType.id = this.documents.documents_type_id
