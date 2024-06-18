@@ -17,9 +17,10 @@ class RouteController extends Controller
         ]);
     }
 
-    public function dashboard(){
+    public function documents(){
+
+        return redirect()->route('documents.index');
         
-        return Inertia::render('Dashboard');
     }
     
 }

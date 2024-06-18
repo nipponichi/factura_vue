@@ -20,7 +20,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <div class="flex justify-start md:justify-end mb-3 md:mb-0">
                                     <div class="relative inline-block w-50">
                                         <button 
-                                            v-if="!loading && ((companies && companies.length > 1) || (customers && customers.length > 1))"
+                                            v-if="!loading && (companies && companies.length > 1)"
                                             type="button" 
                                             class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
                                             @click="selectCompany"
@@ -87,20 +87,48 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                     
                                     
 
-                                    <div class="relative inline-block w-50 ml-2">
-                                        <button 
-                                            type="button" 
-                                            class="px-4 py-2 bg-green-500 text-white rounded flex items-center justify-between" 
-                                            @click="checkDocument()"
-                                            :class="{ 'opacity-50': totalConIVA <= 0}"
-                                            :disabled="totalConIVA <= 0"
-                                        >
-                                            <span>
+                                    <div id="app" class="relative inline-block w-50 ml-2">
+                                        <div class="flex">
+                                            <button 
+                                                type="button" 
+                                                class="px-4 py-2 bg-green-500 text-white rounded-l flex items-center justify-between" 
+                                                @click="checkDocument()"
+                                                :class="{ 'opacity-50': totalConIVA <= 0 }"
+                                                :disabled="totalConIVA <= 0"
+                                            >
                                                 <i class="pi pi-upload mr-2"></i>
                                                 {{ $t('Save') }}
-                                            </span>
-                                        </button>
+                                            </button>
+                                            <button 
+                                                type="button" 
+                                                class="px-4 py-2 bg-green-500 text-white rounded-r flex items-center" 
+                                                @click="toggleDropdown"
+                                                :class="{ 'opacity-50': totalConIVA <= 0 }"
+                                                :disabled="totalConIVA <= 0"
+                                            >
+                                                <i class="pi pi-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    
+                                        <!-- Desplegable -->
+                                        <div 
+                                            v-show="isDropdownOpen"
+                                            class="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg"
+                                        >
+                                            <button 
+                                                class="px-4 py-2 text-gray-800 hover:bg-gray-200 bg-white border border-gray-300 rounded whitespace-nowrap" 
+                                                @click="saveAndReset()" 
+                                                
+                                            >
+                                                {{ $t('Save and create new') }}
+                                            </button>
+                                            <button class="text-left block w-full px-4 py-2 text-gray-800 hover:bg-gray-200" @click="cancelInvoice()">
+                                                {{ $t('Cancel') }}
+                                            </button>
+                                        </div>
                                     </div>
+                                    
+                                    
                                 </div>
 
                             </div>
@@ -166,7 +194,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         </div>
                                     </div>
                                     <div class="mt-2 ml-10">
-                                        <Button :label="$t('Customer')" icon="pi pi-plus" severity="success" class="success-button" @click="openNew()" />
+                                        <Button :label="$t('Customer')" icon="pi pi-plus" severity="success" class="success-button" @click="selectACustomer()" />
                                     </div>
                                 </div>
                                 
@@ -433,57 +461,78 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             </template>
                         </Dialog>
                     </div>
-
+                    <!-- SELECT A CUSTOMER -->
+                    <Dialog v-model:visible="selectACustomerDialog" :header="$t('Select a customer')" id="titleCompany" :modal="true" class="p-fluid">
+                        <Dropdown v-model="selectedCustomer" :options="this.customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value" class=" flex align-items-center ">
+                                    <div>{{ slotProps.value.name }}</div>
+                                </div>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="flex align-items-center">
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                        <div class="grid gap-3 md:grid-cols-1 justify-items-end">
+                            <div>
+                            <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="this.hideDialog()">{{ $t('Close') }}</button>
+                            <button class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="this.openNew()">{{ $t('Create customer') }}</button>
+                            </div>    
+                        </div>
+                    </Dialog> 
 
                     <!-- MODAL NEW CUSTOMER -->
                     <Dialog v-model:visible="customerDialog" :header="$t('Create company')" id="titleCompany" :modal="true" class="p-fluid">
+                        <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select a customer') }}:</label>
                         <form style="width: 800px;" @submit.prevent="saveCustomer">
                             <div class="grid gap-3 mb-6 md:grid-cols-2">
                                 <div>
                                 <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Company name') }}</label>
-                                <input type="text" id="name" v-model="customer.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Company name')" required />
+                                <input type="text" id="name" v-model="customer.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Company name')" :required="!selectedCustomer" />
                                 </div>
                                 <div>
                                 <label for="tax_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Tax number') }}</label>
-                                <input type="text" id="tax_number" v-model="customer.tax_number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Tax number')" required />
+                                <input type="text" id="tax_number" v-model="customer.tax_number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Tax number')"  :required="!selectedCustomer" />
                                 </div>
                             </div>
                         
                             <div class="mb-6">
                                 <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Address') }}</label>
-                                <input type="text" id="address1" v-model="customer.address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Address')" required />
+                                <input type="text" id="address1" v-model="customer.address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Address')" :required="!selectedCustomer" />
                             </div>
                         
                             <div class="grid gap-3 mb-6 md:grid-cols-2"> 
                                 <div>
                                 <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Town') }}</label>
-                                <input type="text" id="town" v-model="customer.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Town')" required />
+                                <input type="text" id="town" v-model="customer.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Town')" :required="!selectedCustomer" />
                                 </div>  
                                 <div>
                                 <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Province') }}</label>
-                                <input type="text" id="province" v-model="customer.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Province')" required />
+                                <input type="text" id="province" v-model="customer.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Province')" :required="!selectedCustomer" />
                                 </div>  
                                 <div>
                                 <label for="post_code" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Post code') }}</label>
-                                <input type="text" id="post_code" v-model="customer.post_code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Post code')" pattern="^\d+$" required />
+                                <input type="text" id="post_code" v-model="customer.post_code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Post code')" pattern="^\d+$" :required="!selectedCustomer" />
                                 </div>
                                 <div>
                                 <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Country') }}</label>
-                                <input type="text" id="country" v-model="customer.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Country')" required />
+                                <input type="text" id="country" v-model="customer.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Country')" :required="!selectedCustomer" />
                                 </div>
                                 <div>
                                 <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Email') }}</label>
-                                <input type="email" id="email" v-model="customer.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('info@mycompany.com')" required />
+                                <input type="email" id="email" v-model="customer.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('info@mycompany.com')" :required="!selectedCustomer" />
                                 </div>    
                                 <div>
                                 <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Phone') }}</label>
-                                <input type="tel" id="phone" v-model="customer.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Phone')" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
+                                <input type="tel" id="phone" v-model="customer.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Phone')" pattern="^\+\d{1,3}\s?\d{1,14}$" :required="!selectedCustomer" />
                                 </div>
                             </div>
                         
                             <div class="grid gap-3 md:grid-cols-1 justify-items-end">
                                 <div>
-                                <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog">{{ $t('Close') }}</button>
+                                <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="this.hideDialog()">{{ $t('Close') }}</button>
                                 <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ $t('Save') }}</button>
                                 </div>    
                             </div>
@@ -597,6 +646,8 @@ export default {
             fechaFormateada: '',
             loading: true,
             showTable: false,
+            isDropdownOpen: false,
+            saveRestart: false,
             taxOptions: [
                 { label: '0%', value: 0 },
                 { label: '4%', value: 4 },
@@ -620,6 +671,7 @@ export default {
             customerDialog: false,
             deleteProductDialog: false,
             deleteProductsDialog: false,
+            selectACustomerDialog: false,
             products: [],
             selectedCompany: [],
             selectedCustomer: [],
@@ -691,6 +743,12 @@ export default {
     
     methods: {
 
+        
+
+        toggleDropdown() {
+            this.isDropdownOpen = !this.isDropdownOpen;
+        },
+
         fetchCompanies() {
             axios.get('/companies-invoice')
             .then(response => {
@@ -720,6 +778,11 @@ export default {
             });
         },
 
+        hideDialog() {
+            this.hideDialog = true;
+        },
+        
+
         openNew() {
             this.customer = {
                 companyID: this.selectedCompany.id,
@@ -727,6 +790,11 @@ export default {
             console.log("Prueba cogiendo compañia " + this.customer.companyID)
             this.submitted = false;
             this.customerDialog = true;
+        },
+
+        selectACustomer() {
+            this.submitted = false;
+            this.selectACustomerDialog = true;
         },
 
         saveCustomer() {
@@ -781,7 +849,7 @@ export default {
                 console.error('Error fetching data:', error);
                 this.loading = false;
                 });
-            },
+        },
 
 
         handleTypeSelection() {
@@ -836,6 +904,11 @@ export default {
             this.products.push(newProduct);
         },
 
+        //Identifica que boton de guardado le ha dado
+        saveAndReset() {
+            this.saveRestart = true;
+            this.checkDocument(); 
+        },
         checkDocument() {
             
             axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
@@ -947,11 +1020,14 @@ export default {
             axios.post('/documents', {documentData: this.myDocument})
             .then(response => {
         
-                this.resetData();
-
+                alert("Factura guardada correctamente")
+                if (this.saveRestart) {
+                    this.resetData();
+                }
             })
             .catch(error => {
                 console.error('Error al guardar los datos del documento:', error.response);
+                alert("Error al guardar factura")
                 this.myDocument.concept = []
             });
         },
@@ -960,7 +1036,6 @@ export default {
         resetData() {
             console.log("reload")
             window.location.reload();
-
         },
 
         
@@ -989,10 +1064,14 @@ export default {
         },
         exportToPDF(){
             this.showTable = !this.showTable;
-            window.print()
+            window.print()    
+        },
 
-            
-            
+        cancelInvoice() {
+            let respuesta = confirm("¿Está seguro? Los datos de esta factura serán descartados");
+            if (respuesta) {
+                this.resetData()
+            }
         },
     },
 }
