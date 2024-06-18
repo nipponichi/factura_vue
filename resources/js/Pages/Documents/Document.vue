@@ -194,7 +194,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         </div>
                                     </div>
                                     <div class="mt-2 ml-10">
-                                        <Button :label="$t('Customer')" icon="pi pi-plus" severity="success" class="success-button" @click="selectACustomer()" />
+                                        <Button :label="$t('Customer')" icon="pi pi-plus" class="success-button" @click="selectACustomer()" />
                                     </div>
                                 </div>
                                 
@@ -462,7 +462,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         </Dialog>
                     </div>
                     <!-- SELECT A CUSTOMER -->
-                    <Dialog v-model:visible="selectACustomerDialog" :header="$t('Select a customer')" id="titleCompany" :modal="true" class="p-fluid">
+                    <Dialog v-model:visible="selectACustomerDialog" :header="$t('Select a customer')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
                         <Dropdown v-model="selectedCustomer" :options="this.customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                             <template #value="slotProps">
                                 <div v-if="slotProps.value" class=" flex align-items-center ">
@@ -475,17 +475,18 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 </div>
                             </template>
                         </Dropdown>
-                        <div class="grid gap-3 md:grid-cols-1 justify-items-end">
-                            <div>
-                            <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="this.hideDialog()">{{ $t('Close') }}</button>
-                            <button class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="this.openNew()">{{ $t('Create customer') }}</button>
-                            </div>    
+                        <div class="grid gap-3 md:grid-cols-1 justify-items">
+                            <div class="flex justify-between">
+                                <button class="success-button mr-1 mr-1 rounded-md" @click="openNew">
+                                    <i class="pi pi-plus"></i> {{ $t('Create customer') }}
+                                </button>
+                                <button class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog()">{{ $t('Close') }}</button>
+                            </div>   
                         </div>
                     </Dialog> 
 
                     <!-- MODAL NEW CUSTOMER -->
                     <Dialog v-model:visible="customerDialog" :header="$t('Create company')" id="titleCompany" :modal="true" class="p-fluid">
-                        <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select a customer') }}:</label>
                         <form style="width: 800px;" @submit.prevent="saveCustomer">
                             <div class="grid gap-3 mb-6 md:grid-cols-2">
                                 <div>
@@ -532,7 +533,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         
                             <div class="grid gap-3 md:grid-cols-1 justify-items-end">
                                 <div>
-                                <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="this.hideDialog()">{{ $t('Close') }}</button>
+                                <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click.prevent="hideDialog()">{{ $t('Close') }}</button>
                                 <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ $t('Save') }}</button>
                                 </div>    
                             </div>
@@ -779,11 +780,15 @@ export default {
         },
 
         hideDialog() {
-            this.hideDialog = true;
+            this.selectACustomerDialog = false
+            this.customerDialog = false
+            this.submitted = false;
+            console.log("hideDialog " + this.selectACustomerDialog)
         },
         
 
         openNew() {
+            this.selectACustomerDialog = false;
             this.customer = {
                 companyID: this.selectedCompany.id,
             };
@@ -793,8 +798,8 @@ export default {
         },
 
         selectACustomer() {
-            this.submitted = false;
             this.selectACustomerDialog = true;
+            console.log("selectACustomer " + this.selectACustomerDialog)
         },
 
         saveCustomer() {
