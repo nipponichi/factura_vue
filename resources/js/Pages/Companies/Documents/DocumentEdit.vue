@@ -799,7 +799,8 @@ export default {
             console.log(company)
             console.log(customer)
             console.log(document)
-            const xml = `<?xml version="1.0" encoding="UTF-8"?>
+            const xml = 
+            `<?xml version="1.0" encoding="UTF-8"?>
             <Facturae xmlns="http://www.facturae.es/Facturae/2014/v3.2.2/Facturae">
             <FileHeader>
                 <SchemaVersion>3.2.2</SchemaVersion>
