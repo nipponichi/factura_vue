@@ -40,6 +40,7 @@ import { FilterMatchMode } from 'primevue/api';
 
 export default {
     data() {
+        
         return {
             companies: null, 
             filters: {}, 
@@ -52,6 +53,7 @@ export default {
             'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
         };
 
+    
         // Verificar si solo hay una empresa y redirigir
         this.companies = this.$page.props.companies;
         if (this.companies.length === 1) {
@@ -62,7 +64,20 @@ export default {
     methods: {
         handleInfoButtonClick(companyId) {
             this.$inertia.get('/companies/' + companyId);
-        }
+        },
+        showSuccessToast() {
+            console.log(this.$root.$refs.toast); // Verifica si la referencia es correcta
+            if (this.$root.$refs.toast) {
+                this.$root.$refs.toast.showToast('This is a success message', 'success');
+            }
+        },
+        showErrorToast() {
+            console.log(this.$root.$refs.toast); // Verifica si la referencia es correcta
+            if (this.$root.$refs.toast) {
+                this.$root.$refs.toast.showToast('This is an error message', 'error');
+            }
+        },
+        
     }
 }
 </script>

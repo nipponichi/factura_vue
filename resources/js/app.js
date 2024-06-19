@@ -1,5 +1,6 @@
 import './bootstrap';
 import '../css/app.css';
+import '../css/global.css';
 
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
@@ -10,6 +11,8 @@ import 'primevue/resources/themes/aura-light-green/theme.css';
 import 'primeicons/primeicons.css';
 import 'flowbite';
 import { i18nVue } from 'laravel-vue-i18n';
+import Toast from '@/Components/Toast.vue'; 
+
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -27,7 +30,9 @@ createInertiaApp({
                     return await langs[`../../lang/${lang}.json`]();
                 }
             })
+            .component('Toast', Toast)
             .mount(el)
+        
     },
     progress: {
         color: '#4B5563',
