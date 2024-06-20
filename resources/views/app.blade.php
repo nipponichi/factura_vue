@@ -21,7 +21,6 @@
     <body class="font-sans antialiased">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
         @inertia
-        <Toast ref="toast"></Toast>
     </body>
     
 

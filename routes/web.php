@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminInvoicesController;
 use App\Http\Controllers\AdminUsersController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\EmailController;
@@ -60,6 +61,9 @@ Route::middleware([
     Route::put('/addresses/{id}', [AddressController::class, 'makeFavourite']);
     Route::get('/addresses/{id}', [AddressController::class, 'index']);
     Route::resource('/address', AddressController::class);
+
+    // Payment Methods
+    Route::resource('/payment', PaymentMethodController::class);
 
     //Documents
     Route::resource('/documents', DocumentController::class);

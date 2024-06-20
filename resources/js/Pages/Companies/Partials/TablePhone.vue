@@ -152,7 +152,8 @@ export default {
             .catch(error => {
                 console.error('Error fetching phone data:', error);
             });
-    },
+        },
+
         openNew() {
             this.myPhone = {
                 phone: '',
@@ -161,11 +162,11 @@ export default {
             this.submitted = false;
             this.phoneDialog = true;
         },
+
         hideDialog() {
             this.phoneDialog = false;
             this.submitted = false;
         },
-
 
         saveMyPhone() {
             console.log("companyId: "+ this.myPhone.companyID)
@@ -200,7 +201,6 @@ export default {
                 this.myPhone.favourite = slotProps.favourite;
                 this.phoneDialog = true;
 
-
         },
 
         updateMyPhone() {
@@ -209,29 +209,34 @@ export default {
             axios.put('/phone/' + this.myPhone.id, this.myPhone)
             .then(response => {
                 this.fetchPhones();
+                
+
+                this.$toast(this.$t(response.data.message), response.data.type);
+
+                
                 this.phoneDialog = false;
             })
             .catch(error => {
-                console.error('Error al actualizar la compañía:', error);
+                this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.phoneDialog = false; 
-                // Mostrar un mensaje de error al usuario
-                
             });
         },
 
         makeFavourite(slotProps) {
 
             if (slotProps.favourite) {
-                return alert("El telefono ya está seleccionado como favorito")
+                return this.$toast(this.$t('The phone is already selected as a favorite'), 'warning');
             }
 
             axios.put('/phones/' + slotProps.id)
             .then(response => {
+
+                this.$toast(this.$t(response.data.message), response.data.type);
                 this.phoneDialog = false;
                 this.fetchPhones();             
             })         
             .catch(error => {
-                console.error('Error al seleccionar un teléfono', error);
+                this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.phoneDialog = false;
             });
         },
@@ -240,6 +245,7 @@ export default {
             this.myPhone = phone;
             this.deletePhoneDialog = true;       
         },
+        
         deleteMyPhone() {
             const phoneId = this.myPhone.id;
 
@@ -259,8 +265,7 @@ export default {
                 })
                 .catch(error => {
                     if (error.response || error.response.status === 400) {
-                        // Si se recibe un error 400, no hacer nada, solo imprimir un mensaje de advertencia
-                        console.warn('Error 400: No se pudo eliminar el teléfono con ID:', phoneId);
+                        this.$toast(this.$t('Error connecting to the server'), 'error');
                         this.deletePhoneDialog = false;
                     }
                 });

@@ -55,19 +55,13 @@ class PhoneController extends Controller
             }
 
 
-            $newPhoneId = DB::table('phones')->insertGetId([
+            DB::table('phones')->insert([
                 'phone' => $request->phone,
                 'dt_start' => now(),
                 'favourite' => $request->favourite,
                 'isMobile' => 1,
                 'company_id' => $companyId,
             ]);
-
-            $phone = DB::table('phones')
-            ->select('phone','id','company_id', 'favourite')
-            ->where('id', $newPhoneId)
-            ->whereNull('dt_end')
-            ->first();
 
             DB::table('phones')
             ->where('id', $phoneId)
@@ -76,10 +70,10 @@ class PhoneController extends Controller
             ]);
 
             DB::commit();
-            return response()->json(['message' => 'update','phone' => $phone, 200]);
+            return response()->json(['message' => 'Correctly updated phone', 'type' => 'success']);
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error update '. $e->getMessage()], 500);
+            return response()->json(['message' => 'Error when updating the phone', 'type' => 'error']);
         }
     }
 
