@@ -130,168 +130,50 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             
 
                             <hr class="linea-grosor">
-
-                            <div class="selector flex flex-col md:flex-row justify-between items-start mt-4 ml-12">
-                                <!-- Foto -->
-                               <!-- <div class="w-64 h-32 mb-3 md:mb-0 border rounded-lg overflow-hidden relative bg-gray-100 mr-0 md:mr-4">
-                                    <img
-                                        alt="Company Logo"
-                                        :src="imageUrl"
-                                        class="object-cover w-full h-48 cursor-pointer"
-                                        @click="openFileInput"
-                                    />
-                                    <div class="absolute top-0 left-0 right-0 bottom-0 w-full block cursor-pointer flex items-center justify-center">
-                                        <button
-                                        type="button"
-                                        style="background-color: rgba(255, 255, 255, 0.65)"
-                                        class="hover:bg-gray-100 text-gray-700 font-semibold py-2 px-4 text-sm border border-gray-300 rounded-lg shadow-sm"
-                                        @click="openFileInput"
-                                        >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            class="icon icon-tabler icon-tabler-camera"
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="2"
-                                            stroke="currentColor"
-                                            fill="none"
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                        >
-                                            <rect x="0" y="0" width="24" height="24" stroke="none"></rect>
-                                            <path
-                                            d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"
-                                            />
-                                            <circle cx="12" cy="13" r="3" />
-                                        </svg>
-                                        <input type="file" ref="fileInput" @change="handleFileChange" style="display: none" />
-                                        </button>
-                                    </div>
-
-
-                                </div>-->
-
-                               <!-- <div class="grid md:grid-cols-1 text-sm gap-y-1 mr-28" style="width: 400px;">
-                                    <div class="flex items-center">
-                                        <div class="font-semibold mr-3 min-w-20">Nº {{ selectedType.name }}:</div>
-                                        <div class="text-gray-700 flex-shrink-0">{{ selectedSerie.serie }}</div>
-                                        <input type="text" class="border border-gray-300 rounded-md ml-3 flex-shrink-0 w-20 px-3 py-2 focus:outline-none focus:border-blue-400" v-model="selectedSerie.number">
-                                    </div>
-                                    <div class="flex items-center">
-                                        <div class="font-semibold mr-3">{{ $t('Date') }}:</div>
-                                        <div>
-                                            <input
-                                                type="date"
-                                                v-model="fecha"
-                                                @change="cambiarFormatoFecha"
-                                                class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-400"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <div class="font-semibold mr-3">{{ $t('Expiration') }}:</div>
-                                        <div>
-                                            <input
-                                                type="date"
-                                                v-model="fecha"
-                                                @change="cambiarFormatoFecha"
-                                                class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-400"
-                                            />
-                                        </div>
-                                    </div>-->
-                                    <!--<div class="mt-2 ml-10">
-                                        <Button :label="$t('Customer')" icon="pi pi-plus" class="success-button" @click="selectACustomer()" />
-                                    </div>-->
-                               <!-- </div>-->
-                                
-                                
-                                
-
-                            </div>
                         
                             <div class="selector flex flex-col md:flex-row justify-between mt-6 ml-12">
                                 
-                                <!--<div class="showCompany">
-
-                                    <div class="flex justify-center">
-                                        
+                                <div class="showCustomer"> 
+                                    <div class="grid md:grid-cols-1 text-m gap-y-1">
+                                        <div class="flex items-center justify-between w-full">
+                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Customer') }}:</div>
+                                            <div class="text-gray-700 w-full">{{ this.selectedCustomer.name }}</div>
                                         </div>
-                                            <div class="grid md:grid-cols-1 text-m gap-y-1">
-                                            <div class="flex items-center">
-                                                <div class="font-semibold mr-3">{{ $t('Company name') }}:</div>
-                                                <div class="text-gray-700">{{this.selectedCompany.name}}</div>
-                                            </div>
-                                            <div class="flex items-center">
-                                                <div class="font-semibold mr-3">{{ $t('Tax Number') }}:</div>
-                                                <div class="text-gray-700">{{this.selectedCompany.tax_number}}</div>
-                                            </div>
-                                            <div class="flex items-center">
-                                                <div class="font-semibold mr-3">{{ $t('Phone') }}:</div>
-                                                <div class="text-gray-700">{{this.selectedCompany.phone}}</div>
-                                            </div>
-                                            <div class="flex items-center">
-                                                <div class="font-semibold mr-3">{{ $t('Email') }}:</div>
-                                                <div class="text-gray-700">{{ this.selectedCompany.email }}</div>
-                                            </div>
-                                            
-                                            <div class="flex items-center">
-                                                <div class="font-semibold mr-3">{{ $t('Address') }}:</div>
-                                                <div class="text-gray-700">{{this.selectedCompany.address}}</div>
-                                            
-                                            </div>
-                                        
+                                        <div class="flex items-center justify-between w-full">
+                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Tax number') }}:</div>
+                                            <div class="text-gray-700 w-full">{{ this.selectedCustomer.tax_number }}</div>
                                         </div>
-                                    
-                                    </div>-->
-                                    
-
-
-                                    <div class="showCustomer"> 
-                                        <div class="grid md:grid-cols-1 text-m gap-y-1">
-                                            <div class="flex items-center justify-between w-full">
-                                                <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Customer') }}:</div>
-                                                <div class="text-gray-700 w-full">{{ this.selectedCustomer.name }}</div>
-                                            </div>
-                                            <div class="flex items-center justify-between w-full">
-                                                <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Tax number') }}:</div>
-                                                <div class="text-gray-700 w-full">{{ this.selectedCustomer.tax_number }}</div>
-                                            </div>
-                                            <div class="flex items-center justify-between w-full">
-                                                <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Phone') }}:</div>
-                                                <div class="text-gray-700 w-full">{{ this.selectedCustomer.phone }}</div>
-                                            </div>
-                                            <div class="flex items-center justify-between w-full">
-                                                <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Email') }}:</div>
-                                                <div class="text-gray-700 w-full">{{ this.selectedCustomer.email }}</div>
-                                            </div>
-                                            <div class="flex items-center justify-between w-full">
-                                                <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Address') }}:</div>
-                                                <div class="text-gray-700 w-full">{{ this.selectedCustomer.address }}</div>
-                                            </div>
+                                        <div class="flex items-center justify-between w-full">
+                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Phone') }}:</div>
+                                            <div class="text-gray-700 w-full">{{ this.selectedCustomer.phone }}</div>
+                                        </div>
+                                        <div class="flex items-center justify-between w-full">
+                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Email') }}:</div>
+                                            <div class="text-gray-700 w-full">{{ this.selectedCustomer.email }}</div>
+                                        </div>
+                                        <div class="flex items-center justify-between w-full">
+                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Address') }}:</div>
+                                            <div class="text-gray-700 w-full">{{ this.selectedCustomer.address }}</div>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div class="grid md:grid-cols-1 text-sm gap-y-1 mr-28">
-                                        <div class="flex items-center justify-between w-full">
-                                            <div class="font-semibold mr-3 min-w-20 flex-shrink-0">Nº {{ selectedType.name }}:</div>
-                                            <div class="text-gray-700 ml-3 flex-shrink-0 font-bold text-lg">{{ selectedSerie.serie }}&nbsp;&nbsp;/&nbsp;</div>
-                                            <input type="text" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400" v-model="selectedSerie.number">
-                                        </div>
-                                        <div class="flex items-center justify-between w-full">
-                                            <div class="font-semibold mr-3 flex-shrink-0">{{ $t('Date') }}:</div>
-                                            <input type="date" v-model="fecha" @change="cambiarFormatoFecha" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
-                                        </div>
-                                        <div class="flex items-center justify-between w-full">
-                                            <div class="font-semibold mr-3 flex-shrink-0">{{ $t('Expiration') }}:</div>
-                                            <input type="date" v-model="fecha" @change="cambiarFormatoFecha" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
-                                        </div>
-                                        <!--<div class="mt-2 ml-10">
-                                            <Button :label="$t('Customer')" icon="pi pi-plus" class="success-button" @click="selectACustomer()" />
-                                        </div>-->
+                                <div class="grid md:grid-cols-1 text-sm gap-y-1 mr-28">
+                                    <div class="flex items-center justify-between w-full">
+                                        <div class="font-semibold mr-3 min-w-20 flex-shrink-0">Nº {{ selectedType.name }}:</div>
+                                        <div class="text-gray-700 ml-3 flex-shrink-0 font-bold text-lg">{{ selectedSerie.serie }}&nbsp;&nbsp;/&nbsp;</div>
+                                        <input type="text" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400" v-model="selectedSerie.number">
                                     </div>
-                                    
-                                    
+                                    <div class="flex items-center justify-between w-full">
+                                        <div class="font-semibold mr-3 flex-shrink-0">{{ $t('Date') }}:</div>
+                                        <input type="date" v-model="fecha" @change="cambiarFormatoFecha" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                    </div>
+                                    <div class="flex items-center justify-between w-full">
+                                        <div class="font-semibold mr-3 flex-shrink-0">{{ $t('Expiration') }}:</div>
+                                        <input type="expiration" v-model="fecha" @change="cambiarFormatoFecha" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                    </div>
+                                </div>
+                                        
                             </div>  
                             <Toolbar class="mb-4 mt-8 border border-slate-200 ...">
                                 <template #start>
@@ -315,8 +197,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                     </div>
                                 </template>
                             </Toolbar>
-
-
 
                             <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id"
                             :paginator="true" :rows="10" :filters="filters"
@@ -376,7 +256,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         <div class="hidden md:flex justify-between mt-4 pr-4 mb-4">
                             <!-- Columna izquierda -->
                             <div class="totals-container w-1/3">
-                                <button class="ml-4 mb-2 success-button rounded-md" @click="addRow()">
+                                <button class="ml-4 mb-2 success-button rounded-md" @click="selectAPaymentMethod()">
                                     <i class="pi pi-plus"></i> {{ $t('Payment method') }}
                                 </button>
                                 <div class="ml-4 totals p-4 rounded-md">
@@ -384,7 +264,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         <tbody>
                                             <tr>
                                                 <td class="text-gray-600 pr-4">{{ $t('Payment method') }}:</td>
-                                                <td class="pl-4">Bank transfer</td>
+                                                <td class="pl-4">{{ this.selectedPaymentMethod.name }}</td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2">
@@ -408,17 +288,19 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <button class="ml-4 mb-5 rounded-md" @click="addRow()">
                                     
                                 </button>
-                                <div class="totals bg-gray-100 p-4 rounded-md">
+                                <div class="totals p-4 rounded-md">
                                     <table class="w-full">
                                         <tbody>
                                             <tr>
                                                 <td class="text-gray-600 pr-4">{{ $t('Subtotal (excluding Tax)') }}:</td>
                                                 <td class="pl-4">{{ subtotal.toFixed(2) }}€</td>
                                             </tr>
+                                            <hr class="my-2 border-gray-300">
                                             <tr>
                                                 <td class="text-gray-600 pr-4">{{ $t('Total Tax') }}:</td>
                                                 <td class="pl-4">{{ totalIVA.toFixed(2) }}€</td>
                                             </tr>
+                                            <hr class="my-2 border-gray-300">
                                             <tr>
                                                 <td class="text-gray-600 pr-4">{{ $t('Total (with IVA)') }}:</td>
                                                 <td class="pl-4">{{ totalConIVA.toFixed(2) }}€</td>
@@ -532,8 +414,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 
                         </Dialog>
 
-
-
                         <!-- MODAL DELETE SIMPLE -->
                         <Dialog v-model:visible="deleteProductDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
                             <div class="confirmation-content">
@@ -558,6 +438,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             </template>
                         </Dialog>
                     </div>
+
                     <!-- SELECT A CUSTOMER -->
                     <Dialog v-model:visible="selectACustomerDialog" :header="$t('Select a customer')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
                         <Dropdown v-model="selectedCustomer" :options="this.customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
@@ -581,6 +462,26 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             </div>   
                         </div>
                     </Dialog> 
+
+                    <Dialog v-model:visible="selectAPaymentMethodDialog" :header="$t('Select a payment method')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
+                        <Dropdown v-model="selectedPaymentMethod" :options="this.payment_methods" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                          <template #value="slotProps">
+                            <div v-if="slotProps.value" class="flex items-center">
+                              <div>{{ slotProps.value.name }}</div>
+                            </div>
+                          </template>
+                          <template #option="slotProps">
+                            <div class="flex items-center">
+                              <div>{{ slotProps.option.name }}</div>
+                            </div>
+                          </template>
+                        </Dropdown>
+                        <div class="flex justify-end">
+                            <button class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog()">
+                                {{ $t('Close') }}
+                            </button>
+                        </div>
+                    </Dialog>
 
                     <!-- MODAL NEW CUSTOMER -->
                     <Dialog v-model:visible="customerDialog" :header="$t('Create company')" id="titleCompany" :modal="true" class="p-fluid">
@@ -741,6 +642,7 @@ export default {
     data() {
         return {
             fecha: '',
+            expiration: '',
             fechaFormateada: '',
             loading: true,
             showTable: false,
@@ -771,12 +673,14 @@ export default {
             deleteProductDialog: false,
             deleteProductsDialog: false,
             selectACustomerDialog: false,
+            selectAPaymentMethodDialog: false,
             products: [],
             selectedCompany: [],
             selectedCustomer: [],
             selectedType: [],
             selectedSerie: [],
             selectedProducts: [],
+            selectedPaymentMethod: [],
             filters: {},
             submitted: false,
             myDocument: { 
@@ -787,8 +691,10 @@ export default {
                 documents_type_id: '',
                 documents_series_id: '',
                 bank_account_id: '',
+                expiration: '',
                 date: '',
                 amount: '',
+                payment_methods_id: '',
                 totalTax: '',
                 subTotal: '',
                 paid: false, 
@@ -833,14 +739,40 @@ export default {
         const month = (today.getMonth() + 1).toString().padStart(2, '0');
         const day = today.getDate().toString().padStart(2, '0');
         this.fecha = `${year}-${month}-${day}`;
+        this.expiration = `${year}-${month}-${day}`;
     },
 
     mounted() {
         this.fetchCompanies();
         this.fetchDocuments();
+        this.fetchPayments();
+        this.fetchBanks();
     },
     
     methods: {
+
+        fetchBanks() {
+            let myCompanyId = window.location.pathname.split('/').pop();
+            axios.get('/banks/' + myCompanyId)
+            .then(response => {
+                this.banks = response.data.accounts;
+                this.selectedBankAccount = this.banks[0]
+            })
+            .catch(error => {
+                console.error('Error fetching bank data:', error);
+            });
+        },
+
+        fetchPayments () {
+            console.log("dentro payments")
+            axios.get('/payment')
+            .then(response => {
+                this.payment_methods = response.data.methods;
+                this.selectedPaymentMethod = this.payment_methods[0]
+                console.log(this.payment_methods)
+            })
+        },
+
         handleScroll() {
             let scrollPosition = window.scrollY;
             console.log(scrollPosition);
@@ -886,12 +818,12 @@ export default {
 
         hideDialog() {
             this.selectACustomerDialog = false
+            this.selectAPaymentMethodDialog = false
             this.customerDialog = false
             this.submitted = false;
             console.log("hideDialog " + this.selectACustomerDialog)
         },
         
-
         openNew() {
             this.selectACustomerDialog = false;
             this.customer = {
@@ -905,6 +837,11 @@ export default {
         selectACustomer() {
             this.selectACustomerDialog = true;
             console.log("selectACustomer " + this.selectACustomerDialog)
+        },
+
+        selectAPaymentMethod() {
+            this.selectAPaymentMethodDialog = true;
+            console.log("selectAPaymentMethod")
         },
 
         saveCustomer() {
@@ -1019,6 +956,7 @@ export default {
             this.saveRestart = true;
             this.checkDocument(); 
         },
+
         checkDocument() {
             
             axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
@@ -1083,17 +1021,15 @@ export default {
             })
             .catch(error => {
                 console.error('Error al guardar los datos del documento:', error.response);
-            });
-
-                
-            
+            });    
         },
 
         saveDocument(){
 
             this.myDocument.number = this.selectedSerie.serie + this.selectedSerie.number
             this.myDocument.document_counter = this.selectedSerie.number
-            
+            this.myDocument.expiration = this.expiration
+            this.myDocument.payment_methods_id = this.selectedMethod.id
             this.myDocument.company_id_company = this.selectedCompany.id 
             this.myDocument.company_id_customer = this.selectedCustomer.id
             this.myDocument.documents_type_id = this.selectedType.id
@@ -1131,6 +1067,7 @@ export default {
             .then(response => {
         
                 alert("Factura guardada correctamente")
+                
                 if (this.saveRestart) {
                     this.resetData();
                 }
@@ -1152,18 +1089,22 @@ export default {
         calculateTotal(product) {
             return product.quantity * product.price;
         },
+
         confirmDeleteProduct(product) {
             this.product = product;
             this.deleteProductDialog = true;
         },
+
         deleteProduct() {
             this.products = this.products.filter(val => val.id !== this.product.id);
             this.product = null;
             this.deleteProductDialog = false;
         },
+
         confirmDeleteSelected() {
             this.deleteProductsDialog = true;
         },
+
         deleteSelectedProducts() {
             this.selectedProducts.forEach(product => {
                 this.products = this.products.filter(val => val.id !== product.id);
@@ -1172,6 +1113,7 @@ export default {
             this.deleteProductsDialog = false;
             
         },
+
         exportToPDF(){
             this.showTable = !this.showTable;
             window.print()    

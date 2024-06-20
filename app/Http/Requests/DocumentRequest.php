@@ -29,12 +29,14 @@ class DocumentRequest extends FormRequest
             'documents_type_id' => 'string',
             'documents_series_id' => 'string',
             'date' => 'datetime',
+            'expiration' => 'datetime',
             'amount' => 'decimal',
             'totalTax' => 'decimal',
             'subTotal' => 'decimal',
             'paid' => 'boolean',
             'invoiced' => 'boolean',
             'bank_account_id' => 'string',
+            'payment_methods_id' => 'string',
             //'active' => 'boolean'
         ];
     }

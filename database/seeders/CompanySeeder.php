@@ -34,6 +34,29 @@ class CompanySeeder extends Seeder
         'name' => 'Pedido',
     ]);
 
+    // METODOS DE PAGO
+
+    DB::table('payment_method')->insert([
+        'name' => 'Transferencia',
+        'dt_start' => now(),
+    ]);
+
+    DB::table('payment_method')->insert([
+        'name' => 'Efectivo',
+        'dt_start' => now(),
+    ]);
+
+    DB::table('payment_method')->insert([
+        'name' => 'Bizum',
+        'dt_start' => now(),
+    ]);
+
+    DB::table('payment_method')->insert([
+        'name' => 'Paypal',
+        'dt_start' => now(),
+    ]);
+
+
 
     //PRIMERA COMPAÑIA
     DB::table('companies')->insert([
