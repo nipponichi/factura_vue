@@ -170,7 +170,7 @@ class DocumentController extends Controller
                 'dt_updated' => now(),
                 'dt_start' => now(),
             ]);
-           
+        
             
             // Asigna los conceptos en el detalle de factura
             foreach ($request->documentData['concept'] as $item) {
@@ -274,7 +274,7 @@ class DocumentController extends Controller
         ->where('documents_id',$documentId)
         ->get();
 
-      
+    
         if ($concepts == null) {
             return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
         }
@@ -367,9 +367,12 @@ class DocumentController extends Controller
         ->where('documents.company_id_company', $id)
         ->where('documents_series.company_id', $id)
         ->whereNull('documents.dt_end')
+        ->whereNull('companies_names.dt_end')
         ->get();
 
-        return response()->json(['message' => 'La factura se ha creado correctamente', 'documents'=>$documents]);
+        //dd($documents);
+
+        return response()->json(['message' => 'Datos de las facturas cargadas correctamente', 'documents'=>$documents]);
 
     }
 
@@ -487,13 +490,12 @@ class DocumentController extends Controller
             DB::commit();
 
             return Inertia::render('Documents/Index');
-            //return response()->json(['message' => 'La factura se ha creado correctamente']);
 
         } catch (Exception $e) {
             DB::rollback();
             return response()->json(['message' => 'Error al crear la factura ', $e->getMessage()], 500);
         }
-       
+    
     }
 
     /**
@@ -501,13 +503,20 @@ class DocumentController extends Controller
      */
     public function destroy(string $id)
     {
-        DB::table('documents')
-        ->where('id', $id)
-        ->update([
-            'dt_end' => now(),
-        ]);
+        DB::beginTransaction();
+        try {
+            DB::table('documents')
+            ->where('id', $id)
+            ->update([
+                'dt_end' => now(),
+            ]);
 
-        return response()->json(['message' => 'La factura se ha eliminado correctamente']);
+            return response()->json(['message' => 'It has been successfully removed.','type' => 'success']);
+        
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Error deleting.','type' => 'error']);
+        }
     }
 
 

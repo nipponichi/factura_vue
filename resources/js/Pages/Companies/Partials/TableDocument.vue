@@ -153,14 +153,25 @@ export default {
 
         deleteProduct() {
             console.log("DELETE")
-            this.documents = this.documents.filter(val => val.id !== this.document.id);
+            
             this.deleteDocumentDialog = false;
 
             axios.delete('/documents/'+ this.document.id)
-                .then(response => { console.log(response)})
-                .catch(error => { console.log(error.response)})
+            .then(response => {
+                if(response.data.type === 'success'){
+                    
+                    this.documents = this.documents.filter(val => val.id !== this.document.id);
+
+                }
+                this.$toast(this.$t(response.data.message), response.data.type);
                 
-            this.document = {};
+            
+            })
+            .catch(error => {
+                this.$toast(this.$t(error.response.message), error.response.type);
+            });
+                
+            this.deleteDocumentDialog = false;
         },
         
         confirmDeleteSelected() {
@@ -173,15 +184,23 @@ export default {
             this.selectedDocuments.forEach(myDocument => {
             axios.delete('/documents/'+ myDocument.id)
                 .then(response => {
-                console.log('Factura eliminada:', myDocument.id);
-                // Elimina el producto de la lista de myDocument
-                this.documents = this.documents.filter(p => p.id !== myDocument.id);
+                    
+                    if(response.data.type === 'success'){
+                    
+                        this.documents = this.documents.filter(p => p.id !== myDocument.id);
+
+                    }
+                    this.$toast(this.$t(response.data.message), response.data.type);
+                        
+                
                 })
                 .catch(error => {
-                console.error('Error al eliminar la factura:', error);
+                    if (error.response || error.response.status === 400) {
+                        this.$toast(this.$t(error.response.message), error.response.type);
+                    }
                 });
             });
-            this.selectedDocuments = [];
+            
             this.deleteDocumentsDialog = false;
         },
 

@@ -150,7 +150,7 @@ export default {
                     
                 })
                 .catch(error => {
-                    console.error('Error fetching emails data:', error);
+                    this.$toast(this.$t('Error connecting to the server'), 'error');
                 });
             },
         openNew() {
@@ -168,7 +168,7 @@ export default {
 
 
         saveMyEmail() {
-            console.log("companyId: "+ this.myEmail.companyID)
+
             if(this.myEmail.favourite == null) {
                 this.myEmail.favourite = false
             }
@@ -176,14 +176,14 @@ export default {
             if (!this.myEmail.id) {
                 axios.post('/email', this.myEmail)
                 .then(response => {
-                    
+
+                    this.$toast(this.$t(response.data.message), response.data.type);
                     this.fetchEmails();
-                    
                     this.emailDialog = false;
                         
                 })
                 .catch(error => {
-                    console.error('Error saving email data:', error.response);
+                    this.$toast(this.$t('Error connecting to the server'), 'error');
                     this.emailDialog = false;
                 });
 
@@ -193,24 +193,24 @@ export default {
         },
 
         editMyEmail(slotProps) {
-            console.log('edit: ' + slotProps.favourite)
-            
-                this.myEmail.email = slotProps.email;
-                this.myEmail.id = slotProps.id;
-                this.myEmail.favourite = slotProps.favourite;
-                this.emailDialog = true;
+
+            this.myEmail.email = slotProps.email;
+            this.myEmail.id = slotProps.id;
+            this.myEmail.favourite = slotProps.favourite;
+            this.emailDialog = true;
         },
 
         updateMyEmail() {
-            console.log("Update: " + this.myEmail.favourite)
 
             axios.put('/email/' + this.myEmail.id, this.myEmail)
             .then(response => {
+
+                this.$toast(this.$t(response.data.message), response.data.type);
                 this.fetchEmails();
                 this.emailDialog = false;
             })
             .catch(error => {
-                console.error('Error al actualizar la compañía:', error);
+                this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.emailDialog = false; 
                 // Mostrar un mensaje de error al usuario
                 
@@ -220,16 +220,17 @@ export default {
         makeFavourite(slotProps) {
 
             if (slotProps.favourite) {
-                return alert("El correo electrónico ya está seleccionado como favorito")
+                return this.$toast(this.$t('Already selected as a favorite.'), 'warning');
             }
 
             axios.put('/emails/' + slotProps.id)
             .then(response => {
+                this.$toast(this.$t(response.data.message), response.data.type);
                 this.emailDialog = false;
                 this.fetchEmails();             
             })         
             .catch(error => {
-                console.error('Error al seleccionar un email', error);
+                this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.emailDialog = false;
             });
         },
@@ -243,24 +244,18 @@ export default {
             // Realizar la solicitud de eliminación al servidor
             axios.delete('/email/' + this.myEmail.id)
                 .then(response => {
-                    console.log(response);
                     
-                    // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
-                    this.emails = this.emails.filter(val => val.id !== this.myEmail.id);
+                    if(response.data.type === 'success'){
+                        // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
+                        this.emails = this.emails.filter(val => val.id !== this.myEmail.id);
+                    }
 
-                    // Limpiar el objeto myEmail después de la eliminación exitosa
-                    this.myEmail = {};
-
-                    // Cerrar el diálogo de eliminación de teléfono
-                    this.deleteEmailDialog = false;
+                    this.$toast(this.$t(response.data.message), response.data.type);
                 })
                 .catch(error => {
-                    if (error.response || error.response.status === 400) {
-                        // Si se recibe un error 400, no hacer nada, solo imprimir un mensaje de advertencia
-                        console.warn('Error 400: No se pudo eliminar el email con ID:', emailId);
-                        this.deleteEmailDialog = false;
-                    }
+                    this.$toast(this.$t(error.response.message), error.response.type);
                 });
+                this.deletePhoneDialog = false;
         },
         
         confirmDeleteSelected() {
@@ -273,21 +268,21 @@ export default {
             this.selectedEmails.forEach(email => {
                 axios.delete('/email/' + email.id)
                     .then(response => {
-                        console.log('Compañía eliminada con ID:', email.id);
-                        
-                        // Solo elimina la compañía de la lista si la solicitud DELETE tiene éxito
-                        this.emails = this.emails.filter(p => p.id !== email.id);
+
+                        if(response.data.type === 'success'){
+                            // Solo elimina la compañía de la lista si la solicitud DELETE tiene éxito
+                            this.emails = this.emails.filter(p => p.id !== email.id);
+                        }
+                        this.$toast(this.$t(response.data.message), response.data.type);
                         
 
                     })
                     .catch(error => {
                         if (error.response || error.response.status === 400) {
-                            // Si se recibe un error 400, no hacer nada, solo imprimir un mensaje de advertencia
-                            console.warn('Error 400: No se pudo eliminar la compañía con ID:', email.id);
+                            this.$toast(this.$t(error.response.message), error.response.type);
                         }
                     });
             });
-            this.selectedEmails = [];
             this.deleteEmailsDialog = false;
         },
 

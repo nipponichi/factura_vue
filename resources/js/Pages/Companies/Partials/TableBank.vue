@@ -52,9 +52,6 @@
                         </template>
                     </Column>
                 </div>
-
-    
-                
             </DataTable>
         </div>
 
@@ -175,11 +172,10 @@ export default {
             axios.get('/banks/' + myCompanyId)
             .then(response => {
                 this.banks = response.data.accounts;
-                console.log("cuenta 1 id: " + this.banks[0].id)
-                console.log("cuenta 1 id: " + this.banks[0].id)
+
             })
             .catch(error => {
-                console.error('Error fetching bank data:', error);
+                this.$toast(this.$t('Error connecting to the server'), 'error');
             });
     },
         openNew() {
@@ -202,7 +198,6 @@ export default {
             
             
             let cleanedIban = this.myBank.complete_bank_account.replace(/\s+/g, '');
-            console.log("ID: " + this.myBank.id)
 
 
             if(cleanedIban.length == 24) {
@@ -219,28 +214,28 @@ export default {
                 this.myBank.control_digit = controlDigit;
                 this.myBank.account_number = accountNumber;
                 this.myBank.complete_bank_account = iban + ' ' + entity + ' ' + office + ' ' + controlDigit + ' ' + accountNumber;
-                console.log(" Process Iban limpio " + this.myBank.complete_bank_account.length)
             }
             
             let value = cleanedIban.length
-            console.log('value: ', value);
+        
 
             switch (true) {
                 case value > 24:
-                    alert("El número de cuenta introducido es demasiado largo")
+                    this.$toast(this.$t('The account number entered is too long.'), 'warning');
                     break;
                 case value < 24:
-                    alert("El número de cuenta introducido es demasiado corto")
+                    this.$toast(this.$t('The account number entered is too short.'), 'warning');
                     break;
                 case value == 24:
                 if (!this.myBank.id) {
                     axios.post('/bank', this.myBank)
                     .then(response => {
+                        this.$toast(this.$t(response.data.message), response.data.type);
                         this.fetchBanks();
                         this.bankDialog = false;
                     })
                     .catch(error => {
-                        console.error('Error saving bank data:', error.response);
+                        this.$toast(this.$t('Error connecting to the server'), 'error');
                         this.bankDialog = false;
                     });
                 }else {
@@ -266,11 +261,13 @@ export default {
 
             axios.put('/bank/' + this.myBank.id, this.myBank)
             .then(response => {
+
+                this.$toast(this.$t(response.data.message), response.data.type);
                 this.fetchBanks();
                 this.bankDialog = false;
             })
             .catch(error => {
-                console.error('Error al actualizar la cuenta bancaria:', error);
+                this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.bankDialog = false; 
                 
             });
@@ -279,16 +276,17 @@ export default {
         makeFavourite(slotProps) {
 
             if (slotProps.favourite) {
-                return alert("El telefono ya está seleccionado como favorito")
+                return this.$toast(this.$t('Already selected as a favorite.'), 'warning');
             }
 
             axios.put('/banks/' + slotProps.id)
             .then(response => {
+                this.$toast(this.$t(response.data.message), response.data.type);
                 this.bankDialog = false;
                 this.fetchBanks();             
             })         
             .catch(error => {
-                console.error('Error al seleccionar un teléfono', error);
+                this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.bankDialog = false;
             });
         },
@@ -303,28 +301,23 @@ export default {
             // Realizar la solicitud de eliminación al servidor
             axios.delete('/bank/' + this.myBank.id)
                 .then(response => {
-                    console.log(response);
-                    
-                    // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
-                    this.banks = this.banks.filter(val => val.id !== bankId);
+        
+                    if(response.data.type === 'success'){
+                        // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
+                        this.banks = this.banks.filter(val => val.id !== bankId);
 
-                    // Limpiar el objeto myBank después de la eliminación exitosa
-                    this.myBank = {};
+                    }
+                    this.$toast(this.$t(response.data.message), response.data.type);
 
-                    // Cerrar el diálogo de eliminación de teléfono
-                    this.deleteBankDialog = false;
                 })
                 .catch(error => {
-                    if (error.response || error.response.status === 400) {
-                        // Si se recibe un error 400, no hacer nada, solo imprimir un mensaje de advertencia
-                        console.warn('Error 400: No se pudo eliminar el teléfono con ID:', bankId);
-                        this.deleteBankDialog = false;
-                    }
+                    this.$toast(this.$t(error.response.message), error.response.type);
+                    
                 });
+                this.deleteBankDialog = false;
         },
         
         confirmDeleteSelected() {
-            console.log("CONFIRM DELETE SELECTED")
             this.deleteBanksDialog = true;
         },
         
@@ -333,21 +326,21 @@ export default {
             this.selectedBanks.forEach(bank => {
                 axios.delete('/bank/' + bank.id)
                     .then(response => {
-                        console.log('Compañía eliminada con ID:', bank.id);
                         
-                        // Solo elimina la compañía de la lista si la solicitud DELETE tiene éxito
-                        this.banks = this.banks.filter(p => p.id !== bank.id);
+                        if(response.data.type === 'success'){
+                            // Solo elimina la compañía de la lista si la solicitud DELETE tiene éxito
+                            this.banks = this.banks.filter(p => p.id !== bank.id);
+                        }
+                        this.$toast(this.$t(response.data.message), response.data.type);
                         
-
+                        
                     })
                     .catch(error => {
                         if (error.response || error.response.status === 400) {
-                            // Si se recibe un error 400, no hacer nada, solo imprimir un mensaje de advertencia
-                            console.warn('Error 400: No se pudo eliminar la compañía con ID:', bank.id);
+                            this.$toast(this.$t(error.response.message), error.response.type);
                         }
                     });
             });
-            this.selectedBanks = [];
             this.deleteBanksDialog = false;
         },
 

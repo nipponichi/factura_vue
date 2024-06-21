@@ -185,19 +185,15 @@ export default {
     methods: {
         fetchCustomers() {
             let myCompanyId = window.location.pathname.split('/').pop();
-            console.log("id: " + myCompanyId);
+
             axios.get('/customers/' + myCompanyId)
             .then(response => {
             // Asigna los datos de los clientes a la propiedad 'companies'
             this.companies = response.data.customers;
-            console.log(this.companies);
-            // Itera sobre todos los elementos del array 'companies'
-            this.companies.forEach((company, index) => {
-                console.log(`Company ${index + 1}:`, company);
-            });
+
         })
         .catch(error => {
-            console.error('Error al obtener los datos de los clientes:', error);
+            this.$toast(this.$t('Error connecting to the server'), 'error');
         });
         },
 
@@ -211,7 +207,6 @@ export default {
         },
         
         hideDialog() {
-            console.log("HIDE")
             this.companyDialog = false;
             this.submitted = false;
         },
@@ -221,11 +216,13 @@ export default {
 
                 axios.post('/customer', this.company)
                 .then(response => {
+
+                    this.$toast(this.$t(response.data.message), response.data.type);
                     this.companyDialog = false;
                     this.fetchCustomers();
                 })
                 .catch(error => {
-                    console.log(error.response);
+                    this.$toast(this.$t('Error connecting to the server'), 'error');
                     this.companyDialog = false;
                 });   
 
@@ -248,11 +245,12 @@ export default {
             axios.put('/customer/' + this.company.id, this.company)
             .then(response => {
                 
+                this.$toast(this.$t(response.data.message), response.data.type);
                 this.fetchCustomers();
                 this.companyDialog = false; 
             })
             .catch(error => {
-                console.error('Error al actualizar la compañía:', error);
+                this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.companyDialog = false; 
                 
             });
@@ -269,41 +267,47 @@ export default {
             axios.delete('/customer/'+ this.company.id)
                 .then(response => {
                     
-                    this.companies = this.companies.filter(val=> val.id !== this.company.id);
+                    if(response.data.type === 'success'){
+                        // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
+                        this.companies = this.companies.filter(val=> val.id !== this.company.id);
 
-                    this.company = {};
+                    }
+                    this.$toast(this.$t(response.data.message), response.data.type);
 
-                    this.deleteCompanyDialog = false;
-                
                 })
                 .catch(error => { 
-                    console.log(error.response)
-                    this.deleteCompanyDialog = false;
+                    this.$toast(this.$t(error.response.message), error.response.type);
+                    
                 })
-                
+                this.deleteCompanyDialog = false;
             
         },
         
         confirmDeleteSelected() {
-            console.log("CONFIRM DELETE SELECTED")
             this.deleteCompaniesDialog = true;
         },
         
         deleteSelectedCompanies() {
             // Envía una solicitud de eliminación para cada compañia seleccionado
             this.selectedCompanies.forEach(company => {
-            axios.delete('/customer/' + company.id)
+                axios.delete('/customer/' + company.id)
                 .then(response => {
-                console.log('Compañía eliminada con ID:', company.id);
-                
-                // Elimina el compañia de la lista de company
-                this.companies = this.companies.filter(p => p.id !== company.id);
+
+                    if(response.data.type === 'success'){
+                        // Elimina el compañia de la lista de company
+                        this.companies = this.companies.filter(p => p.id !== company.id);
+                    }
+                    this.$toast(this.$t(response.data.message), response.data.type);
+                        
+                    
+                    
                 })
                 .catch(error => {
-                console.error('Error al eliminar la compañia:', error);
+                    if (error.response || error.response.status === 400) {
+                        this.$toast(this.$t(error.response.message), error.response.type);
+                    }
                 });
             });
-            this.selectedCompanies = [];
             this.deleteCompaniesDialog = false;
         },
 

@@ -32,7 +32,7 @@ class BankController extends Controller
         
             return response()->json(['message' => 'bank accounts', 'accounts' => $accounts], 200);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Error index bank accounts: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error loading data' ,'type' => 'error']);
         }
         
     }
@@ -59,7 +59,7 @@ class BankController extends Controller
             }
 
             // Insertar una nueva cuenta bancaria
-            $newAccountId = DB::table('bank_account')->insertGetId([
+            DB::table('bank_account')->insert([
                 'iban' => $request->iban,
                 'entity' => $request->entity,
                 'office' => $request->office,
@@ -74,14 +74,6 @@ class BankController extends Controller
                 'company_id' => $companyId,
                 'complete_bank_account' => $request->complete_bank_account,
             ]);
-
-            // Obtener la nueva cuenta bancaria creada
-            $account = DB::table('bank_account')
-                ->select('iban', 'entity', 'office', 'control_digit', 'account_number', 'bank_name', 'country', 'swift', 'currency', 'id', 'company_id', 'favourite', 'complete_bank_account')
-                ->where('id', $newAccountId)
-                ->whereNull('dt_end')
-                ->first();
-
             // Marcar la cuenta bancaria antigua con dt_end
             DB::table('bank_account')
                 ->where('id', $bankAccountId)
@@ -90,10 +82,10 @@ class BankController extends Controller
                 ]);
 
             DB::commit();
-            return response()->json(['message' => 'La cuenta bancaria se ha actualizado correctamente', 'account' => $account], 200);
+            return response()->json(['message' => 'Successfully updated.', 'type' => 'success']);
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error al actualizar la cuenta bancaria: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error when updating.', 'type' => 'error']);
         }
     }
 
@@ -126,18 +118,13 @@ class BankController extends Controller
                 $this->makeFavourite($newAccountId);
             }
 
-            $account = DB::table('bank_account')
-                ->select('iban', 'entity', 'office', 'control_digit', 'account_number', 'bank_name', 'country', 'swift', 'currency', 'id', 'company_id', 'favourite','complete_bank_account')
-                ->where('id', $newAccountId)
-                ->whereNull('dt_end')
-                ->first();
 
             DB::commit();
 
-            return response()->json(['message' => 'La cuenta bancaria se ha creado correctamente', 'account' => $account]);
+            return response()->json(['message' => 'It has been created correctly.','type' => 'success']);
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error al crear la cuenta bancaria: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error when creating.','type' => 'error']);
         }
     }
 
@@ -153,7 +140,6 @@ class BankController extends Controller
                 ->first();
 
             if ($companyResult) {
-                DB::rollback();
                 $companyId = $companyResult->company_id;
             }
             
@@ -164,7 +150,7 @@ class BankController extends Controller
 
             if ($activeAccountsCount <= 1) {
                 DB::rollback();
-                return response()->json(['message' => 'Debe tener al menos una cuenta bancaria activa para poder eliminar.'], 400);
+                return response()->json(['message' => 'There must be at least one active to be able to delete.','type' => 'warning']);
             }
 
             $companyFav = DB::table('bank_account')
@@ -179,7 +165,7 @@ class BankController extends Controller
 
             if ($companyAccount) {
                 DB::rollback();
-                return response()->json(['message' => 'No puedes eliminar una cuenta bancaria marcada como favorita.'], 400);
+                return response()->json(['message' => 'You cannot delete if it is marked as a favorite.','type' => 'warning']);
             }
 
             DB::table('bank_account')
@@ -189,21 +175,22 @@ class BankController extends Controller
                 ]);
 
             DB::commit();
-            return response()->json(['message' => 'Se ha eliminado la cuenta bancaria con éxito']);
+            return response()->json(['message' => 'It has been successfully removed.','type' => 'success']);
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error al eliminar la cuenta bancaria: '.$e->getMessage()], 500);
+            return response()->json(['message' => 'Error deleting.','type' => 'error']);
         }
     }
 
 
     public function makeFavourite($id) {
         try {
+            
             $this->favouriteTrue($id);
             
-            return response()->json(['message' => 'Hacer favorita'], 200);
+            return response()->json(['message' => 'It has been marked as a favorite.','type' => 'success']);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Error al seleccionar cuenta bancaria favorita: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error when selecting as favorite.','type' => 'error']);
         }
     }
     

@@ -28,9 +28,9 @@ class PhoneController extends Controller
                 ->whereNull('dt_end')
                 ->orderByDesc('favourite')
                 ->get();
-            return response()->json(['message' => 'phones', 'phones' => $phones], 200);
+            return response()->json(['message' => 'phones', 'phones' => $phones]);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Error index phones: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error loading data' ,'type' => 'error']);
         }
     }
 
@@ -70,10 +70,10 @@ class PhoneController extends Controller
             ]);
 
             DB::commit();
-            return response()->json(['message' => 'Correctly updated phone', 'type' => 'success']);
+            return response()->json(['message' => 'Successfully updated.', 'type' => 'success']);
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error when updating the phone', 'type' => 'error']);
+            return response()->json(['message' => 'Error when updating.', 'type' => 'error']);
         }
     }
 
@@ -96,20 +96,16 @@ class PhoneController extends Controller
                 $this->makeFavourite($newPhoneId);
             }
 
-            $phone = DB::table('phones')
-            ->select('phone','isMobile','id','company_id', 'favourite')
-            ->where('id', $newPhoneId)
-            ->whereNull('dt_end')
-            ->first();
+            
         
 
             DB::commit();
 
-            return response()->json(['message' => 'El telefono se ha creado correctamente', 'phone' => $phone]);
-            // Confirma la transacción si todas las operaciones son exitosas
+            return response()->json(['message' => 'It has been created correctly.','type' => 'success']);
+            
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error al crear el teléfono: ', $e->getMessage()], 500);
+            return response()->json(['message' => 'Error when creating.','type' => 'error']);
         }
 
     }
@@ -134,7 +130,8 @@ class PhoneController extends Controller
                 ->count();
 
             if ($activePhonesCount <=1) {
-                return response()->json(['message' => 'Debes tener al menos un número de teléfono activo para poder eliminar.'], 400);
+                DB::rollback();
+                return response()->json(['message' => 'There must be at least one active to be able to delete.','type' => 'warning']);
             }
 
             $companyFav = DB::table('phones')
@@ -148,7 +145,9 @@ class PhoneController extends Controller
             }
 
             if ($companyPhone) {
-                return response()->json(['message' => 'No puedes eliminar un teléfono marcado como favorito.'], 400);
+                DB::rollback();
+                return response()->json(['message' => 'You cannot delete if it is marked as a favorite.','type' => 'warning']);
+                
             }
 
             DB::table('phones')
@@ -158,10 +157,10 @@ class PhoneController extends Controller
             ]);
 
             DB::commit();
-            return response()->json(['message' => 'Se ha eliminado el teléfono con éxito']);
+            return response()->json(['message' => 'It has been successfully removed.','type' => 'success']);
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error al eliminar el teléfono: '.$e->getMessage()], 500);
+            return response()->json(['message' => 'Error deleting.','type' => 'error']);
         }
     }
 
@@ -170,9 +169,9 @@ class PhoneController extends Controller
             
             $this->favouriteTrue($id);
             
-            return response()->json(['message' => 'make favourite',], 200);
+            return response()->json(['message' => 'It has been marked as a favorite.','type' => 'success']);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Error al seleccionar teléfono favorito '.$e->getMessage()], 500);
+            return response()->json(['message' => 'Error when selecting as favorite.','type' => 'error']);
         }
     }
 

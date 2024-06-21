@@ -179,7 +179,7 @@ export default {
                     
                 })
                 .catch(error => {
-                    console.error('Error fetching addresses data:', error);
+                    this.$toast(this.$t('Error connecting to the server'), 'error');
                 });
         },
         openNew() {
@@ -197,21 +197,21 @@ export default {
 
 
         saveMyAddress() {
-            console.log("companyId: "+ this.myAddress.companyID)
+
             if(this.myAddress.favourite == null) {
                 this.myAddress.favourite = false
             }
             if (!this.myAddress.id) {
                 axios.post('/address', this.myAddress)
                 .then(response => {
-                    
+                    this.$toast(this.$t(response.data.message), response.data.type);
                     this.fetchAddresses();
                     
                     this.addressDialog = false;
                         
                 })
                 .catch(error => {
-                    console.error('Error saving address data:', error.response);
+                    this.$toast(this.$t('Error connecting to the server'), 'error');
                     this.addressDialog = false;
                 });
 
@@ -245,11 +245,13 @@ export default {
             axios.put('/address/' + this.myAddress.id, this.myAddress)
 
             .then(response => {
+
+                this.$toast(this.$t(response.data.message), response.data.type);
                 this.fetchAddresses();
                 this.addressDialog = false;
             })
             .catch(error => {
-                console.error('Error al actualizar la compañía:', error);
+                this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.addressDialog = false; 
                 // Mostrar un mensaje de error al usuario
                 
@@ -257,19 +259,19 @@ export default {
         },
 
         makeFavourite(slotProps) {
-            console.log(slotProps)
 
             if (slotProps.favourite) {
-                return alert("El telefono ya está seleccionado como favorito")
+                return this.$toast(this.$t('Already selected as a favorite.'), 'warning');
             }
 
             axios.put('/addresses/' + slotProps.id)
             .then(response => {
+                this.$toast(this.$t(response.data.message), response.data.type);
                 this.addressDialog = false;
                 this.fetchAddresses();             
             })         
             .catch(error => {
-                console.error('Error al seleccionar un address', error);
+                this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.addressDialog = false;
             });
         },
@@ -282,33 +284,27 @@ export default {
 
         deleteMyAddress() {
             let addressId = this.myAddress.id
-            console.log(this.myAddress.id)
 
             // Realizar la solicitud de eliminación al servidor
             axios.delete('/address/' + this.myAddress.id)
                 .then(response => {
-                    console.log(response);
-                    
-                    // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
-                    this.addresses = this.addresses.filter(val => val.id !== addressId);
+                    if(response.data.type === 'success'){
+                        // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
+                        this.addresses = this.addresses.filter(val => val.id !== addressId);
 
-                    // Limpiar el objeto myAddress después de la eliminación exitosa
-                    this.myAddress = {};
-
-                    // Cerrar el diálogo de eliminación de teléfono
-                    this.deleteAddressDialog = false;
+                    }
+                    this.$toast(this.$t(response.data.message), response.data.type);
                 })
                 .catch(error => {
                     if (error.response || error.response.status === 400) {
-                        // Si se recibe un error 400, no hacer nada, solo imprimir un mensaje de advertencia
-                        console.warn('Error 400: No se pudo eliminar el address con ID:', addressId);
-                        this.deleteAddressDialog = false;
+                        this.$toast(this.$t(error.response.message), error.response.type);
                     }
                 });
+                this.deleteAddressDialog = false;
         },
         
         confirmDeleteSelected() {
-            console.log("CONFIRM DELETE SELECTED")
+
             this.deleteAddressesDialog = true;
         },
         
@@ -317,21 +313,20 @@ export default {
             this.selectedAddresses.forEach(address => {
                 axios.delete('/address/' + address.id)
                     .then(response => {
-                        console.log('Compañía eliminada con ID:', address.id);
-                        
-                        // Solo elimina la compañía de la lista si la solicitud DELETE tiene éxito
-                        this.addresses = this.addresses.filter(p => p.id !== address.id);
-                        
+                    
+                        if(response.data.type === 'success'){
+                            // Solo elimina la compañía de la lista si la solicitud DELETE tiene éxito
+                            this.addresses = this.addresses.filter(p => p.id !== address.id);
+                        }
+                        this.$toast(this.$t(response.data.message), response.data.type);
 
                     })
                     .catch(error => {
                         if (error.response || error.response.status === 400) {
-                            // Si se recibe un error 400, no hacer nada, solo imprimir un mensaje de advertencia
-                            console.warn('Error 400: No se pudo eliminar la compañía con ID:', address.id);
+                            this.$toast(this.$t(error.response.message), error.response.type);
                         }
                     });
             });
-            this.selectedAddresses = [];
             this.deleteAddressesDialog = false;
         },
 
