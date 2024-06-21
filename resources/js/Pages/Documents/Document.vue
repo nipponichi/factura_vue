@@ -18,7 +18,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <button                                     
                                     v-if="!loading && (companies.length > 0)"
                                     type="button" 
-                                    class="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-between" 
+                                    class="px-4 py-2 bg-black text-white border border-gray-200 rounded-md flex items-center justify-between" 
                                     @click="selectCompany">
                                     <span class="font-bold text-lg">
                                         <i class="pi pi-plus mr-2"></i>
@@ -32,13 +32,27 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <div class="flex flex-wrap justify-start md:justify-end items-center mb-3 md:mb-0">
 
                                     <div class="relative inline-block w-50">
-                                        <Button :label="$t('Customer')" icon="pi pi-plus" class="success-button" @click="selectACustomer()" />
+                                        <Button :label="$t('Customer')" icon="pi pi-plus" class="success-button text-white p-2" @click="selectACustomer()" />
                                     </div>
 
                                     <div class="relative inline-block w-50 ml-2">
-                                        <button 
+
+                                    </div>
+                                    <div class="flex items-center ml-2">
+                                        <label for="link-checkbox" class="ms-2 mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark as paid') }}</label>
+                                        <input id="link-checkbox" type="checkbox" v-model="this.myDocument.paid" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    </div>
+                                </div>
+                            
+                                <div class="flex justify-end">
+
+
+                                    <div id="app" class="relative inline-block w-50 ml-2">
+                                        
+                                        <div class="flex">
+                                            <button 
                                             type="button" 
-                                            class="px-4 py-2 success-button text-white rounded flex items-center justify-between" 
+                                            class="px-4 py-2 mr-2 success-button text-white rounded flex items-center justify-between" 
                                             @click="selectDocument()"
                                             :class="{ 'opacity-50': !this.selectedCompany.id }"
                                             :disabled="!this.selectedCompany.id"
@@ -48,59 +62,71 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                 {{ $t('Document type') }}
                                             </span>
                                         </button>
-                                    </div>
-                                    <div class="flex items-center ml-2">
-                                        <label for="link-checkbox" class="ms-2 mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark as paid') }}</label>
-                                        <input id="link-checkbox" type="checkbox" v-model="this.myDocument.paid" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                    </div>
-                                </div>
-                            
-                                <div class="flex justify-end">
-                                    <div class="relative inline-block w-50 ml-2">
-                                        <button 
+                                            <button 
+                                                type="button" 
+                                                class="px-4 py-2 bg-purple-600 text-white rounded-md flex items-center justify-between" 
+                                                @click="toggleDropdownExport"
+                                                :class="{ 'opacity-50': totalConIVA <= 0 }"
+                                                :disabled="totalConIVA <= 0"
+                                            >
+                                                <i class="pi pi-upload mr-2"></i>
+                                                {{ $t('Export') }}
+                                            </button>
+                                            
+                                        </div>
+                                    
+                                        <!-- Desplegable -->
+                                        <div 
+                                            v-show="isDropdownOpenExport"
+                                            class="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg"
+                                        >
+                                        
+                                            <button 
+                                                type="button" 
+                                                class="px-4 py-2 rounded-l flex items-center justify-between" 
+                                                @click="exportToPDF()"
+                                                :class="{ 'opacity-50': totalConIVA <= 0 }"
+                                                :disabled="totalConIVA <= 0"
+                                            >
+                                                <span>
+                                                    <i class="pi pi-file-pdf mr-2"></i>
+                                                    {{ $t('PDF') }}
+                                                </span>
+                                            </button>
+
+                                            <button 
                                             type="button" 
-                                            class="px-4 py-2 bg-purple-500 text-white rounded flex items-center justify-between" 
-                                            @click="exportDocument()"
+                                            class="px-4 py-2 rounded-r flex items-center" 
+                                            @click="exportToXML()"
                                             :class="{ 'opacity-50': totalConIVA <= 0 }"
                                             :disabled="totalConIVA <= 0"
                                         >
                                             <span>
                                                 <i class="pi pi-file-export mr-2"></i>
-                                                {{ $t('Export') }}
+                                                {{ $t('XML') }}
                                             </span>
+                                            
                                         </button>
+
+                                        </div>
                                     </div>
-                            
-                                    <div class="relative inline-block w-50 ml-2">
-                                        <button 
-                                            type="button" 
-                                            class="px-4 py-2 bg-red-500 text-white rounded flex items-center justify-between"
-                                            @click="exportToPDF()"
-                                            :class="{ 'opacity-50': totalConIVA <= 0 }"
-                                            :disabled="totalConIVA <= 0"
-                                        >
-                                            <span>
-                                                <i class="pi pi-file-pdf mr-2"></i>
-                                                {{ $t('PDF') }}
-                                            </span>
-                                        </button>
-                                    </div>
+                                    
                             
                                     <div id="app" class="relative inline-block w-50 ml-2">
                                         <div class="flex">
                                             <button 
                                                 type="button" 
-                                                class="px-4 py-2 bg-green-500 text-white rounded-l flex items-center justify-between" 
+                                                class="px-4 py-2 bg-blue-500 text-white rounded-l flex items-center justify-between" 
                                                 @click="checkDocument()"
                                                 :class="{ 'opacity-50': totalConIVA <= 0 }"
                                                 :disabled="totalConIVA <= 0"
                                             >
-                                                <i class="pi pi-upload mr-2"></i>
+                                                <i class="pi pi-save mr-2"></i>
                                                 {{ $t('Save') }}
                                             </button>
                                             <button 
                                                 type="button" 
-                                                class="px-4 py-2 bg-green-500 text-white rounded-r flex items-center" 
+                                                class="px-4 py-2 bg-blue-500 text-white rounded-r flex items-center" 
                                                 @click="toggleDropdown"
                                                 :class="{ 'opacity-50': totalConIVA <= 0 }"
                                                 :disabled="totalConIVA <= 0"
@@ -109,7 +135,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                             </button>
                                         </div>
                                     
-                                        <!-- Desplegable -->
+                                        <!-- Desplegable Save-->
                                         <div 
                                             v-show="isDropdownOpen"
                                             class="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg"
@@ -137,11 +163,11 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                     <div class="grid md:grid-cols-1 text-m gap-y-1">
                                         <div class="flex items-center justify-between w-full">
                                             <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Customer') }}:</div>
-                                            <div class="text-gray-700 w-full">{{ this.selectedCustomer.name }}</div>
+                                            <div class="text-gray-700 w-full font-bold text-lg">{{ this.selectedCustomer.name }}</div>
                                         </div>
                                         <div class="flex items-center justify-between w-full">
                                             <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Tax number') }}:</div>
-                                            <div class="text-gray-700 w-full">{{ this.selectedCustomer.tax_number }}</div>
+                                            <div class="text-gray-700 w-full uppercase">{{ this.selectedCustomer.tax_number }}</div>
                                         </div>
                                         <div class="flex items-center justify-between w-full">
                                             <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Phone') }}:</div>
@@ -153,7 +179,9 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         </div>
                                         <div class="flex items-center justify-between w-full">
                                             <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Address') }}:</div>
-                                            <div class="text-gray-700 w-full">{{ this.selectedCustomer.address }}</div>
+                                            <div class="text-gray-700 w-full">
+                                                {{ this.selectedCustomer.address }}, {{ this.selectedCustomer.post_code }}, {{ this.selectedCustomer.town }}, {{ this.selectedCustomer.province }} ( {{ this.selectedCustomer.country }} )
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -170,7 +198,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                     </div>
                                     <div class="flex items-center justify-between w-full">
                                         <div class="font-semibold mr-3 flex-shrink-0">{{ $t('Expiration') }}:</div>
-                                        <input type="expiration" v-model="fecha" @change="cambiarFormatoFecha" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                        <input type="date" v-model="expiration" @change="cambiarFormatoFecha" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
                                     </div>
                                 </div>
                                         
@@ -202,9 +230,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             :paginator="true" :rows="10" :filters="filters"
                             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
                             :currentPageReportTemplate="`${$t('Showing')} {first} ${$t('of')} {last} ${$t('of')} {totalRecords} ${$t('products')}`">
-                                <template #header>
-
-                                </template>
 
                                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox"></Column>
                                 <Column field="reference" :header="$t('Reference')" sortable class="dateTable">
@@ -232,15 +257,18 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         <Dropdown class="input-short" v-model="slotProps.data.taxes" :options="taxOptions" optionLabel="label" optionValue="value" />
                                     </template>
                                 </Column>
-                                
+                                <Column field="discount" :header="$t('Discount (%)')" sortable class="dateTable">
+                                    <template #body="slotProps">
+                                        <InputText class="input input-short" v-model="slotProps.data.discount" />
+                                    </template>
+                                </Column>
                                 <Column field="total" :header="$t('Total')" sortable class="dateTable">
                                     <template #body="slotProps">
                                         <InputText class="input input-short" :value="calculateTotal(slotProps.data)" readonly />
                                     </template>
                                 </Column>
 
-
-                                <Column :exportable="false" class="dateTable">
+                                <Column :exportable="false" :header="$t('Utility')" class="dateTable">
                                     <template #body="slotProps">
                                         <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteProduct(slotProps.data)" />
                                     </template>
@@ -256,7 +284,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         <div class="hidden md:flex justify-between mt-4 pr-4 mb-4">
                             <!-- Columna izquierda -->
                             <div class="totals-container w-1/3">
-                                <button class="ml-4 mb-2 success-button rounded-md" @click="selectAPaymentMethod()">
+                                <button class="ml-4 mb-2 success-button text-white rounded-md p-2" @click="selectAPaymentMethod()">
                                     <i class="pi pi-plus"></i> {{ $t('Payment method') }}
                                 </button>
                                 <div class="ml-4 totals p-4 rounded-md">
@@ -272,8 +300,18 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-gray-600 pr-4">{{ $t('Bank account') }}:</td>
-                                                <td class="pl-4">{{ this.selectedCompany.complete_bank_account }}</td>
+                                                <td class="text-gray-600 pr-4">
+                                                    <span v-if="selectedPaymentMethod.id === 2">{{ '' }}</span>
+                                                    <span v-else-if="selectedPaymentMethod.id === 3">{{ $t('Phone') }}:</span>
+                                                    <span v-else-if="selectedPaymentMethod.id === 4">{{ $t('Email') }}:</span>
+                                                    <span v-else>{{ $t('Bank account') }}:</span>
+                                                </td>
+                                                <td class="pl-4">
+                                                    <span v-if="selectedPaymentMethod.id === 2">{{ '' }}</span>
+                                                    <span v-else-if="selectedPaymentMethod.id === 3">{{ this.selectedPhone.phone }}</span>
+                                                    <span v-else-if="selectedPaymentMethod.id === 4">{{ this.selectedEmail.email }}</span>
+                                                    <span v-else>{{ this.selectedBankAccount.complete_bank_account }}</span>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -285,7 +323,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 
                             <!-- Columna central (Totales) -->
                             <div class="totals-container w-1/3">
-                                <button class="ml-4 mb-5 rounded-md" @click="addRow()">
+                                <button class="ml-4 mb-5 rounded-md" @click="selectAPaymentMethod()">
                                     
                                 </button>
                                 <div class="totals p-4 rounded-md">
@@ -315,7 +353,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         <div class="flex flex-wrap justify-between mt-4 pr-4 mb-4 md:hidden">
                             <!-- Columna izquierda -->
                             <div class="totals-container w-full md:w-1/3 flex flex-col mb-4 md:mb-0">
-                                <button class="ml-4 mb-2 success-button rounded-md" @click="addRow()">
+                                <button class="ml-4 mb-2 success-button rounded-md" @click="selectAPaymentMethod()">
                                     <i class="pi pi-plus"></i> {{ $t('Payment method') }}
                                 </button>
                                 <div class="ml-4 totals p-4 rounded-md flex-grow">
@@ -323,7 +361,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         <tbody>
                                             <tr>
                                                 <td class="text-gray-600 pr-4">{{ $t('Payment method') }}:</td>
-                                                <td class="pl-4">Bank transfer</td>
+                                                <td class="pl-4">{{ this.selectedPaymentMethod.name }}</td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2">
@@ -332,7 +370,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                             </tr>
                                             <tr>
                                                 <td class="text-gray-600 pr-4">{{ $t('Bank account') }}:</td>
-                                                <td class="pl-4">{{ this.selectedCompany.complete_bank_account }}</td>
+                                                <td class="pl-4">{{ this.selectedBankAccount.complete_bank_account }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -383,7 +421,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         </Dialog>
 
                         <!-- MODAL DOCUMENT -->
-
                         <Dialog v-model:visible="documentDialog" :style="{width: '450px'}" :header="$t('Select document')" :modal="true" @change="handleTypeSelection">
                             <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select document type') }}</label>
                             <Dropdown v-model="selectedType" :options="types" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="handleTypeSelection">
@@ -463,18 +500,33 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         </div>
                     </Dialog> 
 
+                    <!-- MODAL PAYMENT METHOD -->
                     <Dialog v-model:visible="selectAPaymentMethodDialog" :header="$t('Select a payment method')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
+                        <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Payment method') }}</label>
                         <Dropdown v-model="selectedPaymentMethod" :options="this.payment_methods" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
-                          <template #value="slotProps">
-                            <div v-if="slotProps.value" class="flex items-center">
-                              <div>{{ slotProps.value.name }}</div>
-                            </div>
-                          </template>
-                          <template #option="slotProps">
-                            <div class="flex items-center">
-                              <div>{{ slotProps.option.name }}</div>
-                            </div>
-                          </template>
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value" class="flex items-center">
+                                    <div>{{ slotProps.value.name }}</div>
+                                </div>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="flex items-center">
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                        <label v-if="!isDropdownHidden" for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select an option') }}</label>
+                        <Dropdown v-if="!isDropdownHidden" v-model="selectedOption" :options="this.options" filter :optionLabel="dynamicOptionLabel" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value" class="flex items-center">
+                                    <div>{{ slotProps.value[dynamicOptionLabel]  }}</div>
+                                </div>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="flex items-center">
+                                    <div>{{ slotProps.option[dynamicOptionLabel]  }}</div>
+                                </div>
+                            </template>
                         </Dropdown>
                         <div class="flex justify-end">
                             <button class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog()">
@@ -554,6 +606,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                     <div class="invoice_details">
                         <h3>{{ selectedType.name }}</h3>
                         <p><strong>{{ $t('Date') }}: </strong>{{ fecha }}</p>
+                        <p><strong>{{ $t('Expiration') }}: </strong>{{ expiration }}</p>
                         <p><strong>{{ $t('Number of') }} {{ selectedType.name }}:</strong> {{ selectedSerie.serie }} {{ selectedSerie.number }}</p>
                     </div>
                 </div>
@@ -602,30 +655,42 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                     <div class="table-container">
                         <table class="totals">  
                             <tr>
-                            <td class="title">{{ $t('Subtotal (excluding Tax)') }}</td>
-                            <td>{{ subtotal.toFixed(2) }}€</td>
+                                <td class="title">{{ $t('Subtotal (excluding Tax)') }}</td>
+                                <td>{{ subtotal.toFixed(2) }}€</td>
                             </tr>
+                            <hr>
                             <tr>
-                            <td class="title">{{ $t('Total Tax') }}</td>
-                            <td>{{ totalIVA.toFixed(2) }}€</td>
+                                <td class="title">{{ $t('Total Tax') }}</td>
+                                <td>{{ totalIVA.toFixed(2) }}€</td>
                             </tr>
+                            <hr>
                             <tr>
-                            <td class="title"><strong>{{ $t('Total (with IVA)') }}</strong></td>
-                            <td><strong>{{ totalConIVA.toFixed(2) }}€</strong></td>
+                                <td class="title"><strong>{{ $t('Total (with IVA)') }}</strong></td>
+                                <td><strong>{{ totalConIVA.toFixed(2) }}€</strong></td>
                             </tr>
                         </table>
 
                     </div>
                     <table class="bank">  
                         <tr>
-                            <td>{{ this.selectedCompany.bank_name }}</td>
+                            <td>{{ $t('Payment method') }}:</td>
+                            <td>{{ this.selectedPaymentMethod.name }}</td>    
                         </tr>
                         <tr>
-                            <td>{{ this.selectedCompany.swift }}</td>
+                            <td class="text-gray-600 pr-4">
+                                <span v-if="selectedPaymentMethod.id === 2">{{ '' }}</span>
+                                <span v-else-if="selectedPaymentMethod.id === 3">{{ $t('Phone') }}:</span>
+                                <span v-else-if="selectedPaymentMethod.id === 4">{{ $t('Email') }}:</span>
+                                <span v-else>{{ $t('Bank account') }}:</span>
+                            </td>
+                            <td class="pl-4">
+                                <span v-if="selectedPaymentMethod.id === 2">{{ '' }}</span>
+                                <span v-else-if="selectedPaymentMethod.id === 3">{{ this.selectedPhone.phone }}</span>
+                                <span v-else-if="selectedPaymentMethod.id === 4">{{ this.selectedEmail.email }}</span>
+                                <span v-else>{{ this.selectedBankAccount.complete_bank_account }}</span>
+                            </td>
                         </tr>
-                        <tr>
-                            <td>{{ this.selectedCompany.complete_bank_account }}</td>
-                        </tr>
+
                     </table>
                 </div>
         </div>
@@ -647,17 +712,25 @@ export default {
             loading: true,
             showTable: false,
             isDropdownOpen: false,
+            isDropdownOpenExport: false,
             saveRestart: false,
             taxOptions: [
-                { label: '0%', value: 0 },
-                { label: '4%', value: 4 },
-                { label: '5%', value: 5 },
-                { label: '7%', value: 7 },
-                { label: '8%', value: 8 },
-                { label: '10%', value: 10 },
-                { label: '16%', value: 16 },
-                { label: '18%', value: 18},
-                { label: '21%', value: 21 },
+                { label: '0', value: 0 },
+                { label: '4', value: 4 },
+                { label: '5', value: 5 },
+                { label: '7', value: 7 },
+                { label: '8', value: 8 },
+                { label: '10', value: 10 },
+                { label: '16', value: 16 },
+                { label: '18', value: 18},
+                { label: '21', value: 21 },
+            ],
+
+            paymentMethods: [
+                { id: 1 },
+                { id: 2 },
+                { id: 3 },
+                { id: 4 }
             ],
             imageUrl: 'https://placehold.co/300x300/e2e8f0/e2e8f0',
             companies: null,
@@ -674,11 +747,18 @@ export default {
             deleteProductsDialog: false,
             selectACustomerDialog: false,
             selectAPaymentMethodDialog: false,
+            selectedOption: [],
+            options: [],
+            selectedBankAccount: [],
+            selectedEmail: [],
+            selectedPhone: [],
             products: [],
             selectedCompany: [],
             selectedCustomer: [],
             selectedType: [],
             selectedSerie: [],
+            emails:[],
+            phones:[],
             selectedProducts: [],
             selectedPaymentMethod: [],
             filters: {},
@@ -718,6 +798,24 @@ export default {
     },
 
     computed: {
+
+        dynamicOptionLabel() {
+            switch (this.selectedPaymentMethod.id) {
+                case 1:
+                return 'complete_bank_account'; 
+                case 3:
+                return 'phone';
+                case 4:
+                return 'email';
+                default:
+                return '';
+            }
+        },
+
+        isDropdownHidden() {
+            return this.dynamicOptionLabel === '';
+        },
+
         subtotal() {
             return this.products.reduce((acc, product) => acc + product.quantity * product.price, 0);
         },
@@ -746,30 +844,84 @@ export default {
         this.fetchCompanies();
         this.fetchDocuments();
         this.fetchPayments();
-        this.fetchBanks();
+    },
+
+    watch: {
+        selectedPaymentMethod(newMethod) {
+            this.handlePaymentMethodChange(newMethod);
+        }
     },
     
     methods: {
 
+        handlePaymentMethodChange(paymentMethod) {
+            switch (paymentMethod.id) {
+                case 1:
+                    console.log('Transferencia');
+                    this.fetchBanks();
+                    break;
+                case 2:
+                    console.log('Efectivo');
+                    break;
+                case 3:
+                    console.log('Bizum');
+                    this.fetchPhones();
+                    break;
+                case 4:
+                    console.log('PayPal');
+                    this.fetchEmails();
+                    break;
+                default:
+                    console.log('Error');
+            }
+        },
+
         fetchBanks() {
-            let myCompanyId = window.location.pathname.split('/').pop();
-            axios.get('/banks/' + myCompanyId)
-            .then(response => {
-                this.banks = response.data.accounts;
-                this.selectedBankAccount = this.banks[0]
-            })
-            .catch(error => {
-                console.error('Error fetching bank data:', error);
-            });
+            console.log("id " + this.selectedCompany.id)
+            axios.get('/banks/' + this.selectedCompany.id)
+                .then(response => {
+                    this.banks = response.data.accounts;
+                    console.log("aqui")
+                    console.log(this.banks[0])
+                    this.selectedBankAccount = this.banks[0]
+                    this.options = this.banks
+                })
+                .catch(error => {
+                    console.error('Error fetching bank data:', error);
+                });
+        },
+
+        fetchEmails() {
+            axios.get('/emails/' + this.selectedCompany.id)
+                .then(response => {
+                    this.emails = response.data.emails;
+                    this.selectedEmail = this.emails[0]
+                    this.options = this.emails
+                })
+                .catch(error => {
+                    this.$toast(this.$t('Error connecting to the server'), 'error');
+                });
+        },
+
+        fetchPhones() {
+            axios.get('/phones/' + this.selectedCompany.id)
+                .then(response => {
+                    this.phones = response.data.phones;
+                    this.selectedPhone = this.phones[0]
+                    this.options = this.phones
+                })
+                .catch(error => {
+                    this.$toast(this.$t('Error connecting to the server'), 'error');
+                });
         },
 
         fetchPayments () {
             console.log("dentro payments")
             axios.get('/payment')
             .then(response => {
+                console.log("dentro payments2")
                 this.payment_methods = response.data.methods;
                 this.selectedPaymentMethod = this.payment_methods[0]
-                console.log(this.payment_methods)
             })
         },
 
@@ -787,17 +939,24 @@ export default {
             this.isDropdownOpen = !this.isDropdownOpen;
         },
 
+        toggleDropdownExport() {
+            this.isDropdownOpenExport = !this.isDropdownOpenExport;
+        },
+
         fetchCompanies() {
             axios.get('/companies-invoice')
             .then(response => {
             this.companies = response.data.companies;
-
+            console.log(this.companies)
             if (this.companies.length === 1) {
                 this.selectedCompany = this.companies[0];
+            
                 return axios.get('/customers/' + this.selectedCompany.id);
             } else {
+
+                this.selectedCompany = this.companies[0];
                 this.loading = false;
-                return Promise.resolve(null);
+                return axios.get('/customers/' + this.selectedCompany.id);
             }
             })
             .then(response => {
@@ -846,16 +1005,16 @@ export default {
 
         saveCustomer() {
 
-                axios.post('/customer', this.customer)
-                .then(response => {
-                    this.customer.id = response.data.companyId;
-                    this.selectedCustomer = this.customer;
-                    this.customerDialog = false;      
-                })
-                .catch(error => {
-                    console.log(error.response);
-                    this.customerDialog = false;
-                });   
+            axios.post('/customer', this.customer)
+            .then(response => {
+                this.customer.id = response.data.companyId;
+                this.selectedCustomer = this.customer;
+                this.customerDialog = false;      
+            })
+            .catch(error => {
+                console.log(error.response);
+                this.customerDialog = false;
+            });   
 
         },
 
@@ -984,18 +1143,18 @@ export default {
 
                     if (respuesta === '1') {
                         // Conservar el número ingresado por el cliente
-                        alert("Se conservará el número ingresado: " + this.selectedSerie.number);
+                        this.$toast(this.$t('The number entered will be retained: ') + this.selectedSerie.number, 'success');
                         this.serie = '';
                         this.saveDocument();
                     } else if (respuesta === '2') {
                         // Asignar el siguiente valor disponible
                         this.selectedSerie.number = ++this.serie;
-                        alert("Se ha asignado el siguiente número disponible: " + this.selectedSerie.number);
+                        this.$toast(this.$t('The following available number has been assigned: ') + this.selectedSerie.number, 'success');
                         this.serie = '';
                         this.saveDocument();
                     } else {
                         // Cancelar la operación
-                        alert("Operación cancelada.");
+                        this.$toast(this.$t('Invoice cancelled.'), 'error');
                     }
 
 
@@ -1009,7 +1168,7 @@ export default {
                         const day = today.getDate().toString().padStart(2, '0');
                         this.fecha = `${year}-${month}-${day}`;
                         
-                        alert("Se ha asignado la fecha actual");
+                        this.$toast(this.$t('The current date has been assigned.'), 'success');
 
                         this.saveDocument();
                     }
@@ -1020,22 +1179,26 @@ export default {
                 }
             })
             .catch(error => {
-                console.error('Error al guardar los datos del documento:', error.response);
+                this.$toast(this.$t('Error saving document data.'), 'error');
             });    
         },
 
         saveDocument(){
-
+            console.log("aqui1")
             this.myDocument.number = this.selectedSerie.serie + this.selectedSerie.number
+            console.log("aqui2")
             this.myDocument.document_counter = this.selectedSerie.number
+        
             this.myDocument.expiration = this.expiration
-            this.myDocument.payment_methods_id = this.selectedMethod.id
+            console.log("aqui3")
+            this.myDocument.payment_methods_id = this.selectedPaymentMethod.id
+            console.log("aqui4")
             this.myDocument.company_id_company = this.selectedCompany.id 
             this.myDocument.company_id_customer = this.selectedCustomer.id
             this.myDocument.documents_type_id = this.selectedType.id
             this.myDocument.documents_series_id = this.selectedSerie.id
             this.myDocument.date = this.fecha
-
+            console.log("aqui3")
             this.myDocument.bank_account_id = this.selectedCompany.bank_account_id
             
             
@@ -1066,23 +1229,26 @@ export default {
             axios.post('/documents', {documentData: this.myDocument})
             .then(response => {
         
-                alert("Factura guardada correctamente")
+                this.$toast(this.$t('Invoice saved correctly.'), 'success');
                 
                 if (this.saveRestart) {
                     this.resetData();
                 }
             })
             .catch(error => {
-                console.error('Error al guardar los datos del documento:', error.response);
-                alert("Error al guardar factura")
+                this.$toast(this.$t('Error saving invoice.'), 'error');
                 this.myDocument.concept = []
             });
         },
 
 
         resetData() {
-            console.log("reload")
-            window.location.reload();
+            
+            setTimeout(function() {
+                // Recargar la página
+                window.location.reload();
+            }, 3000);
+            
         },
 
         
@@ -1117,6 +1283,175 @@ export default {
         exportToPDF(){
             this.showTable = !this.showTable;
             window.print()    
+        },
+
+        exportToXML() {
+            const data = {
+                company: this.selectedCompany,
+                customer: this.selectedCustomer,
+                document: this.myDocument,
+                payment: this.selectedPaymentMethod,
+                bank: this.selectedBankAccount,
+                phone: this.selectedPhone,
+                email: this.selectedEmail
+            };
+            
+            const xmlContent = this.convertToFacturaeXML(data);
+            this.$toast(this.$t('XML document generated correctly.'), 'success');
+            this.downloadXML(xmlContent, 'facturae.xml');
+            
+        },
+    
+        convertToFacturaeXML(data) {
+            
+            //const { company, customer, document } = data;
+            // console.log(company)
+            // console.log(customer)
+            // console.log(document)
+            // console.log(payment)
+            // console.log(bank)
+            // console.log(phone)
+            // console.log(email)
+            const xml = 
+            `<?xml version="1.0" encoding="UTF-8"?>
+            <fe:Facturae xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:fe="http://www.facturae.es/Facturae/2014/v3.2.1/Facturae">
+            <FileHeader>
+                <SchemaVersion>3.2.1</SchemaVersion>
+                <Modality>I</Modality>
+                <InvoiceIssuerType>EM</InvoiceIssuerType>
+                <Batch>
+                    <BatchIdentifier>B989898731Emit-</BatchIdentifier>
+                    <InvoicesCount>1</InvoicesCount>
+                    <TotalInvoicesAmount>
+                        <TotalAmount>363.0</TotalAmount>
+                    </TotalInvoicesAmount>
+                    <TotalOutstandingAmount>
+                        <TotalAmount>363.0</TotalAmount>
+                    </TotalOutstandingAmount>
+                    <TotalExecutableAmount>
+                        <TotalAmount>363.0</TotalAmount>
+                    </TotalExecutableAmount>
+                    <InvoiceCurrencyCode>EUR</InvoiceCurrencyCode>
+                </Batch>
+            </FileHeader>
+            <Parties>
+                <SellerParty>
+                    <TaxIdentification>
+                        <PersonTypeCode>J</PersonTypeCode>
+                        <ResidenceTypeCode>R</ResidenceTypeCode>
+                        <TaxIdentificationNumber>B53988497</TaxIdentificationNumber>
+                    </TaxIdentification>
+                    <LegalEntity>
+                        <CorporateName>Manolo S.L</CorporateName>
+                        <AddressInSpain>
+                            <Address>Calle prueba</Address>
+                            <PostCode>03315</PostCode>
+                            <Town>La murada</Town>
+                            <Province>Alicante</Province>
+                            <CountryCode>ESP</CountryCode>
+                        </AddressInSpain>
+                        <ContactDetails>
+                            <Telephone>682924866</Telephone>
+                            <ElectronicMail>prueba@gmail.com</ElectronicMail>
+                        </ContactDetails>
+                    </LegalEntity>
+                </SellerParty>
+                <BuyerParty>
+                    <TaxIdentification>
+                        <PersonTypeCode>J</PersonTypeCode>
+                        <ResidenceTypeCode>R</ResidenceTypeCode>
+                        <TaxIdentificationNumber>B98989873</TaxIdentificationNumber>
+                    </TaxIdentification>
+                    <LegalEntity>
+                        <CorporateName>Pepito S.L</CorporateName>
+                        <AddressInSpain>
+                            <Address>Calle manolo 72</Address>
+                            <PostCode>03300</PostCode>
+                            <Town>Orihuela</Town>
+                            <Province>Alicante</Province>
+                            <CountryCode>ESP</CountryCode>
+                        </AddressInSpain>
+                        <ContactDetails>
+                            <Telephone>689596321</Telephone>
+                            <ElectronicMail>pepito@gmail.com</ElectronicMail>
+                        </ContactDetails>
+                    </LegalEntity>
+                </BuyerParty>
+            </Parties>
+            <Invoices>
+                <Invoice>
+                    <InvoiceHeader>
+                        <InvoiceNumber>F4</InvoiceNumber>
+                        <InvoiceSeriesCode>F</InvoiceSeriesCode>
+                        <InvoiceDocumentType>FC</InvoiceDocumentType>
+                        <InvoiceClass>OO</InvoiceClass>
+                    </InvoiceHeader>
+                    <InvoiceIssueData>
+                        <IssueDate>2024-06-21</IssueDate>
+                        <InvoiceCurrencyCode>EUR</InvoiceCurrencyCode>
+                        <TaxCurrencyCode>EUR</TaxCurrencyCode>
+                        <LanguageName>es</LanguageName>
+                    </InvoiceIssueData>
+                    <TaxesOutputs>
+                        <Tax>
+                            <TaxTypeCode>01</TaxTypeCode>
+                            <TaxRate>21.0</TaxRate>
+                            <TaxableBase>
+                                <TotalAmount>300.0</TotalAmount>
+                            </TaxableBase>
+                            <TaxAmount>
+                                <TotalAmount>63.0</TotalAmount>
+                            </TaxAmount>
+                        </Tax>
+                    </TaxesOutputs>
+                    <InvoiceTotals>
+                        <TotalGrossAmount>300.0</TotalGrossAmount>
+                        <TotalGeneralDiscounts>0.0</TotalGeneralDiscounts>
+                        <TotalGeneralSurcharges>0.0</TotalGeneralSurcharges>
+                        <TotalGrossAmountBeforeTaxes>300.0</TotalGrossAmountBeforeTaxes>
+                        <TotalTaxOutputs>63.0</TotalTaxOutputs>
+                        <TotalTaxesWithheld>0.0</TotalTaxesWithheld>
+                        <InvoiceTotal>363.0</InvoiceTotal>
+                        <TotalOutstandingAmount>363.0</TotalOutstandingAmount>
+                        <TotalExecutableAmount>363.0</TotalExecutableAmount>
+                    </InvoiceTotals>
+                    <Items>
+                        <InvoiceLine>
+                            <IssuerContractDate>2024-06-21</IssuerContractDate>
+                            <IssuerTransactionDate>2024-06-21</IssuerTransactionDate>
+                            <ItemDescription>Colchon</ItemDescription>
+                            <Quantity>3</Quantity>
+                            <UnitOfMeasure>01</UnitOfMeasure>
+                            <UnitPriceWithoutTax>100</UnitPriceWithoutTax>
+                            <TotalCost>300</TotalCost>
+                            <GrossAmount>300</GrossAmount>
+                            <TaxesOutputs>
+                                <Tax>
+                                    <TaxTypeCode>01</TaxTypeCode>
+                                    <TaxRate>21</TaxRate>
+                                    <TaxableBase>
+                                        <TotalAmount>300</TotalAmount>
+                                    </TaxableBase>
+                                    <TaxAmount>
+                                        <TotalAmount>63</TotalAmount>
+                                    </TaxAmount>
+                                </Tax>
+                            </TaxesOutputs>
+                        </InvoiceLine>
+                    </Items>
+                </Invoice>
+            </Invoices>
+            </fe:Facturae>`;
+            return xml;
+        },
+        
+        downloadXML(content, filename) {
+            const blob = new Blob([content], { type: 'application/xml' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(link.href);
         },
 
         cancelInvoice() {
@@ -1352,13 +1687,13 @@ export default {
     border-collapse: collapse;
 }
 
-
 .invoice-table th,
 .invoice-table td {
-
-    padding: 10px;
+    border: 1px solid #d3d3d3;
+    padding: 8px;
     text-align: left;
 }
+
 
 .invoice-table th {
     background-color: #f2f2f2;
@@ -1383,12 +1718,12 @@ export default {
 }
 
 .header th {
+    border: 1px solid black;
     background-color:black;
     color:white;
 }
 
 .table-container {
-    background-color: #f0f0f0;
     padding:10px;
     text-align: right;
     float:right;

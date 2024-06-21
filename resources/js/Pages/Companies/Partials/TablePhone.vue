@@ -144,14 +144,14 @@ export default {
     methods: {
         fetchPhones() {
             let myCompanyId = window.location.pathname.split('/').pop();
-        axios.get('/phones/' + myCompanyId)
-            .then(response => {
-                this.phones = response.data.phones;
-                
-            })
-            .catch(error => {
-                console.error('Error fetching phone data:', error);
-            });
+            axios.get('/phones/' + myCompanyId)
+                .then(response => {
+                    this.phones = response.data.phones;
+                    
+                })
+                .catch(error => {
+                    this.$toast(this.$t('Error connecting to the server'), 'error');
+                });
         },
 
         openNew() {
@@ -169,7 +169,6 @@ export default {
         },
 
         saveMyPhone() {
-            console.log("companyId: "+ this.myPhone.companyID)
             if(this.myPhone.favourite == null) {
                 this.myPhone.favourite = false
             }
@@ -178,13 +177,14 @@ export default {
                 axios.post('/phone', this.myPhone)
                 .then(response => {
                     
+                    this.$toast(this.$t(response.data.message), response.data.type);
                     this.fetchPhones();
                     
                     this.phoneDialog = false;
                         
                 })
                 .catch(error => {
-                    console.error('Error saving phone data:', error.response);
+                    this.$toast(this.$t('Error connecting to the server'), 'error');
                     this.phoneDialog = false;
                 });
 
@@ -194,26 +194,20 @@ export default {
         },
 
         editMyPhone(slotProps) {
-            console.log('edit: ' + slotProps.favourite)
-            
-                this.myPhone.phone = slotProps.phone;
-                this.myPhone.id = slotProps.id;
-                this.myPhone.favourite = slotProps.favourite;
-                this.phoneDialog = true;
+            this.myPhone.phone = slotProps.phone;
+            this.myPhone.id = slotProps.id;
+            this.myPhone.favourite = slotProps.favourite;
+            this.phoneDialog = true;
 
         },
 
         updateMyPhone() {
-            console.log("Update: " + this.myPhone.favourite)
 
             axios.put('/phone/' + this.myPhone.id, this.myPhone)
             .then(response => {
-                this.fetchPhones();
-                
 
                 this.$toast(this.$t(response.data.message), response.data.type);
-
-                
+                this.fetchPhones();                
                 this.phoneDialog = false;
             })
             .catch(error => {
@@ -225,7 +219,7 @@ export default {
         makeFavourite(slotProps) {
 
             if (slotProps.favourite) {
-                return this.$toast(this.$t('The phone is already selected as a favorite'), 'warning');
+                return this.$toast(this.$t('Already selected as a favorite.'), 'warning');
             }
 
             axios.put('/phones/' + slotProps.id)
@@ -252,27 +246,23 @@ export default {
             // Realizar la solicitud de eliminación al servidor
             axios.delete('/phone/' + this.myPhone.id)
                 .then(response => {
-                    console.log(response);
+                    if(response.data.type === 'success'){
+                        // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
+                        this.phones = this.phones.filter(val => val.id !== phoneId);
+
+                    }
+                    this.$toast(this.$t(response.data.message), response.data.type);
                     
-                    // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
-                    this.phones = this.phones.filter(val => val.id !== phoneId);
-
-                    // Limpiar el objeto myPhone después de la eliminación exitosa
-                    this.myPhone = {};
-
-                    // Cerrar el diálogo de eliminación de teléfono
-                    this.deletePhoneDialog = false;
+                    
                 })
                 .catch(error => {
-                    if (error.response || error.response.status === 400) {
-                        this.$toast(this.$t('Error connecting to the server'), 'error');
-                        this.deletePhoneDialog = false;
-                    }
+                    this.$toast(this.$t(error.response.message), error.response.type);
+                    
                 });
+                this.deletePhoneDialog = false;
         },
         
         confirmDeleteSelected() {
-            console.log("CONFIRM DELETE SELECTED")
             this.deletePhonesDialog = true;
         },
         
@@ -281,21 +271,21 @@ export default {
             this.selectedPhones.forEach(phone => {
                 axios.delete('/phone/' + phone.id)
                     .then(response => {
-                        console.log('Compañía eliminada con ID:', phone.id);
-                        
-                        // Solo elimina la compañía de la lista si la solicitud DELETE tiene éxito
-                        this.phones = this.phones.filter(p => p.id !== phone.id);
+
+                        if(response.data.type === 'success'){
+                            // Solo elimina la compañía de la lista si la solicitud DELETE tiene éxito
+                            this.phones = this.phones.filter(p => p.id !== phone.id);
+                        }
+                        this.$toast(this.$t(response.data.message), response.data.type);
                         
 
                     })
                     .catch(error => {
                         if (error.response || error.response.status === 400) {
-                            // Si se recibe un error 400, no hacer nada, solo imprimir un mensaje de advertencia
-                            console.warn('Error 400: No se pudo eliminar la compañía con ID:', phone.id);
+                            this.$toast(this.$t(error.response.message), error.response.type);
                         }
                     });
             });
-            this.selectedPhones = [];
             this.deletePhonesDialog = false;
         },
 
