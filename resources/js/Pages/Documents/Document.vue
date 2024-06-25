@@ -1,5 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
+
 </script>
 <template>
     <div class="no-imprimir">
@@ -15,146 +16,104 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 
                         <div class="card">
                             <div class="relative inline-block flex mb-5">
-                                <button                                     
+                                <button
                                     v-if="!loading && (companies.length > 0)"
-                                    type="button" 
-                                    class="px-4 py-2 bg-black text-white border border-gray-200 rounded-md flex items-center justify-between" 
+                                    type="button"
+                                    class="px-4 py-2 bg-black text-white border border-gray-200 rounded-md flex items-center justify-between"
                                     @click="selectCompany">
                                     <span class="font-bold text-lg">
                                         <i class="pi pi-plus mr-2"></i>
                                         {{ this.selectedCompany.name }}
                                     </span>
-                                </button>                             
+                                </button>
                             </div>
                             
                             <div class="select flex flex-col md:flex-row justify-between mb-4 items-center">
-
                                 <div class="flex flex-wrap justify-start md:justify-end items-center mb-3 md:mb-0">
-
                                     <div class="relative inline-block w-50">
                                         <Button :label="$t('Customer')" icon="pi pi-plus" class="success-button text-white p-2" @click="selectACustomer()" />
                                     </div>
-
-                                    <div class="relative inline-block w-50 ml-2">
-
-                                    </div>
+                            
+                                    <div class="relative inline-block w-50 ml-2"></div>
+                            
                                     <div class="flex items-center ml-2">
                                         <label for="link-checkbox" class="ms-2 mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark as paid') }}</label>
                                         <input id="link-checkbox" type="checkbox" v-model="this.myDocument.paid" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                     </div>
                                 </div>
-                            
-                                <div class="flex justify-end">
 
-
+                                
+                                <!-- Botones normales para pantallas grandes -->
+                                <div class="hidden md:flex justify-end">
                                     <div id="app" class="relative inline-block w-50 ml-2">
-                                        
                                         <div class="flex">
-                                            <button 
-                                            type="button" 
-                                            class="px-4 py-2 mr-2 success-button text-white rounded flex items-center justify-between" 
-                                            @click="selectDocument()"
-                                            :class="{ 'opacity-50': !this.selectedCompany.id }"
-                                            :disabled="!this.selectedCompany.id"
-                                        >
-                                            <span>
-                                                <i class="pi pi-plus mr-2"></i>
-                                                {{ $t('Document type') }}
-                                            </span>
-                                        </button>
-                                            <button 
-                                                type="button" 
-                                                class="px-4 py-2 bg-purple-600 text-white rounded-md flex items-center justify-between" 
-                                                @click="toggleDropdownExport"
-                                                :class="{ 'opacity-50': totalConIVA <= 0 }"
-                                                :disabled="totalConIVA <= 0"
-                                            >
+                                            <button
+                                                type="button"
+                                                class="px-4 py-2 mr-2 success-button text-white rounded flex items-center justify-between"
+                                                @click="selectDocument()"
+                                                :class="{ 'opacity-50': !this.selectedCompany.id }"
+                                                :disabled="!this.selectedCompany.id">
+                                                <span>
+                                                    <i class="pi pi-plus mr-2"></i>
+                                                    {{ $t('Document type') }}
+                                                </span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="px-4 py-2 bg-purple-600 text-white rounded-md flex items-center justify-between"
+                                                @click="toggleDropdownExport">
                                                 <i class="pi pi-upload mr-2"></i>
                                                 {{ $t('Export') }}
                                             </button>
-                                            
                                         </div>
-                                    
-                                        <!-- Desplegable -->
-                                        <div 
-                                            v-show="isDropdownOpenExport"
-                                            class="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg"
-                                        >
                                         
-                                            <button 
-                                                type="button" 
-                                                class="px-4 py-2 rounded-l flex items-center justify-between" 
+                                        
+                                        <!-- Desplegable Export -->
+                                        <div
+                                            v-show="isDropdownOpenExport"
+                                            class="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
+                                            <button
+                                                type="button"
+                                                class="px-4 py-2 rounded-l flex items-center justify-between"
                                                 @click="exportToPDF()"
                                                 :class="{ 'opacity-50': totalConIVA <= 0 }"
-                                                :disabled="totalConIVA <= 0"
-                                            >
+                                                :disabled="totalConIVA <= 0">
                                                 <span>
                                                     <i class="pi pi-file-pdf mr-2"></i>
                                                     {{ $t('PDF') }}
                                                 </span>
                                             </button>
-
-                                            <button 
-                                            type="button" 
-                                            class="px-4 py-2 rounded-r flex items-center" 
-                                            @click="exportToXML()"
-                                            :class="{ 'opacity-50': totalConIVA <= 0 }"
-                                            :disabled="totalConIVA <= 0"
-                                        >
-                                            <span>
-                                                <i class="pi pi-file-export mr-2"></i>
-                                                {{ $t('XML') }}
-                                            </span>
-                                            
-                                        </button>
-
-                                        </div>
-                                    </div>
-                                    
                             
-                                    <div id="app" class="relative inline-block w-50 ml-2">
-                                        <div class="flex">
-                                            <button 
-                                                type="button" 
-                                                class="px-4 py-2 bg-blue-500 text-white rounded-l flex items-center justify-between" 
-                                                @click="checkDocument()"
-                                                :class="{ 'opacity-50': totalConIVA <= 0 }"
-                                                :disabled="totalConIVA <= 0"
-                                            >
-                                                <i class="pi pi-save mr-2"></i>
-                                                {{ $t('Save') }}
-                                            </button>
-                                            <button 
-                                                type="button" 
-                                                class="px-4 py-2 bg-blue-500 text-white rounded-r flex items-center" 
-                                                @click="toggleDropdown"
-                                                :class="{ 'opacity-50': totalConIVA <= 0 }"
-                                                :disabled="totalConIVA <= 0"
-                                            >
-                                                <i class="pi pi-chevron-down"></i>
-                                            </button>
-                                        </div>
-                                    
-                                        <!-- Desplegable Save-->
-                                        <div 
-                                            v-show="isDropdownOpen"
-                                            class="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg"
-                                        >
-                                            <button 
-                                                class="px-4 py-2 text-gray-800 hover:bg-gray-200 bg-white border border-gray-300 rounded whitespace-nowrap" 
-                                                @click="saveAndReset()" 
-                                            >
-                                                {{ $t('Save and create new') }}
-                                            </button>
-                                            <button class="text-left block w-full px-4 py-2 text-gray-800 hover:bg-gray-200" @click="cancelInvoice()">
-                                                {{ $t('Cancel') }}
+                                            <button
+                                                type="button"
+                                                class="px-4 py-2 rounded-r flex items-center"
+                                                @click="exportToXML()">
+                                                <span>
+                                                    <i class="pi pi-file-export mr-2"></i>
+                                                    {{ $t('XML') }}
+                                                </span>
                                             </button>
                                         </div>
                                     </div>
+
+                                    
+
+                                    <div class="split-button-container ml-2">
+                                        <SplitButton class="blue-button" :label="$t('Save')" @click="checkDocument" :model="items">
+                                            <template v-slot:icon>
+                                            <i class="pi pi-save mr-2"></i>
+                                            </template>
+                                        </SplitButton>
+                                    </div>
+                
+
                                 </div>
+
+                                
+                            
                             </div>
                             
-
+                            
                             <hr class="linea-grosor">
                         
                             <div class="selector flex flex-col md:flex-row justify-between mt-6 ml-12">
@@ -225,50 +184,54 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                     </div>
                                 </template>
                             </Toolbar>
-
                             <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id"
                             :paginator="true" :rows="10" :filters="filters"
                             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
-                            :currentPageReportTemplate="`${$t('Showing')} {first} ${$t('of')} {last} ${$t('of')} {totalRecords} ${$t('products')}`">
-
+                            :currentPageReportTemplate="`${$t('Showing')} {first} ${$t('of')} {last} ${$t('of')} {totalRecords} ${$t('products')}`"
+                            class="w-full lg:w-4/4 mx-auto">
+                
                                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox"></Column>
-                                <Column field="reference" :header="$t('Reference')" sortable class="dateTable">
+                                <Column field="reference" :header="$t('Reference')" sortable class="dateTable w-1/4">
                                     <template #body="slotProps">
-                                        <InputText class="input" :placeholder="$t('Reference')" v-model="slotProps.data.reference" />
+                                        <InputText class="input w-full" :placeholder="$t('Reference')" v-model="slotProps.data.reference" />
                                     </template>
                                 </Column>
-                                <Column field="product" :header="$t('Description')" sortable class="dateTable">
+                                <Column field="product" :header="$t('Description')" sortable class="dateTable w-full">
                                     <template #body="slotProps">
-                                        <InputText class="input" :placeholder="$t('Description')" v-model="slotProps.data.description" />
+                                        <InputText class="input w-full" :placeholder="$t('Description')" v-model="slotProps.data.description" />
                                     </template>
                                 </Column>
-                                <Column field="quantity" :header="$t('Quantity')" sortable class="dateTable">
+                                <Column field="quantity" :header="$t('Quantity')" sortable class="dateTable w-1/8">
                                     <template #body="slotProps">
-                                        <InputText class="input input-short" v-model="slotProps.data.quantity" />
+                                        <InputText class="input input-short w-full" v-model="slotProps.data.quantity" />
                                     </template>
                                 </Column>
-                                <Column field="price" :header="$t('Price')" sortable class="dateTable">
+                                <Column field="price" :header="$t('Price')" sortable class="dateTable w-1/4">
                                     <template #body="slotProps">
-                                        <InputText class="input input-short" v-model="slotProps.data.price" />
+                                        <InputText class="input input-short w-full" v-model="slotProps.data.price" />
                                     </template>
                                 </Column>
-                                <Column field="taxes" :header="$t('Tax (%)')" sortable class="dateTable">
+                                <Column field="discount" :header="$t('Discount (%)')" sortable class="dateTable w-1/4">
                                     <template #body="slotProps">
-                                        <Dropdown class="input-short" v-model="slotProps.data.taxes" :options="taxOptions" optionLabel="label" optionValue="value" />
+                                        <InputText class="input input-short w-full" v-model="slotProps.data.discount" />
                                     </template>
                                 </Column>
-                                <Column field="discount" :header="$t('Discount (%)')" sortable class="dateTable">
+                                <Column field="subTotal" :header="$t('Subtotal')" sortable class="dateTable w-1/12">
                                     <template #body="slotProps">
-                                        <InputText class="input input-short" v-model="slotProps.data.discount" />
+                                        <InputText class="input input-short w-1/12" :value="calculateSubtotal(slotProps.data)" readonly />
                                     </template>
                                 </Column>
-                                <Column field="total" :header="$t('Total')" sortable class="dateTable">
+                                <Column field="taxes" :header="$t('Tax (%)')" sortable class="dateTable w-1/4">
                                     <template #body="slotProps">
-                                        <InputText class="input input-short" :value="calculateTotal(slotProps.data)" readonly />
+                                        <Dropdown class="input-short w-full" v-model="slotProps.data.taxes" :options="taxOptions" optionLabel="label" optionValue="value" />
                                     </template>
                                 </Column>
-
-                                <Column :exportable="false" :header="$t('Utility')" class="dateTable">
+                                <Column field="total" :header="$t('Total')" sortable class="dateTable w-1/12">
+                                    <template #body="slotProps">
+                                        <InputText class="input input-short w-1/12" :value="calculateTotal(slotProps.data)" readonly />
+                                    </template>
+                                </Column>
+                                <Column :exportable="false" :header="$t('Utility')" class="dateTable w-1/12">
                                     <template #body="slotProps">
                                         <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteProduct(slotProps.data)" />
                                     </template>
@@ -379,6 +342,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 
                             <!-- Espacio entre las tablas en pantallas grandes -->
                             <div class="hidden md:block w-1/12"></div>
+
+                            
 
                             <!-- Columna central (Totales) -->
                             <div class="totals-container w-full md:w-1/3 flex flex-col">
@@ -636,6 +601,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             <th>{{ $t('Description') }}</th>
                             <th>{{ $t('Quantity') }}</th>
                             <th>{{ $t('Price') }}</th>
+                            <th>{{ $t('Discount (%)') }}</th>
+                            <th>{{ $t('Subtotal') }}</th>
                             <th>{{ $t('Tax (%)') }}</th>
                             <th>{{ $t('Total') }}</th>                      
                         </tr>
@@ -646,6 +613,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             <td>{{ product.description}}</td>
                             <td>{{ product.quantity }}</td>
                             <td>{{ product.price }}</td>
+                            <td>{{ product.discount }}</td>
+                            <td>{{ product.subTotal }}</td>
                             <td>{{ product.taxes }}</td>
                             <td>{{ calculateTotal(product) }}</td>
                         </tr>
@@ -658,12 +627,24 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <td class="title">{{ $t('Subtotal (excluding Tax)') }}</td>
                                 <td>{{ subtotal.toFixed(2) }}€</td>
                             </tr>
-                            <hr>
-                            <tr>
-                                <td class="title">{{ $t('Total Tax') }}</td>
-                                <td>{{ totalIVA.toFixed(2) }}€</td>
+                            
+                            <tr v-for="(entry, index) in this.taxMap" :key="index">
+                                <td class="title">{{ $t('Total IVA') }} {{ Object.values(entry)[0] }} %</td>
+                                <td> {{ Object.values(entry)[1].toFixed(2) }}€</td>
                             </tr>
-                            <hr>
+                          
+                        
+                            <tr v-for="(value, key) in Object.entries(this.taxMap)" :key="key">
+                                <td class="title">{{ $t('Total IVA') }} {{ key }} %</td>
+                                <td>{{ `${value} €` }}</td>
+                            </tr>
+
+                            <tr v-for="(value, key) in Object.entries(this.taxMap)" :key="key">
+                                <td class="title">{{ $t('Total IVA') }} {{ key[0].value }} %</td>
+                                <td>{{ `${value} €` }}</td>
+                            </tr>
+                        
+                            
                             <tr>
                                 <td class="title"><strong>{{ $t('Total (with IVA)') }}</strong></td>
                                 <td><strong>{{ totalConIVA.toFixed(2) }}€</strong></td>
@@ -702,18 +683,32 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 
 <script>
 import { FilterMatchMode } from 'primevue/api';
-
 export default {
     data() {
         return {
+            items: [
+                {
+                    label: this.$t('Save and create new'),
+                    icon: 'pi pi-refresh',
+                    command: () => this.saveAndReset()
+                },
+                {
+                    label: this.$t('Cancel'),
+                    command: () => this.cancelInvoice()
+                },
+            ],
+            taxMap: new Map(),
             fecha: '',
             expiration: '',
             fechaFormateada: '',
             loading: true,
+            isMobileMenuOpen: false,
             showTable: false,
             isDropdownOpen: false,
             isDropdownOpenExport: false,
             saveRestart: false,
+            taxTypes: [],
+            taxValues: [],
             taxOptions: [
                 { label: '0', value: 0 },
                 { label: '4', value: 4 },
@@ -794,6 +789,7 @@ export default {
                 province: '',
                 country: ''
             },
+            
         };
     },
 
@@ -817,15 +813,17 @@ export default {
         },
 
         subtotal() {
-            return this.products.reduce((acc, product) => acc + product.quantity * product.price, 0);
+            return this.products.reduce((acc, product) => acc + product.subTotal, 0);
         },
         totalIVA() {
-            return this.products.reduce((acc, product) => acc + (product.quantity * product.price * product.taxes / 100), 0);
+            return this.products.reduce((acc, product) => acc + product.priceTax, 0);
         },
         totalConIVA() {
             return this.subtotal + this.totalIVA;
         }
+
     },
+
     created() {
         this.filters = {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -838,12 +836,17 @@ export default {
         const day = today.getDate().toString().padStart(2, '0');
         this.fecha = `${year}-${month}-${day}`;
         this.expiration = `${year}-${month}-${day}`;
+
+        
+        
+    
     },
 
     mounted() {
         this.fetchCompanies();
         this.fetchDocuments();
         this.fetchPayments();
+        
     },
 
     watch: {
@@ -943,6 +946,10 @@ export default {
             this.isDropdownOpenExport = !this.isDropdownOpenExport;
         },
 
+        toggleMobileMenu() {
+            this.isMobileMenuOpen = !this.isMobileMenuOpen;
+        },
+
         fetchCompanies() {
             axios.get('/companies-invoice')
             .then(response => {
@@ -1008,6 +1015,7 @@ export default {
             axios.post('/customer', this.customer)
             .then(response => {
                 this.customer.id = response.data.companyId;
+                console.log("customer: " + this.customer.id)
                 this.selectedCustomer = this.customer;
                 this.customerDialog = false;      
             })
@@ -1097,17 +1105,20 @@ export default {
         addRow() {
 
             let newProduct = {
-                reference: '',
-                description: '',
-                product: '',
-                quantity: 0,
-                price: 0,
+                reference: '5.01.02.003',
+                description: 'Collar',
+                price: 8,
+                quantity: 1,
+                discount: 15,
+                subtotal: 0,
                 taxes: 21,
                 priceTax: 0,
                 total: 0,
                 id: this.products.length + 1,
             };
             this.products.push(newProduct);
+            console.log("aqui calculadora")
+            
         },
 
         //Identifica que boton de guardado le ha dado
@@ -1198,6 +1209,7 @@ export default {
             this.myDocument.documents_type_id = this.selectedType.id
             this.myDocument.documents_series_id = this.selectedSerie.id
             this.myDocument.date = this.fecha
+            this.myDocument.document_counter = 1
             console.log("aqui3")
             this.myDocument.bank_account_id = this.selectedCompany.bank_account_id
             
@@ -1219,6 +1231,8 @@ export default {
                     quantity: product.quantity,
                     price: product.price,
                     taxes: product.taxes,
+                    discount: product.discount,
+                    gross: product.gross,
                     total: this.calculateTotal(product).toFixed(2)
                 };
 
@@ -1251,9 +1265,27 @@ export default {
             
         },
 
-        
-        calculateTotal(product) {
+        calculateGross(product) {
             return product.quantity * product.price;
+        },
+
+        calculateTax(product) {
+            console.log("calculateTax");
+            product.priceTax = parseFloat((product.taxes / 100) * product.subTotal);
+            return product.priceTax;
+        },
+
+
+        calculateTotal(product) {
+            let taxAmount = this.calculateTax(product)
+            product.total =taxAmount + product.subTotal
+            return product.total.toFixed(2)
+        },
+
+        calculateSubtotal(product) {
+            let subtotalWithoutDiscount =  (parseFloat(product.quantity) * parseFloat(product.price))
+            product.subTotal = subtotalWithoutDiscount - ((product.discount/100) * subtotalWithoutDiscount);
+            return product.subTotal
         },
 
         confirmDeleteProduct(product) {
@@ -1280,178 +1312,195 @@ export default {
             
         },
 
-        exportToPDF(){
-            this.showTable = !this.showTable;
-            window.print()    
+        exportToPDF() {
+            this.calculateTaxes().then(() => {
+                this.showTable = !this.showTable;
+                window.print();
+            }).catch(error => {
+                this.$toast(this.$t('XML document generated correctly.'), 'error');
+                // Manejar el error según sea necesario
+            });
+
         },
 
-        exportToXML() {
-            const data = {
-                company: this.selectedCompany,
-                customer: this.selectedCustomer,
-                document: this.myDocument,
-                payment: this.selectedPaymentMethod,
-                bank: this.selectedBankAccount,
-                phone: this.selectedPhone,
-                email: this.selectedEmail
-            };
+        exportToXML() {    
+            //this.calculateTaxes();       
+            this.myDocument.document_counter = 1
+            console.log("contador: " + this.myDocument.document_counter)
             
-            const xmlContent = this.convertToFacturaeXML(data);
+            const xmlContent = this.convertToFacturaeXML();
+            
             this.$toast(this.$t('XML document generated correctly.'), 'success');
-            this.downloadXML(xmlContent, 'facturae.xml');
             
+            this.downloadXML(xmlContent, 'facturae.xml');    
         },
     
-        convertToFacturaeXML(data) {
-            
-            //const { company, customer, document } = data;
-            // console.log(company)
-            // console.log(customer)
-            // console.log(document)
-            // console.log(payment)
-            // console.log(bank)
-            // console.log(phone)
-            // console.log(email)
-            const xml = 
-            `<?xml version="1.0" encoding="UTF-8"?>
+        convertToFacturaeXML() {
+            console.log("Prueba2.5");
+            let xml = `<?xml version="1.0" encoding="UTF-8"?>
             <fe:Facturae xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:fe="http://www.facturae.es/Facturae/2014/v3.2.1/Facturae">
-            <FileHeader>
-                <SchemaVersion>3.2.1</SchemaVersion>
-                <Modality>I</Modality>
-                <InvoiceIssuerType>EM</InvoiceIssuerType>
-                <Batch>
-                    <BatchIdentifier>B989898731Emit-</BatchIdentifier>
-                    <InvoicesCount>1</InvoicesCount>
-                    <TotalInvoicesAmount>
-                        <TotalAmount>363.0</TotalAmount>
-                    </TotalInvoicesAmount>
-                    <TotalOutstandingAmount>
-                        <TotalAmount>363.0</TotalAmount>
-                    </TotalOutstandingAmount>
-                    <TotalExecutableAmount>
-                        <TotalAmount>363.0</TotalAmount>
-                    </TotalExecutableAmount>
-                    <InvoiceCurrencyCode>EUR</InvoiceCurrencyCode>
-                </Batch>
-            </FileHeader>
-            <Parties>
-                <SellerParty>
-                    <TaxIdentification>
-                        <PersonTypeCode>J</PersonTypeCode>
-                        <ResidenceTypeCode>R</ResidenceTypeCode>
-                        <TaxIdentificationNumber>B53988497</TaxIdentificationNumber>
-                    </TaxIdentification>
-                    <LegalEntity>
-                        <CorporateName>Manolo S.L</CorporateName>
-                        <AddressInSpain>
-                            <Address>Calle prueba</Address>
-                            <PostCode>03315</PostCode>
-                            <Town>La murada</Town>
-                            <Province>Alicante</Province>
-                            <CountryCode>ESP</CountryCode>
-                        </AddressInSpain>
-                        <ContactDetails>
-                            <Telephone>682924866</Telephone>
-                            <ElectronicMail>prueba@gmail.com</ElectronicMail>
-                        </ContactDetails>
-                    </LegalEntity>
-                </SellerParty>
-                <BuyerParty>
-                    <TaxIdentification>
-                        <PersonTypeCode>J</PersonTypeCode>
-                        <ResidenceTypeCode>R</ResidenceTypeCode>
-                        <TaxIdentificationNumber>B98989873</TaxIdentificationNumber>
-                    </TaxIdentification>
-                    <LegalEntity>
-                        <CorporateName>Pepito S.L</CorporateName>
-                        <AddressInSpain>
-                            <Address>Calle manolo 72</Address>
-                            <PostCode>03300</PostCode>
-                            <Town>Orihuela</Town>
-                            <Province>Alicante</Province>
-                            <CountryCode>ESP</CountryCode>
-                        </AddressInSpain>
-                        <ContactDetails>
-                            <Telephone>689596321</Telephone>
-                            <ElectronicMail>pepito@gmail.com</ElectronicMail>
-                        </ContactDetails>
-                    </LegalEntity>
-                </BuyerParty>
-            </Parties>
-            <Invoices>
-                <Invoice>
-                    <InvoiceHeader>
-                        <InvoiceNumber>F4</InvoiceNumber>
-                        <InvoiceSeriesCode>F</InvoiceSeriesCode>
-                        <InvoiceDocumentType>FC</InvoiceDocumentType>
-                        <InvoiceClass>OO</InvoiceClass>
-                    </InvoiceHeader>
-                    <InvoiceIssueData>
-                        <IssueDate>2024-06-21</IssueDate>
+                <FileHeader>
+                    <SchemaVersion>3.2.1</SchemaVersion>
+                    <Modality>I</Modality>
+                    <InvoiceIssuerType>EM</InvoiceIssuerType>
+                    <Batch>
+                        <BatchIdentifier>${this.selectedCompany.tax_number}${this.selectedSerie.serie}</BatchIdentifier>
+                        <InvoicesCount>${this.myDocument.document_counter}</InvoicesCount>
+                        <TotalInvoicesAmount>
+                            <TotalAmount>${this.myDocument.amount}</TotalAmount>
+                        </TotalInvoicesAmount>
+                        <TotalOutstandingAmount>
+                            <TotalAmount>${this.myDocument.amount}</TotalAmount>
+                        </TotalOutstandingAmount>
+                        <TotalExecutableAmount>
+                            <TotalAmount>${this.myDocument.amount}</TotalAmount>
+                        </TotalExecutableAmount>
                         <InvoiceCurrencyCode>EUR</InvoiceCurrencyCode>
-                        <TaxCurrencyCode>EUR</TaxCurrencyCode>
-                        <LanguageName>es</LanguageName>
-                    </InvoiceIssueData>
-                    <TaxesOutputs>
-                        <Tax>
-                            <TaxTypeCode>01</TaxTypeCode>
-                            <TaxRate>21.0</TaxRate>
-                            <TaxableBase>
-                                <TotalAmount>300.0</TotalAmount>
-                            </TaxableBase>
-                            <TaxAmount>
-                                <TotalAmount>63.0</TotalAmount>
-                            </TaxAmount>
-                        </Tax>
-                    </TaxesOutputs>
-                    <InvoiceTotals>
-                        <TotalGrossAmount>300.0</TotalGrossAmount>
-                        <TotalGeneralDiscounts>0.0</TotalGeneralDiscounts>
-                        <TotalGeneralSurcharges>0.0</TotalGeneralSurcharges>
-                        <TotalGrossAmountBeforeTaxes>300.0</TotalGrossAmountBeforeTaxes>
-                        <TotalTaxOutputs>63.0</TotalTaxOutputs>
-                        <TotalTaxesWithheld>0.0</TotalTaxesWithheld>
-                        <InvoiceTotal>363.0</InvoiceTotal>
-                        <TotalOutstandingAmount>363.0</TotalOutstandingAmount>
-                        <TotalExecutableAmount>363.0</TotalExecutableAmount>
-                    </InvoiceTotals>
-                    <Items>
-                        <InvoiceLine>
-                            <IssuerContractDate>2024-06-21</IssuerContractDate>
-                            <IssuerTransactionDate>2024-06-21</IssuerTransactionDate>
-                            <ItemDescription>Colchon</ItemDescription>
-                            <Quantity>3</Quantity>
-                            <UnitOfMeasure>01</UnitOfMeasure>
-                            <UnitPriceWithoutTax>100</UnitPriceWithoutTax>
-                            <TotalCost>300</TotalCost>
-                            <GrossAmount>300</GrossAmount>
-                            <TaxesOutputs>
-                                <Tax>
-                                    <TaxTypeCode>01</TaxTypeCode>
-                                    <TaxRate>21</TaxRate>
-                                    <TaxableBase>
-                                        <TotalAmount>300</TotalAmount>
-                                    </TaxableBase>
-                                    <TaxAmount>
-                                        <TotalAmount>63</TotalAmount>
-                                    </TaxAmount>
-                                </Tax>
-                            </TaxesOutputs>
-                        </InvoiceLine>
-                    </Items>
-                </Invoice>
-            </Invoices>
+                    </Batch>
+                </FileHeader>
+                <Parties>
+                    <SellerParty>
+                        <TaxIdentification>
+                            <PersonTypeCode>J</PersonTypeCode>
+                            <ResidenceTypeCode>R</ResidenceTypeCode>
+                            <TaxIdentificationNumber>${this.selectedCompany.tax_number}</TaxIdentificationNumber>
+                        </TaxIdentification>
+                        <LegalEntity>
+                            <CorporateName>${this.selectedCompany.name}</CorporateName>
+                            <AddressInSpain>
+                                <Address>${this.selectedCompany.address}</Address>
+                                <PostCode>${this.selectedCompany.post_code}</PostCode>
+                                <Town>${this.selectedCompany.town}</Town>
+                                <Province>${this.selectedCompany.province}</Province>
+                                <CountryCode>ESP</CountryCode>
+                            </AddressInSpain>
+                            <ContactDetails>
+                                <Telephone>${this.selectedCompany.phone}</Telephone>
+                                <ElectronicMail>${this.selectedCompany.email}</ElectronicMail>
+                            </ContactDetails>
+                        </LegalEntity>
+                    </SellerParty>
+                    <BuyerParty>
+                        <TaxIdentification>
+                            <PersonTypeCode>J</PersonTypeCode>
+                            <ResidenceTypeCode>R</ResidenceTypeCode>
+                            <TaxIdentificationNumber>${this.selectedCustomer.tax_number}</TaxIdentificationNumber>
+                        </TaxIdentification>
+                        <LegalEntity>
+                            <CorporateName>${this.selectedCustomer.name}</CorporateName>
+                            <AddressInSpain>
+                                <Address>${this.selectedCustomer.address}</Address>
+                                <PostCode>${this.selectedCustomer.post_code}</PostCode>
+                                <Town>${this.selectedCustomer.town}</Town>
+                                <Province>${this.selectedCustomer.province}</Province>
+                                <CountryCode>ESP</CountryCode>
+                            </AddressInSpain>
+                            <ContactDetails>
+                                <Telephone>${this.selectedCustomer.phone}</Telephone>
+                                <ElectronicMail>${this.selectedCustomer.email}</ElectronicMail>
+                            </ContactDetails>
+                        </LegalEntity>
+                    </BuyerParty>
+                </Parties>
+                <Invoices>
+                    <Invoice>
+                        <InvoiceHeader>
+                            <InvoiceNumber>${this.myDocument.number}</InvoiceNumber>
+                            <InvoiceSeriesCode>${this.selectedSerie.serie}</InvoiceSeriesCode>
+                            <InvoiceDocumentType>FC</InvoiceDocumentType>
+                            <InvoiceClass>OO</InvoiceClass>
+                        </InvoiceHeader>
+                        <InvoiceIssueData>
+                            <IssueDate>${this.myDocument.date}</IssueDate>
+                            <InvoiceCurrencyCode>EUR</InvoiceCurrencyCode>
+                            <TaxCurrencyCode>EUR</TaxCurrencyCode>
+                            <LanguageName>es</LanguageName>
+                            <Extensions>
+                                <AdditionalInformation>${this.myDocument.additionalInformation}</AdditionalInformation>
+                            </Extensions>
+                        </InvoiceIssueData>
+                        <TaxesOutputs>
+                            <Tax>
+                                forEACH
+                                
+                                <TaxTypeCode>01</TaxTypeCode>
+                                <TaxRate>21.0</TaxRate>
+                                <TaxableBase>
+                                    <TotalAmount>${this.myDocument.amount}</TotalAmount>
+                                </TaxableBase>
+                                <TaxAmount>
+                                    <TotalAmount>${(this.myDocument.amount * 0.21).toFixed(2)}</TotalAmount>
+                                </TaxAmount>
+                            </Tax>
+                        </TaxesOutputs>
+                        <InvoiceTotals>
+                            <TotalGeneralDiscounts>0.000000</TotalGeneralDiscounts>
+                            <TotalGeneralSurcharges>0.00</TotalGeneralSurcharges>
+                            <TotalGrossAmount>${this.myDocument.amount}</TotalGrossAmount>
+                            <TotalGrossAmountBeforeTaxes>${this.myDocument.amount}</TotalGrossAmountBeforeTaxes>
+                            <TotalTaxOutputs>${(this.myDocument.amount * 0.21).toFixed(2)}</TotalTaxOutputs>
+                            <TotalTaxesWithheld>0.0</TotalTaxesWithheld>
+                            <InvoiceTotal>${(this.myDocument.amount * 1.21).toFixed(2)}</InvoiceTotal>
+                            <TotalOutstandingAmount>${(this.myDocument.amount * 1.21).toFixed(2)}</TotalOutstandingAmount>
+                            <TotalExecutableAmount>${(this.myDocument.amount * 1.21).toFixed(2)}</TotalExecutableAmount>
+                        </InvoiceTotals>
+                        <Items>`;
+                        
+            console.log("Products:", this.products);
+            this.products.forEach(product => {
+                product.priceTax = this.calculateTax(product).toFixed(2);
+                product.gross = this.calculateTotal(product).toFixed(2);
+                product.total = this.calculateGross(product).toFixed(2);
+
+                xml += `
+                    <InvoiceLine>
+                        <IssuerContractDate>${this.myDocument.date}</IssuerContractDate>
+                        <IssuerTransactionDate>${this.myDocument.date}</IssuerTransactionDate>
+                        <ItemDescription>${product.description}</ItemDescription>
+                        <Quantity>${product.quantity}</Quantity>
+                        <UnitOfMeasure>01</UnitOfMeasure>
+                        <UnitPriceWithoutTax>${product.price}</UnitPriceWithoutTax>
+                        <TotalCost>${product.total}</TotalCost>
+                        <GrossAmount>${product.gross}</GrossAmount>
+                        <TaxesOutputs>
+                            <Tax>
+                                <TaxTypeCode>01</TaxTypeCode>
+                                <TaxRate>${product.taxes}</TaxRate>
+                                <TaxableBase>
+                                    <TotalAmount>${product.total}</TotalAmount>
+                                </TaxableBase>
+                                <TaxAmount>
+                                    <TotalAmount>${product.priceTax}</TotalAmount>
+                                </TaxAmount>
+                            </Tax>
+                        </TaxesOutputs>
+                    </InvoiceLine>`;
+            });
+            xml += `
+                        </Items>
+                    </Invoice>
+                </Invoices>
             </fe:Facturae>`;
+            console.log("XML Generated:", xml);
             return xml;
         },
+
+
         
         downloadXML(content, filename) {
+            console.log("Prueba7");
             const blob = new Blob([content], { type: 'application/xml' });
+            console.log("Prueba8");
             const link = document.createElement('a');
+            console.log("Prueba9");
             link.href = URL.createObjectURL(blob);
+            console.log("Prueba10");
             link.download = filename;
+            console.log("Prueba11");
             link.click();
+            console.log("Prueba12");
             URL.revokeObjectURL(link.href);
+            console.log("Prueba13");
         },
 
         cancelInvoice() {
@@ -1460,11 +1509,68 @@ export default {
                 this.resetData()
             }
         },
-    },
+
+        // REPARAR ESTA PUTA MIERDA
+        
+        calculateTaxes() {
+            
+            return new Promise((resolve, reject) => {
+                try {
+                    this.taxMap.clear();
+                    this.products.forEach(product => {
+                        let taxes = product.taxes;
+                        let priceTax = parseFloat(product.priceTax);
+
+                            if (this.taxMap.has(taxes)) {
+                                let precioActual = this.taxMap.get(taxes);
+                                this.taxMap.set(taxes, precioActual + priceTax);
+                            } else {
+                                this.taxMap.set(taxes, priceTax);
+                            }
+                    });
+
+                    // Mostrar el objeto taxMap resultante en la consola
+                    console.log(this.taxMap);
+
+                    // Resolver la promesa una vez completado el cálculo y la preparación de datos
+                    resolve();
+                } catch (error) {
+                    // En caso de error, rechazar la promesa
+                    reject(error);
+                }
+            });
+                }
+            },
+        
+
+
+
+    
+    
 }
 </script>
 
 <style>
+
+
+.blue-button {
+background-color: #3b82f6; /* Azul según el esquema de colores de Tailwind CSS */
+color: white; /* Texto en blanco */
+border-color: #3b82f6; /* Color del borde igual que el fondo */
+padding: 0.5rem 1rem; /* Ajusta el relleno según sea necesario */
+transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.blue-button:hover {
+background-color: #0056b3; /* Cambio de color de fondo en hover */
+border-color: #0056b3; /* Cambio de color de borde en hover */
+}
+
+.p-splitbutton .p-button:hover {
+    background-color: #0056b3; /* Cambio de color de fondo en hover de los items del menú */
+}
+
+
 
 .dateTable {
     border-right: 1px solid #ddd;

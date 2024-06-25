@@ -585,6 +585,7 @@ class DocumentController extends Controller
                     'quantity' => $item->quantity,
                     'tax' => $item->tax,
                     'price' => $item->price,
+                    'discount' => $item->discount,
                     'total' => $item->total,
                     'documents_id' => $documentsId,
                     'dt_start' => now()
