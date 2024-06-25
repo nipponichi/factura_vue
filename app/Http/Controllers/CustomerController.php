@@ -148,7 +148,7 @@ class CustomerController extends Controller
 
             DB::commit();
 
-            return response()->json(['message' => 'It has been created correctly.','type' => 'success']);
+            return response()->json(['message' => 'It has been created correctly.','type' => 'success', 'companyId' => $companyId]);
             
         } catch (Exception $e) {
             DB::rollback();
