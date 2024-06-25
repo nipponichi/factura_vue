@@ -632,19 +632,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <td class="title">{{ $t('Total IVA') }} {{ Object.values(entry)[0] }} %</td>
                                 <td> {{ Object.values(entry)[1].toFixed(2) }}€</td>
                             </tr>
-                          
-                        
-                            <tr v-for="(value, key) in Object.entries(this.taxMap)" :key="key">
-                                <td class="title">{{ $t('Total IVA') }} {{ key }} %</td>
-                                <td>{{ `${value} €` }}</td>
-                            </tr>
 
-                            <tr v-for="(value, key) in Object.entries(this.taxMap)" :key="key">
-                                <td class="title">{{ $t('Total IVA') }} {{ key[0].value }} %</td>
-                                <td>{{ `${value} €` }}</td>
-                            </tr>
-                        
-                            
                             <tr>
                                 <td class="title"><strong>{{ $t('Total (with IVA)') }}</strong></td>
                                 <td><strong>{{ totalConIVA.toFixed(2) }}€</strong></td>
@@ -836,9 +824,6 @@ export default {
         const day = today.getDate().toString().padStart(2, '0');
         this.fecha = `${year}-${month}-${day}`;
         this.expiration = `${year}-${month}-${day}`;
-
-        
-        
     
     },
 
@@ -1194,7 +1179,7 @@ export default {
             });    
         },
 
-        saveDocument(){
+        myDocumentSave() {
             console.log("aqui1")
             this.myDocument.number = this.selectedSerie.serie + this.selectedSerie.number
             console.log("aqui2")
@@ -1218,6 +1203,10 @@ export default {
             this.myDocument.totalTax = this.totalIVA.toFixed(2)
             this.myDocument.amount = this.totalConIVA.toFixed(2)
             
+        },
+
+        saveDocument(){
+            this.myDocumentSave()
             if(this.selectedType.id == 1 ) {
                 this.myDocument.invoiced = true
             }
@@ -1313,30 +1302,38 @@ export default {
         },
 
         exportToPDF() {
+            this.myDocumentSave()
             this.calculateTaxes().then(() => {
                 this.showTable = !this.showTable;
                 window.print();
             }).catch(error => {
-                this.$toast(this.$t('XML document generated correctly.'), 'error');
-                // Manejar el error según sea necesario
+                this.$toast(this.$t('Could not generate the PDF.'), 'error');
             });
 
         },
 
-        exportToXML() {    
-            //this.calculateTaxes();       
+        exportToXML() {
+            this.myDocumentSave()
+            this.calculateTaxes().then(() => {   
             this.myDocument.document_counter = 1
             console.log("contador: " + this.myDocument.document_counter)
-            
             const xmlContent = this.convertToFacturaeXML();
-            
             this.$toast(this.$t('XML document generated correctly.'), 'success');
-            
-            this.downloadXML(xmlContent, 'facturae.xml');    
+            this.downloadXML(xmlContent, 'facturae.xml');
+            }).catch(error => {
+                this.$toast(this.$t('Could not generate the PDF.'), 'error');
+            }); 
+        },
+
+        calcularImporteBase(porcentajeIva, totalIvaRepercutido) {
+            if (porcentajeIva <= 0) {
+                return 0
+            }
+            return totalIvaRepercutido / (porcentajeIva / 100);
         },
     
         convertToFacturaeXML() {
-            console.log("Prueba2.5");
+            
             let xml = `<?xml version="1.0" encoding="UTF-8"?>
             <fe:Facturae xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:fe="http://www.facturae.es/Facturae/2014/v3.2.1/Facturae">
                 <FileHeader>
@@ -1344,7 +1341,7 @@ export default {
                     <Modality>I</Modality>
                     <InvoiceIssuerType>EM</InvoiceIssuerType>
                     <Batch>
-                        <BatchIdentifier>${this.selectedCompany.tax_number}${this.selectedSerie.serie}</BatchIdentifier>
+                        <BatchIdentifier>${this.selectedCompany.tax_number}${this.selectedSerie.number}${this.selectedSerie.serie}</BatchIdentifier>
                         <InvoicesCount>${this.myDocument.document_counter}</InvoicesCount>
                         <TotalInvoicesAmount>
                             <TotalAmount>${this.myDocument.amount}</TotalAmount>
@@ -1357,7 +1354,8 @@ export default {
                         </TotalExecutableAmount>
                         <InvoiceCurrencyCode>EUR</InvoiceCurrencyCode>
                     </Batch>
-                </FileHeader>
+                </FileHeader> 
+                
                 <Parties>
                     <SellerParty>
                         <TaxIdentification>
@@ -1380,6 +1378,7 @@ export default {
                             </ContactDetails>
                         </LegalEntity>
                     </SellerParty>
+                    
                     <BuyerParty>
                         <TaxIdentification>
                             <PersonTypeCode>J</PersonTypeCode>
@@ -1401,11 +1400,12 @@ export default {
                             </ContactDetails>
                         </LegalEntity>
                     </BuyerParty>
+                    
                 </Parties>
                 <Invoices>
                     <Invoice>
                         <InvoiceHeader>
-                            <InvoiceNumber>${this.myDocument.number}</InvoiceNumber>
+                            <InvoiceNumber>${this.selectedSerie.number}</InvoiceNumber>
                             <InvoiceSeriesCode>${this.selectedSerie.serie}</InvoiceSeriesCode>
                             <InvoiceDocumentType>FC</InvoiceDocumentType>
                             <InvoiceClass>OO</InvoiceClass>
@@ -1415,66 +1415,71 @@ export default {
                             <InvoiceCurrencyCode>EUR</InvoiceCurrencyCode>
                             <TaxCurrencyCode>EUR</TaxCurrencyCode>
                             <LanguageName>es</LanguageName>
-                            <Extensions>
-                                <AdditionalInformation>${this.myDocument.additionalInformation}</AdditionalInformation>
-                            </Extensions>
                         </InvoiceIssueData>
-                        <TaxesOutputs>
-                            <Tax>
-                                forEACH
-                                
-                                <TaxTypeCode>01</TaxTypeCode>
-                                <TaxRate>21.0</TaxRate>
-                                <TaxableBase>
-                                    <TotalAmount>${this.myDocument.amount}</TotalAmount>
-                                </TaxableBase>
-                                <TaxAmount>
-                                    <TotalAmount>${(this.myDocument.amount * 0.21).toFixed(2)}</TotalAmount>
-                                </TaxAmount>
-                            </Tax>
-                        </TaxesOutputs>
+                        <TaxesOutputs>\n`;
+                            
+                        // No Tocar
+                        this.taxMap.forEach((value, tax) => {            
+                            xml += '  <Tax>\n';
+                            xml += `    <TaxTypeCode>01</TaxTypeCode>\n`;  
+                            xml += `    <TaxRate>${parseFloat(tax).toFixed(2)}</TaxRate>\n`;
+                            xml += '    <TaxableBase>\n';
+                            xml += `      <TotalAmount>${ this.calcularImporteBase(tax,value).toFixed(2) }</TotalAmount>\n`;
+                            xml += '    </TaxableBase>\n';   
+                            xml += '    <TaxAmount>\n';
+                            xml += `      <TotalAmount>${value.toFixed(2)}</TotalAmount>\n`;
+                            xml += '    </TaxAmount>\n';
+                            xml += '  </Tax>\n';
+                        
+                        });
+
+                        xml += `</TaxesOutputs>
                         <InvoiceTotals>
-                            <TotalGeneralDiscounts>0.000000</TotalGeneralDiscounts>
-                            <TotalGeneralSurcharges>0.00</TotalGeneralSurcharges>
-                            <TotalGrossAmount>${this.myDocument.amount}</TotalGrossAmount>
-                            <TotalGrossAmountBeforeTaxes>${this.myDocument.amount}</TotalGrossAmountBeforeTaxes>
-                            <TotalTaxOutputs>${(this.myDocument.amount * 0.21).toFixed(2)}</TotalTaxOutputs>
+                            <TotalGrossAmount>${ this.subtotal.toFixed(2) }</TotalGrossAmount>
+                            <TotalGeneralDiscounts>0.0</TotalGeneralDiscounts>
+                            <TotalGeneralSurcharges>0.0</TotalGeneralSurcharges>
+                            <TotalGrossAmountBeforeTaxes>${ this.subtotal.toFixed(2) }</TotalGrossAmountBeforeTaxes>
+                            <TotalTaxOutputs>${this.totalIVA.toFixed(2)}</TotalTaxOutputs>
                             <TotalTaxesWithheld>0.0</TotalTaxesWithheld>
-                            <InvoiceTotal>${(this.myDocument.amount * 1.21).toFixed(2)}</InvoiceTotal>
-                            <TotalOutstandingAmount>${(this.myDocument.amount * 1.21).toFixed(2)}</TotalOutstandingAmount>
-                            <TotalExecutableAmount>${(this.myDocument.amount * 1.21).toFixed(2)}</TotalExecutableAmount>
+                            <InvoiceTotal>${ this.myDocument.amount }</InvoiceTotal>
+                            <TotalOutstandingAmount>${ this.myDocument.amount }</TotalOutstandingAmount>
+                            <TotalExecutableAmount>${ this.myDocument.amount }</TotalExecutableAmount>
                         </InvoiceTotals>
                         <Items>`;
                         
-            console.log("Products:", this.products);
+            
             this.products.forEach(product => {
-                product.priceTax = this.calculateTax(product).toFixed(2);
-                product.gross = this.calculateTotal(product).toFixed(2);
-                product.total = this.calculateGross(product).toFixed(2);
-
+                
+                console.log("Products:", this.products);
                 xml += `
                     <InvoiceLine>
-                        <IssuerContractDate>${this.myDocument.date}</IssuerContractDate>
-                        <IssuerTransactionDate>${this.myDocument.date}</IssuerTransactionDate>
                         <ItemDescription>${product.description}</ItemDescription>
                         <Quantity>${product.quantity}</Quantity>
                         <UnitOfMeasure>01</UnitOfMeasure>
                         <UnitPriceWithoutTax>${product.price}</UnitPriceWithoutTax>
-                        <TotalCost>${product.total}</TotalCost>
-                        <GrossAmount>${product.gross}</GrossAmount>
+                        <TotalCost>${product.quantity * product.price}</TotalCost>
+                        <DiscountsAndRebates>
+                            <Discount>
+                                <DiscountReason>Pronto pago</DiscountReason>
+                                <DiscountRate>${parseFloat(product.discount).toFixed(1)}</DiscountRate>
+                                <DiscountAmount>${((product.quantity * product.price) * (product.discount/ 100)).toFixed(1) }</DiscountAmount>
+                            </Discount>
+                        </DiscountsAndRebates>
+                        <GrossAmount>${ product.subTotal }</GrossAmount>
                         <TaxesOutputs>
                             <Tax>
                                 <TaxTypeCode>01</TaxTypeCode>
                                 <TaxRate>${product.taxes}</TaxRate>
                                 <TaxableBase>
-                                    <TotalAmount>${product.total}</TotalAmount>
+                                    <TotalAmount>${product.subTotal}</TotalAmount>
                                 </TaxableBase>
                                 <TaxAmount>
-                                    <TotalAmount>${product.priceTax}</TotalAmount>
+                                    <TotalAmount>${product.priceTax.toFixed(2)}</TotalAmount>
                                 </TaxAmount>
                             </Tax>
                         </TaxesOutputs>
                     </InvoiceLine>`;
+                    
             });
             xml += `
                         </Items>
@@ -1485,8 +1490,6 @@ export default {
             return xml;
         },
 
-
-        
         downloadXML(content, filename) {
             console.log("Prueba7");
             const blob = new Blob([content], { type: 'application/xml' });
@@ -1509,8 +1512,6 @@ export default {
                 this.resetData()
             }
         },
-
-        // REPARAR ESTA PUTA MIERDA
         
         calculateTaxes() {
             
@@ -1541,12 +1542,6 @@ export default {
             });
                 }
             },
-        
-
-
-
-    
-    
 }
 </script>
 
