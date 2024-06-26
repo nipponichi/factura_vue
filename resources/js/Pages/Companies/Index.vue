@@ -53,11 +53,7 @@ import NewCompany from '@/Components/NewCompany.vue';
                         this.companyExists = response.data;
                         
                         this.isLoading = false;
-                        if (this.companyExists) {
-                            console.log("La empresa existe.");
-
-                        } else {
-                            console.log("La empresa no existe.");
+                        if (!this.companyExists) {
                             this.isLoading = false;
                         }
                     })

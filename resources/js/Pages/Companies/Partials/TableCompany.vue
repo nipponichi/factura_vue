@@ -27,7 +27,7 @@
                 <Column field="province" :header="$t('Province')" sortable class="dateTable"></Column>
                 <Column :exportable="false" class="dateTable">
                     <template #body="slotProps">
-                        <Button icon="pi pi-eye" outlined rounded class="mr-2 info-button" @click="handleInfoButtonClick(slotProps.data.id)" />
+                        <Button icon="pi pi-eye" outlined rounded class="mr-2 view-button" @click="handleInfoButtonClick(slotProps.data.id)" />
                     </template>
                 </Column>
             </DataTable>
@@ -69,26 +69,3 @@ export default {
     }
 }
 </script>
-
-<style>
-    .info-button {
-        color:#007BFF;
-        border: 1px solid;
-    }
-
-    .info-button:hover {
-        background-color:rgba(0, 4, 252,0.1);
-        transition-duration: 0.5s;
-        padding:7px;
-    }
-
-    .card {
-        padding: 3% 3% 0% 3%;
-    }
-
-    .dateTable {
-        border-top: #E2E8F0 1px solid;
-        border-bottom: #E2E8F0 1px solid;
-        min-width:10rem;
-    }
-</style>
