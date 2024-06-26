@@ -765,6 +765,7 @@ export default {
                 concept: [],
             
             },
+            
             customer: {
                 id:'',
                 name: '',
@@ -1095,6 +1096,7 @@ export default {
                 price: 8,
                 quantity: 1,
                 discount: 15,
+                discount_reason: 'Descuento profesional',
                 subtotal: 0,
                 taxes: 21,
                 priceTax: 0,
@@ -1180,22 +1182,16 @@ export default {
         },
 
         myDocumentSave() {
-            console.log("aqui1")
             this.myDocument.number = this.selectedSerie.serie + this.selectedSerie.number
-            console.log("aqui2")
             this.myDocument.document_counter = this.selectedSerie.number
-        
             this.myDocument.expiration = this.expiration
-            console.log("aqui3")
             this.myDocument.payment_methods_id = this.selectedPaymentMethod.id
-            console.log("aqui4")
             this.myDocument.company_id_company = this.selectedCompany.id 
             this.myDocument.company_id_customer = this.selectedCustomer.id
             this.myDocument.documents_type_id = this.selectedType.id
             this.myDocument.documents_series_id = this.selectedSerie.id
             this.myDocument.date = this.fecha
             this.myDocument.document_counter = 1
-            console.log("aqui3")
             this.myDocument.bank_account_id = this.selectedCompany.bank_account_id
             
             
@@ -1206,27 +1202,40 @@ export default {
         },
 
         saveDocument(){
+            
             this.myDocumentSave()
+
             if(this.selectedType.id == 1 ) {
                 this.myDocument.invoiced = true
             }
 
-            
+        
             this.products.forEach(product => {
-                // Creamos un nuevo objeto con los valores del producto
-                let newProduct = {
-                    reference: product.reference,
-                    description: product.description,
-                    quantity: product.quantity,
-                    price: product.price,
-                    taxes: product.taxes,
-                    discount: product.discount,
-                    gross: product.gross,
-                    total: this.calculateTotal(product).toFixed(2)
-                };
+                
 
-                this.myDocument.concept.push(newProduct);
-
+                  
+                //subtotal: 0,
+                //priceTax: 0,
+                
+                try {
+                    let newProduct = {
+                        reference: product.reference,
+                        description: product.description,
+                        quantity: product.quantity,
+                        price: product.price,
+                        taxes: product.taxes,
+                        discount: product.discount,
+                        discount_reason: product.discount_reason,
+                        total: this.calculateTotal(product)
+                    };
+                    this.myDocument.concept.push(newProduct);
+                    console.log(newProduct);
+                } catch (error) {
+                    console.error("Error al crear el objeto newProduct:", error);
+                }
+                
+                
+                
             });
             console.log("numero factura: " + this.myDocument.number)
             axios.post('/documents', {documentData: this.myDocument})
@@ -1460,7 +1469,7 @@ export default {
                         <TotalCost>${product.quantity * product.price}</TotalCost>
                         <DiscountsAndRebates>
                             <Discount>
-                                <DiscountReason>Pronto pago</DiscountReason>
+                                <DiscountReason>${product.discount_reason}</DiscountReason>
                                 <DiscountRate>${parseFloat(product.discount).toFixed(1)}</DiscountRate>
                                 <DiscountAmount>${((product.quantity * product.price) * (product.discount/ 100)).toFixed(1) }</DiscountAmount>
                             </Discount>

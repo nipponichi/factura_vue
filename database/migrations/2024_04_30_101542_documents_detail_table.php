@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('price');
             $table->decimal('total');
             $table->decimal('discount')->nullable();
+            $table->string('discount_reason')->nullable();
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
             $table->foreignId('documents_id')->constrained('documents');

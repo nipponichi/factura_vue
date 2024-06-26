@@ -128,7 +128,7 @@ class DocumentController extends Controller
      */
     public function store(DocumentRequest $request)
     {
-        
+
         DB::beginTransaction();
         
         try {
@@ -147,6 +147,8 @@ class DocumentController extends Controller
             if($repatedInvoice) {
                 return response()->json(['message' => 'El número de factura ya existe, puedes modificarla desde el listado de facturas']);
             }
+
+            
 
             // Guarda la nueva factura
             $documentsId = DB::table('documents')->insertGetId([
@@ -177,6 +179,8 @@ class DocumentController extends Controller
                 DB::table('documents_details')->insert([
                     'reference' => $item['reference'],
                     'description' => $item['description'],
+                    'discount' => $item['discount'],
+                    'discount_reason' => $item['discount_reason'],
                     'quantity' => $item['quantity'],
                     'tax' => $item['taxes'],
                     'price' => $item['price'],
@@ -265,6 +269,8 @@ class DocumentController extends Controller
             'reference',
             'id',
             'description',
+            'discount',
+            'discount_reason',
             'quantity',
             'tax',
             'price',
@@ -467,6 +473,8 @@ class DocumentController extends Controller
                 DB::table('documents_details')->insert([
                     'reference' => $item['reference'],
                     'description' => $item['description'],
+                    'discount' => $item['discount'],
+                    'discount_reason' => $item['discount_reason'],
                     'quantity' => $item['quantity'],
                     'tax' => $item['tax'],
                     'price' => $item['price'],
@@ -586,6 +594,7 @@ class DocumentController extends Controller
                     'tax' => $item->tax,
                     'price' => $item->price,
                     'discount' => $item->discount,
+                    'discount_reason' => $item->discount_reason,
                     'total' => $item->total,
                     'documents_id' => $documentsId,
                     'dt_start' => now()
