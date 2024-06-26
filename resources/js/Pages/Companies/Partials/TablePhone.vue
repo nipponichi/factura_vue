@@ -148,8 +148,6 @@ export default {
             return axios.get('/phones/' + myCompanyId)
                 .then(response => {
                     this.phones = response.data.phones;
-                    console.log("nuevos phones");
-                    console.log(this.phones);
                 })
                 .catch(error => {
                     this.$toast(this.$t('Error connecting to the server'), 'error');
@@ -185,9 +183,9 @@ export default {
                     await this.updateMyPhone();
                 }
 
-                await this.fetchPhones(); // Espera a que fetchPhones() complete
+                await this.fetchPhones();
                 this.phoneDialog = false;
-                this.updateFields(); // Se ejecuta después de que fetchPhones() haya completado
+                this.updateFields();
             } catch (error) {
                 this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.phoneDialog = false;
@@ -208,8 +206,8 @@ export default {
                     this.$toast(this.$t(response.data.message), response.data.type);
                     this.phoneDialog = false;
 
-                    await this.fetchPhones(); // Espera a que fetchPhones() complete
-                    this.updateFields(); // Se ejecuta después de que fetchPhones() haya completado
+                    await this.fetchPhones(); 
+                    this.updateFields();
                 })
                 .catch(error => {
                     this.$toast(this.$t('Error connecting to the server'), 'error');
@@ -294,17 +292,11 @@ export default {
 
         updateFields() {
 
-            
-                this.phones.forEach(phone => {
-                    if (phone.favourite) {
-                        this.$emit('updatePhones', phone.phone);
-                    }
-                });
-
-                console.log(this.phones)
-                console.log("Emilio")
-             
-            
+            this.phones.forEach(phone => {
+                if (phone.favourite) {
+                    this.$emit('updatePhone', phone.phone);
+                }
+            });
         },
 
     }
