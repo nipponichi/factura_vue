@@ -185,9 +185,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 </template>
                             </Toolbar>
                             <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id"
-                            :paginator="true" :rows="10" :filters="filters"
-                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
-                            :currentPageReportTemplate="`${$t('Showing')} {first} ${$t('of')} {last} ${$t('of')} {totalRecords} ${$t('products')}`"
+                        
                             class="w-full lg:w-4/4 mx-auto">
                 
                                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox"></Column>
@@ -676,12 +674,12 @@ export default {
         return {
             items: [
                 {
-                    label: this.$t('Save and create new'),
+                    label: this.$t('Guardar y crear nueva'),
                     icon: 'pi pi-refresh',
                     command: () => this.saveAndReset()
                 },
                 {
-                    label: this.$t('Cancel'),
+                    label: this.$t('Cancelar'),
                     command: () => this.cancelInvoice()
                 },
             ],
