@@ -142,6 +142,7 @@ export default {
             
     },
     methods: {
+        
         fetchPhones() {
             let myCompanyId = window.location.pathname.split('/').pop();
             return axios.get('/phones/' + myCompanyId)
@@ -170,27 +171,26 @@ export default {
             this.submitted = false;
         },
 
-        saveMyPhone() {
-            if(this.myPhone.favourite == null) {
-                this.myPhone.favourite = false
+        async saveMyPhone() {
+            if (this.myPhone.favourite == null) {
+                this.myPhone.favourite = false;
             }
             this.myPhone.isMobile = 0;
-            if (!this.myPhone.id) {
-                axios.post('/phone', this.myPhone)
-                .then(response => {
-                    
-                    this.$toast(this.$t(response.data.message), response.data.type);
-                    this.fetchPhones();
-                    this.phoneDialog = false;
-                        
-                })
-                .catch(error => {
-                    this.$toast(this.$t('Error connecting to the server'), 'error');
-                    this.phoneDialog = false;
-                });
 
-            }else {               
-                this.updateMyPhone();
+            try {
+                if (!this.myPhone.id) {
+                    const response = await axios.post('/phone', this.myPhone);
+                    this.$toast(this.$t(response.data.message), response.data.type);
+                } else {
+                    await this.updateMyPhone();
+                }
+
+                await this.fetchPhones(); // Espera a que fetchPhones() complete
+                this.phoneDialog = false;
+                this.updateFields(); // Se ejecuta después de que fetchPhones() haya completado
+            } catch (error) {
+                this.$toast(this.$t('Error connecting to the server'), 'error');
+                this.phoneDialog = false;
             }
         },
 
@@ -218,15 +218,14 @@ export default {
         },
 
 
-
         async makeFavourite(slotProps) {
             if (slotProps.favourite) {
                 return this.$toast(this.$t('Already selected as a favorite.'), 'warning');
             }
 
             try {
-                await axios.put('/phones/' + slotProps.id);
-                this.$toast(this.$t('Successfully marked as favorite.'), 'success');
+                const response = await axios.put('/phones/' + slotProps.id);
+                this.$toast(this.$t(response.data.message), response.data.type);
                 this.phoneDialog = false;
 
                 await this.fetchPhones(); // Espera a que fetchPhones() complete
@@ -238,7 +237,7 @@ export default {
             }
         },
 
-        
+
         confirmDeletePhone(phone) {
             this.myPhone = phone;
             this.deletePhoneDialog = true;       
