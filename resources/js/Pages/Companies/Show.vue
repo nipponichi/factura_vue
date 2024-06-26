@@ -119,10 +119,10 @@
                                 <TableCustomers />
                             </div>
                             <div v-else-if="activeTab === 'phone'" class="w-full">
-                                <TablePhone @updatePhones="handlePhoneUpdate" />
+                                <TablePhone @updatePhone="handlePhoneUpdate" />
                             </div>
                             <div v-else-if="activeTab === 'email'" class="w-full">
-                                <TableEmail />
+                                <TableEmail @updateEmail="handleEmailUpdate" />
                             </div>
                             <div v-else-if="activeTab === 'address'" class="w-full">
                                 <TableAddress />
@@ -167,9 +167,10 @@ export default {
     methods: {
         handlePhoneUpdate(phone) {
             this.company.phone = phone;
-            console.log(phone);
-            console.log('Evento updatePhones recibido en el componente padre');
-            
+        },
+
+        handleEmailUpdate(email) {
+            this.company.email = email;
         },
         
     }

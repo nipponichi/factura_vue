@@ -142,15 +142,17 @@ export default {
     },
     
     methods: {
+
         fetchEmails() {
             let myCompanyId = window.location.pathname.split('/').pop();
-            axios.get('/emails/' + myCompanyId)
+            return axios.get('/emails/' + myCompanyId)
                 .then(response => {
                     this.emails = response.data.emails;
                     
                 })
                 .catch(error => {
                     this.$toast(this.$t('Error connecting to the server'), 'error');
+                    throw error;
                 });
             },
         openNew() {
@@ -167,30 +169,31 @@ export default {
         },
 
 
-        saveMyEmail() {
-
-            if(this.myEmail.favourite == null) {
-                this.myEmail.favourite = false
+        async saveMyEmail() {
+            if (this.myEmail.favourite == null) {
+                this.myEmail.favourite = false;
             }
             this.myEmail.isMobile = 0;
-            if (!this.myEmail.id) {
-                axios.post('/email', this.myEmail)
-                .then(response => {
 
+            try {
+                
+                if (!this.myEmail.id) {
+                    const response = await axios.post('/email', this.myEmail);
                     this.$toast(this.$t(response.data.message), response.data.type);
-                    this.fetchEmails();
-                    this.emailDialog = false;
-                        
-                })
-                .catch(error => {
-                    this.$toast(this.$t('Error connecting to the server'), 'error');
-                    this.emailDialog = false;
-                });
+                } else {
+                    await this.updateMyEmail();
+                }
 
-            }else {               
-                this.updateMyEmail();
+            
+                await this.fetchEmails(); // Esperar a que fetchEmails() complete
+                this.emailDialog = false;
+                this.updateFields();
+            } catch (error) {
+                this.$toast(this.$t('Error connecting to the server'), 'error');
+                this.emailDialog = false;
             }
         },
+
 
         editMyEmail(slotProps) {
 
@@ -203,11 +206,12 @@ export default {
         updateMyEmail() {
 
             axios.put('/email/' + this.myEmail.id, this.myEmail)
-            .then(response => {
+            .then(async response => {
 
                 this.$toast(this.$t(response.data.message), response.data.type);
-                this.fetchEmails();
+                await this.fetchEmails();
                 this.emailDialog = false;
+                this.updateFields();
             })
             .catch(error => {
                 this.$toast(this.$t('Error connecting to the server'), 'error');
@@ -217,22 +221,21 @@ export default {
             });
         },
 
-        makeFavourite(slotProps) {
-
+        async makeFavourite(slotProps) {
             if (slotProps.favourite) {
                 return this.$toast(this.$t('Already selected as a favorite.'), 'warning');
             }
 
-            axios.put('/emails/' + slotProps.id)
-            .then(response => {
+            try {
+                const response = await axios.put('/emails/' + slotProps.id);
+                await this.fetchEmails(); // Espera a que fetchEmails() complete
                 this.$toast(this.$t(response.data.message), response.data.type);
                 this.emailDialog = false;
-                this.fetchEmails();             
-            })         
-            .catch(error => {
+                this.updateFields();
+            } catch (error) {
                 this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.emailDialog = false;
-            });
+            }
         },
         
         confirmDeleteEmail(email) {
@@ -254,8 +257,8 @@ export default {
                 })
                 .catch(error => {
                     this.$toast(this.$t(error.response.message), error.response.type);
+                    this.emailDialog = false; 
                 });
-                this.deletePhoneDialog = false;
         },
         
         confirmDeleteSelected() {
@@ -284,6 +287,15 @@ export default {
                     });
             });
             this.deleteEmailsDialog = false;
+        },
+
+        updateFields() {
+
+            this.emails.forEach(email => {
+                if (email.favourite) {
+                    this.$emit('updateEmail', email.email);
+                }
+            });
         },
 
     }
