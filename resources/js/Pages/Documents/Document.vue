@@ -1,6 +1,5 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import Autoscript from '../../Libcustom/autoscript.js';
 </script>
 <template>
     <div class="no-imprimir">
@@ -661,18 +660,32 @@ import Autoscript from '../../Libcustom/autoscript.js';
                     </table>
                 </div>
         </div>
+
+        
     </div>
 
+    <div>
+        <p>Resultado de la suma: {{ resultadoSuma }}</p>
+        <p>Resultado de la resta: {{ resultadoResta }}</p>
+    </div>
+
+    <button @click="logWindowInfo">Log Info de Window</button>
     
 </template>
 
 
 <script>
 import { FilterMatchMode } from 'primevue/api';
+import { sum, subtract, logWindow } from '@/Libcustom/prueba.js';
+import { Autoscript } from '@/Libcustom/autoscript.js';
+
 
 export default {
     data() {
         return {
+
+            resultadoSuma: 0,
+            resultadoResta: 0,
             items: [
                 {
                     label: this.$t('Guardar y crear nueva'),
@@ -831,7 +844,12 @@ export default {
         this.fetchCompanies();
         this.fetchDocuments();
         this.fetchPayments();
-        
+
+        this.resultadoSuma = sum(10, 5); // Resultado esperado: 15
+        this.resultadoResta = subtract(10, 5); // Resultado esperado: 5
+        console.log("Log windows")
+        logWindow();
+            
     },
 
     watch: {
@@ -841,6 +859,11 @@ export default {
     },
     
     methods: {
+
+        logWindowInfo() {
+        // Llama a la función importada
+        
+        },
 
         handlePaymentMethodChange(paymentMethod) {
             switch (paymentMethod.id) {
@@ -1344,7 +1367,7 @@ export default {
             function errorCallback() { console.log("ERR"); }
             var dataB64 = AutoScript.getBase64FromText(data);
             AutoScript.signAndSaveToFile('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "AUTO", "", null, showSignResultCallback, showErrorCallback);
-        },
+        }, 
     
         convertToFacturaeXML() {
             
