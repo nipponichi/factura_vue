@@ -35,7 +35,7 @@
                 <Column field="town" :header="$t('Town')" sortable class="dateTable"></Column>
                 <Column :exportable="false" class="dateTable">
                     <template #body="slotProps">
-                        <Button icon="pi pi-eye" outlined rounded class="mr-2 info-button" @click="handleInfoButtonClick(slotProps.data.id)" />
+                        <Button icon="pi pi-eye" outlined rounded class="mr-2 view-button" @click="handleInfoButtonClick(slotProps.data.id)" />
                         <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editCompany(slotProps.data)" />
                         <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteCompany(slotProps.data)" />
                     </template>
@@ -134,35 +134,7 @@
 
         
 
-        <!--
-            Toast alertas
-        <div id="toast-success" class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
-            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
-                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
-                </svg>
-                <span class="sr-only">Check icon</span>
-            </div>
-
-            <div class="ms-3 text-sm font-normal">Item moved successfully.</div>
-        </div>
-        <div id="toast-danger" class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
-            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
-                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
-                </svg>
-                <span class="sr-only">Error icon</span>
-            </div>
-            <div class="ms-3 text-sm font-normal">Item has been deleted.</div>
-        </div>
-        <div id="toast-warning" class="flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
-            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-orange-500 bg-orange-100 rounded-lg dark:bg-orange-700 dark:text-orange-200">
-                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5Z"/>
-                </svg>
-                <span class="sr-only">Warning icon</span>
-            </div>
-        </div>-->
+        
 
 
 	</div>
@@ -213,19 +185,15 @@ export default {
     methods: {
         fetchCustomers() {
             let myCompanyId = window.location.pathname.split('/').pop();
-            console.log("id: " + myCompanyId);
+
             axios.get('/customers/' + myCompanyId)
             .then(response => {
             // Asigna los datos de los clientes a la propiedad 'companies'
             this.companies = response.data.customers;
-            console.log(this.companies);
-            // Itera sobre todos los elementos del array 'companies'
-            this.companies.forEach((company, index) => {
-                console.log(`Company ${index + 1}:`, company);
-            });
+
         })
         .catch(error => {
-            console.error('Error al obtener los datos de los clientes:', error);
+            this.$toast(this.$t('Error connecting to the server'), 'error');
         });
         },
 
@@ -239,7 +207,6 @@ export default {
         },
         
         hideDialog() {
-            console.log("HIDE")
             this.companyDialog = false;
             this.submitted = false;
         },
@@ -249,11 +216,13 @@ export default {
 
                 axios.post('/customer', this.company)
                 .then(response => {
+
+                    this.$toast(this.$t(response.data.message), response.data.type);
                     this.companyDialog = false;
                     this.fetchCustomers();
                 })
                 .catch(error => {
-                    console.log(error.response);
+                    this.$toast(this.$t('Error connecting to the server'), 'error');
                     this.companyDialog = false;
                 });   
 
@@ -276,11 +245,12 @@ export default {
             axios.put('/customer/' + this.company.id, this.company)
             .then(response => {
                 
+                this.$toast(this.$t(response.data.message), response.data.type);
                 this.fetchCustomers();
                 this.companyDialog = false; 
             })
             .catch(error => {
-                console.error('Error al actualizar la compañía:', error);
+                this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.companyDialog = false; 
                 
             });
@@ -297,41 +267,47 @@ export default {
             axios.delete('/customer/'+ this.company.id)
                 .then(response => {
                     
-                    this.companies = this.companies.filter(val=> val.id !== this.company.id);
+                    if(response.data.type === 'success'){
+                        // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
+                        this.companies = this.companies.filter(val=> val.id !== this.company.id);
 
-                    this.company = {};
+                    }
+                    this.$toast(this.$t(response.data.message), response.data.type);
 
-                    this.deleteCompanyDialog = false;
-                
                 })
                 .catch(error => { 
-                    console.log(error.response)
-                    this.deleteCompanyDialog = false;
+                    this.$toast(this.$t(error.response.message), error.response.type);
+                    
                 })
-                
+                this.deleteCompanyDialog = false;
             
         },
         
         confirmDeleteSelected() {
-            console.log("CONFIRM DELETE SELECTED")
             this.deleteCompaniesDialog = true;
         },
         
         deleteSelectedCompanies() {
             // Envía una solicitud de eliminación para cada compañia seleccionado
             this.selectedCompanies.forEach(company => {
-            axios.delete('/customer/' + company.id)
+                axios.delete('/customer/' + company.id)
                 .then(response => {
-                console.log('Compañía eliminada con ID:', company.id);
-                
-                // Elimina el compañia de la lista de company
-                this.companies = this.companies.filter(p => p.id !== company.id);
+
+                    if(response.data.type === 'success'){
+                        // Elimina el compañia de la lista de company
+                        this.companies = this.companies.filter(p => p.id !== company.id);
+                    }
+                    this.$toast(this.$t(response.data.message), response.data.type);
+                        
+                    
+                    
                 })
                 .catch(error => {
-                console.error('Error al eliminar la compañia:', error);
+                    if (error.response || error.response.status === 400) {
+                        this.$toast(this.$t(error.response.message), error.response.type);
+                    }
                 });
             });
-            this.selectedCompanies = [];
             this.deleteCompaniesDialog = false;
         },
 
@@ -343,123 +319,4 @@ export default {
 
     }
 }
-
 </script>
-
-
-<style>
-
-    .checkbox {
-        background-color: rgba(246, 246, 246, 0.609);
-        border-top: #E2E8F0 1px solid;
-        border-bottom: #E2E8F0 1px solid;
-        
-    }
-
-    .success-button {
-        background-color: rgb(34, 197, 94);
-        color: #ffffff;
-        padding: 8px;
-        font-size:15px;
-    }
-    .danger-button {
-        background-color:rgb(239, 68, 68);
-        color: #ffffff;
-        font-size:15px;
-        padding: 8px;
-    }
-    .export-button {
-        background-color:#007BFF;
-        color: #ffffff;
-        font-size:15px;
-        padding: 8px;
-    }
-
-    .info-button {
-        color:#007BFF;
-        border: 1px solid;
-    }
-
-    .info-button:hover {
-        background-color:rgba(0, 4, 252,0.1);
-        transition-duration: 0.5s;
-        padding:7px;
-    }
-
-    .edit-button {
-        color:rgb(34, 197, 94);
-        border: 1px solid;
-    }
-
-    .edit-button:hover {
-        background-color:rgb(229, 245, 236);
-        transition-duration: 0.5s;
-        padding:7px;
-    }
-
-    .simpleDelete-button {
-        color:rgb(239, 68, 68);
-        border: 1px solid;
-    }
-
-    .simpleDelete-button:hover {
-        background-color:rgb(245, 229, 229);
-        transition-duration: 0.5s;
-        padding:7px;
-    }
-    .save-button {
-        color:rgb(34, 197, 94);
-        padding:7px;
-    }
-    .cancel-button {
-        color:rgb(239, 68, 68);
-        padding:7px;
-    }
-
-    .save-button:hover {
-        transition-duration: 0.5s;
-        background-color: rgba(34, 197, 94, 0.1);
-        padding:7px;
-    }
-    .cancel-button:hover {
-        transition-duration: 0.5s;
-        background-color: rgba(239, 68, 68, 0.1);
-        padding:7px;
-    }
-    .input {
-        border:1px solid rgb(203, 213, 225);
-        border-radius:10px;
-        margin-top:10px;
-    }
-    .search-wrapper {
-        position: relative;
-        width: 271px;
-    }
-    .input-icon {
-        color: #191919;
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-    .input:focus {
-        outline:none !important;
-        border:2px solid rgb(153, 228, 153) !important;
-        border-radius:10px;
-        box-shadow: none !important;
-    
-    }
-
-    .card{
-        padding: 3% 3% 0% 3%;
-    }
-
-    .dateTable{
-        border-top: #E2E8F0 1px solid;
-        border-bottom: #E2E8F0 1px solid;
-        min-width:10rem;
-    }
-
-</style>

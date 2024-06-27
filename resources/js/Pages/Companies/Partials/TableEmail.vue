@@ -34,8 +34,8 @@
                 <Column :exportable="false" :header="$t('Favourite')" class="dateTable w-24 text-center">
             
                     <template #body="slotProps">
-                        <Button v-if="slotProps.data.favourite" icon="pi pi-star-fill"  class="mr-2 info-button" @click="makeFavourite(slotProps.data)" />
-                        <Button v-else icon="pi pi-star" class="mr-2 info-button" @click="makeFavourite(slotProps.data)" />
+                        <Button v-if="slotProps.data.favourite" icon="pi pi-star-fill"  class="mr-2 fav-button" @click="makeFavourite(slotProps.data)" />
+                        <Button v-else icon="pi pi-star" class="mr-2 fav-button" @click="makeFavourite(slotProps.data)" />
                     </template>
                 </Column>
 
@@ -142,15 +142,17 @@ export default {
     },
     
     methods: {
+
         fetchEmails() {
             let myCompanyId = window.location.pathname.split('/').pop();
-            axios.get('/emails/' + myCompanyId)
+            return axios.get('/emails/' + myCompanyId)
                 .then(response => {
                     this.emails = response.data.emails;
                     
                 })
                 .catch(error => {
-                    console.error('Error fetching emails data:', error);
+                    this.$toast(this.$t('Error connecting to the server'), 'error');
+                    throw error;
                 });
             },
         openNew() {
@@ -167,71 +169,73 @@ export default {
         },
 
 
-        saveMyEmail() {
-            console.log("companyId: "+ this.myEmail.companyID)
-            if(this.myEmail.favourite == null) {
-                this.myEmail.favourite = false
+        async saveMyEmail() {
+            if (this.myEmail.favourite == null) {
+                this.myEmail.favourite = false;
             }
             this.myEmail.isMobile = 0;
-            if (!this.myEmail.id) {
-                axios.post('/email', this.myEmail)
-                .then(response => {
-                    
-                    this.fetchEmails();
-                    
-                    this.emailDialog = false;
-                        
-                })
-                .catch(error => {
-                    console.error('Error saving email data:', error.response);
-                    this.emailDialog = false;
-                });
 
-            }else {               
-                this.updateMyEmail();
+            try {
+                
+                if (!this.myEmail.id) {
+                    const response = await axios.post('/email', this.myEmail);
+                    this.$toast(this.$t(response.data.message), response.data.type);
+                } else {
+                    await this.updateMyEmail();
+                }
+
+            
+                await this.fetchEmails(); // Esperar a que fetchEmails() complete
+                this.emailDialog = false;
+                this.updateFields();
+            } catch (error) {
+                this.$toast(this.$t('Error connecting to the server'), 'error');
+                this.emailDialog = false;
             }
         },
 
+
         editMyEmail(slotProps) {
-            console.log('edit: ' + slotProps.favourite)
-            
-                this.myEmail.email = slotProps.email;
-                this.myEmail.id = slotProps.id;
-                this.myEmail.favourite = slotProps.favourite;
-                this.emailDialog = true;
+
+            this.myEmail.email = slotProps.email;
+            this.myEmail.id = slotProps.id;
+            this.myEmail.favourite = slotProps.favourite;
+            this.emailDialog = true;
         },
 
         updateMyEmail() {
-            console.log("Update: " + this.myEmail.favourite)
 
             axios.put('/email/' + this.myEmail.id, this.myEmail)
-            .then(response => {
-                this.fetchEmails();
+            .then(async response => {
+
+                this.$toast(this.$t(response.data.message), response.data.type);
+                await this.fetchEmails();
                 this.emailDialog = false;
+                this.updateFields();
             })
             .catch(error => {
-                console.error('Error al actualizar la compañía:', error);
+                this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.emailDialog = false; 
                 // Mostrar un mensaje de error al usuario
                 
             });
         },
 
-        makeFavourite(slotProps) {
-
+        async makeFavourite(slotProps) {
             if (slotProps.favourite) {
-                return alert("El correo electrónico ya está seleccionado como favorito")
+                return this.$toast(this.$t('Already selected as a favorite.'), 'warning');
             }
 
-            axios.put('/emails/' + slotProps.id)
-            .then(response => {
+            try {
+                const response = await axios.put('/emails/' + slotProps.id);
+                await this.fetchEmails(); // Espera a que fetchEmails() complete
+                this.$toast(this.$t(response.data.message), response.data.type);
                 this.emailDialog = false;
-                this.fetchEmails();             
-            })         
-            .catch(error => {
-                console.error('Error al seleccionar un email', error);
+                this.updateFields();
+            } catch (error) {
+                this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.emailDialog = false;
-            });
+            }
         },
         
         confirmDeleteEmail(email) {
@@ -243,23 +247,17 @@ export default {
             // Realizar la solicitud de eliminación al servidor
             axios.delete('/email/' + this.myEmail.id)
                 .then(response => {
-                    console.log(response);
                     
-                    // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
-                    this.emails = this.emails.filter(val => val.id !== this.myEmail.id);
+                    if(response.data.type === 'success'){
+                        // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
+                        this.emails = this.emails.filter(val => val.id !== this.myEmail.id);
+                    }
 
-                    // Limpiar el objeto myEmail después de la eliminación exitosa
-                    this.myEmail = {};
-
-                    // Cerrar el diálogo de eliminación de teléfono
-                    this.deleteEmailDialog = false;
+                    this.$toast(this.$t(response.data.message), response.data.type);
                 })
                 .catch(error => {
-                    if (error.response || error.response.status === 400) {
-                        // Si se recibe un error 400, no hacer nada, solo imprimir un mensaje de advertencia
-                        console.warn('Error 400: No se pudo eliminar el email con ID:', emailId);
-                        this.deleteEmailDialog = false;
-                    }
+                    this.$toast(this.$t(error.response.message), error.response.type);
+                    this.emailDialog = false; 
                 });
         },
         
@@ -273,150 +271,33 @@ export default {
             this.selectedEmails.forEach(email => {
                 axios.delete('/email/' + email.id)
                     .then(response => {
-                        console.log('Compañía eliminada con ID:', email.id);
-                        
-                        // Solo elimina la compañía de la lista si la solicitud DELETE tiene éxito
-                        this.emails = this.emails.filter(p => p.id !== email.id);
+
+                        if(response.data.type === 'success'){
+                            // Solo elimina la compañía de la lista si la solicitud DELETE tiene éxito
+                            this.emails = this.emails.filter(p => p.id !== email.id);
+                        }
+                        this.$toast(this.$t(response.data.message), response.data.type);
                         
 
                     })
                     .catch(error => {
                         if (error.response || error.response.status === 400) {
-                            // Si se recibe un error 400, no hacer nada, solo imprimir un mensaje de advertencia
-                            console.warn('Error 400: No se pudo eliminar la compañía con ID:', email.id);
+                            this.$toast(this.$t(error.response.message), error.response.type);
                         }
                     });
             });
-            this.selectedEmails = [];
             this.deleteEmailsDialog = false;
+        },
+
+        updateFields() {
+
+            this.emails.forEach(email => {
+                if (email.favourite) {
+                    this.$emit('updateEmail', email.email);
+                }
+            });
         },
 
     }
 }
 </script>
-
-
-<style>
-
-    .checkbox {
-        background-color: rgba(246, 246, 246, 0.609);
-        border-top: #E2E8F0 1px solid;
-        border-bottom: #E2E8F0 1px solid;
-    }
-
-    .success-button {
-        background-color: rgb(34, 197, 94);
-        color: #ffffff;
-        padding: 8px;
-        font-size:15px;
-    }
-    .danger-button {
-        background-color:rgb(239, 68, 68);
-        color: #ffffff;
-        font-size:15px;
-        padding: 8px;
-    }
-    .export-button {
-        background-color:#007BFF;
-        color: #ffffff;
-        font-size:15px;
-        padding: 8px;
-    }
-
-    .info-button {
-        color: #FFB500;
-        border: none;
-        margin-right: 55px;
-        box-shadow: none !important;
-        
-    }
-    
-    .info-button .pi {
-        font-size: 26px;
-    }
-    
-    .info-button:hover {
-        background: #ffffff;
-        transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-        transform: scale(1.2);
-    }
-    
-    .edit-button {
-        color:rgb(34, 197, 94);
-        border: 1px solid;
-        margin-right: 5px;
-    }
-
-    .edit-button:hover {
-        background-color:rgb(229, 245, 236);
-        transition-duration: 0.5s;
-        padding:7px;
-    }
-
-    .simpleDelete-button {
-        color:rgb(239, 68, 68);
-        border: 1px solid;
-        
-    }
-
-    .simpleDelete-button:hover {
-        background-color:rgb(245, 229, 229);
-        transition-duration: 0.5s;
-        padding:7px;
-    }
-    .save-button {
-        color:rgb(34, 197, 94);
-        padding:7px;
-    }
-    .cancel-button {
-        color:rgb(239, 68, 68);
-        padding:7px;
-    }
-
-    .save-button:hover {
-        transition-duration: 0.5s;
-        background-color: rgba(34, 197, 94, 0.1);
-        padding:7px;
-    }
-    .cancel-button:hover {
-        transition-duration: 0.5s;
-        background-color: rgba(239, 68, 68, 0.1);
-        padding:7px;
-    }
-    .input {
-        border:1px solid rgb(203, 213, 225);
-        border-radius:10px;
-        margin-top:10px;
-    }
-    .search-wrapper {
-        position: relative;
-        width: 271px;
-    }
-    .input-icon {
-        color: #191919;
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-    .input:focus {
-        outline:none !important;
-        border:2px solid rgb(153, 228, 153) !important;
-        border-radius:10px;
-        box-shadow: none !important;
-    
-    }
-
-    .card{
-        padding: 3% 3% 0% 3%;
-    }
-
-    .dateTable{
-        border-top: #E2E8F0 1px solid;
-        border-bottom: #E2E8F0 1px solid;
-        min-width:10rem;
-    }
-
-</style>

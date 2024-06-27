@@ -77,7 +77,7 @@
                                 </li>
                                 <li class="me-2">
                                     <button @click="changeTab('address')" :class="{'border-b-2 border-blue-500': activeTab === 'address'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
-                                        <i class="pi pi-home w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>     
+                                        <i class="pi pi-home w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
                                         {{ $t('Address') }}
                                     </button>
                                 </li>
@@ -87,27 +87,23 @@
                                         {{ $t('Bank account') }}
                                     </button>
                                 </li>
-                                
-
                             </ul>
                         </div>
             
-                        <div class="flex flex-col items-center justify-center w-full">
-                            
-                            <table v-if="activeTab === 'phone'" class="w-full">
+                        <div class="flex flex-col items-center justify-center w-full overflow-x-auto">
+                            <div v-if="activeTab === 'phone'" class="w-full">
                                 <TablePhone />
-                            </table>
-                            <table v-else-if="activeTab === 'email'" class="w-full">
+                            </div>
+                            <div v-else-if="activeTab === 'email'" class="w-full">
                                 <TableEmail />
-                            </table>
-                            <table v-else-if="activeTab === 'address'" class="w-full">
+                            </div>
+                            <div v-else-if="activeTab === 'address'" class="w-full">
                                 <TableAddress />
-                            </table>
-                            <table v-else-if="activeTab === 'bank'" class="w-full">
+                            </div>
+                            <div v-else-if="activeTab === 'bank'" class="w-full">
                                 <TableBank />
-                            </table>
+                            </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -118,10 +114,11 @@
 <script setup>
     import AppLayout from '@/Layouts/AppLayout.vue';
     import TablePhone from '@/Pages/Companies/Partials/TablePhone.vue';
+    import TableBank from '@/Pages/Companies/Partials/TableBank.vue';
     import TableEmail from '@/Pages/Companies/Partials/TableEmail.vue';
     import TableAddress from '@/Pages/Companies/Partials/TableAddress.vue';
-    import TableBank from '@/Pages/Companies/Partials/TableBank.vue';
-    
+
+
 
     import { ref } from 'vue';
     

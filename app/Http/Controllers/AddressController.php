@@ -46,7 +46,7 @@ class AddressController extends Controller
 
             return response()->json(['message' => 'all addresses', 'addresses' => $addresses], 200);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Error index addresses: '  . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error loading data' ,'type' => 'error']);
         }
     }
 
@@ -77,12 +77,11 @@ class AddressController extends Controller
             DB::commit();
 
 
-            return response()->json(['message' => 'El addresses se ha creado correctamente']);
-
+            return response()->json(['message' => 'It has been created correctly.','type' => 'success']);
             
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error al guardar la dirección: ', $e->getMessage()], 500);
+            return response()->json(['message' => 'Error when creating.','type' => 'error']);
         }
 
     }
@@ -100,7 +99,7 @@ class AddressController extends Controller
 
             if ($companyFav->favourite && $request->favourite === false) {
                 DB::rollback();
-                return response()->json(['message' => 'Necesitas al menos una dirección marcada como favorito.'], 400);
+                return response()->json(['message' => 'You need to mark at least one as a favorite.', 'type' => 'warning']);
             }
 
             DB::table('addresses')
@@ -124,10 +123,10 @@ class AddressController extends Controller
 
     
             DB::commit();
-            return response()->json(['message' => 'La dirección se ha modificado con éxito', 200]);
+            return response()->json(['message' => 'Successfully updated.', 'type' => 'success']);
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error al modificar la direccion', $e->getMessage()], 500);
+            return response()->json(['message' => 'Error when updating.', 'type' => 'error']);
         }
     }
 
@@ -149,7 +148,7 @@ class AddressController extends Controller
             
             if ($activeAddressesCount <= 1) {
                 DB::rollback();
-                return response()->json(['message' => 'Debes tener al menos una dirección activo para poder eliminar.'], 400);
+                return response()->json(['message' => 'There must be at least one active to be able to delete.','type' => 'warning']);
             }
 
             $companyFav = DB::table('addresses')
@@ -160,7 +159,7 @@ class AddressController extends Controller
 
             if ($companyFav->favourite) {
                 DB::rollback();
-                return response()->json(['message' => 'No puedes eliminar una dirección marcada como favorito.'], 400);
+                return response()->json(['message' => 'You cannot delete if it is marked as a favorite.','type' => 'warning']);
             }
             
             DB::table('addresses')
@@ -168,10 +167,10 @@ class AddressController extends Controller
             ->update(['dt_end' => now()]);
             
             DB::commit();
-            return response()->json(['message' => 'Se ha eliminado la dirección con éxito']);
+            return response()->json(['message' => 'It has been successfully removed.','type' => 'success']);
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error al eliminar la dirección: '.$e->getMessage()], 500);
+            return response()->json(['message' => 'Error deleting.','type' => 'error']);
         }
     }
 
@@ -180,9 +179,9 @@ class AddressController extends Controller
             
             $this->favouriteTrue($companyAddressesId);
             
-            return response()->json(['message' => 'make favourite'], 200);
+            return response()->json(['message' => 'It has been marked as a favorite.','type' => 'success']);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Error al seleccionar dirección favorito '.$e->getMessage()], 500);
+            return response()->json(['message' => 'Error when selecting as favorite.','type' => 'error']);
         }
     }
 
