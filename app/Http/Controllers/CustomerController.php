@@ -74,20 +74,10 @@ class CustomerController extends Controller
 
             return response()->json(['message' => 'Compañía no encontrada ahora ', 'customers' => $companies]);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Error index companies: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error loading data' ,'type' => 'error']);
         }
     }
     
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(Request $request)
-    {
-
-
-    }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -155,13 +145,14 @@ class CustomerController extends Controller
                 'isConsulting' => false,
             ]);
 
+
             DB::commit();
 
-            return response()->json(['message' => 'La compañía se ha creado correctamente']);
-            // Confirma la transacción si todas las operaciones son exitosas
+            return response()->json(['message' => 'It has been created correctly.','type' => 'success', 'companyId' => $companyId]);
+            
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error al crear la compañía: ', $e->getMessage()], 500);
+            return response()->json(['message' => 'Error when creating.','type' => 'error']);
         }
 
     }
@@ -185,10 +176,17 @@ class CustomerController extends Controller
             ->where('company_id', $companyId)
             ->first();
 
-
-            // Verificar si el usuario es el propietario de la empresa o tiene el rol de administrador
-            if ($userId != $currentUserId->user_id && !$user->hasRole('admin')) {
-                return Redirect::route('companies.index')->with('error', 'No se encontró el cliente');
+            $currentCustomerId = DB::table('companies_customers')
+            ->select([
+                'company_id_customer'
+            ])
+            ->where('company_id_company', $companyId)
+            ->where('company_id_customer', $customerId)
+            ->whereNull('dt_end')
+            ->first();
+            
+            if ($currentUserId === null || $currentCustomerId === null || $userId != $currentUserId->user_id && !$user->hasRole('admin')) {
+                return Redirect::route('companies.index')->with('error', 'No se encontró la empresa o no tiene permisos suficientes');
             }
         
             $companies = DB::table('companies')
@@ -236,7 +234,7 @@ class CustomerController extends Controller
             
         }catch (Exception $e) {
                 
-            return response()->json(['message' => 'Cliente no encontrada ', $e->getMessage()], 500);
+            return response()->json(['message' => 'Error loading data' ,'type' => 'error']);
         }
 
     }
@@ -307,10 +305,10 @@ class CustomerController extends Controller
 
             DB::commit();
             
-            return response()->json(['message' => 'La compañia se ha modificado correctamente.'], 200);
+            return response()->json(['message' => 'Successfully updated.', 'type' => 'success']);
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error al editar la compañía: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error when updating.', 'type' => 'error']);
         }
     }
     
@@ -329,10 +327,9 @@ class CustomerController extends Controller
                 ]);
 
     
-            return response()->json(['message' => 'Se ha desactivado la compañía con éxito: ' . $id]);
+            return response()->json(['message' => 'It has been successfully removed.','type' => 'success']);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Error al desactivar la compañía: ' . $id . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error deleting.','type' => 'error']);
         }
     }
-
 }

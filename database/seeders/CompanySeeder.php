@@ -34,6 +34,29 @@ class CompanySeeder extends Seeder
         'name' => 'Pedido',
     ]);
 
+    // METODOS DE PAGO
+
+    DB::table('payment_method')->insert([
+        'name' => 'Transferencia',
+        'dt_start' => now(),
+    ]);
+
+    DB::table('payment_method')->insert([
+        'name' => 'Efectivo',
+        'dt_start' => now(),
+    ]);
+
+    DB::table('payment_method')->insert([
+        'name' => 'Bizum',
+        'dt_start' => now(),
+    ]);
+
+    DB::table('payment_method')->insert([
+        'name' => 'Paypal',
+        'dt_start' => now(),
+    ]);
+
+
 
     //PRIMERA COMPAÑIA
     DB::table('companies')->insert([
@@ -129,7 +152,7 @@ class CompanySeeder extends Seeder
 
     DB::table('documents_series')->insert([
         'serie' => 'F',
-        'number' => 1,
+        'number' => 0,
         'company_id' => 1,
         'documents_type_id' => 1,
         'dt_start' => now(),
@@ -137,8 +160,8 @@ class CompanySeeder extends Seeder
 
     
     DB::table('documents_series')->insert([
-        'serie' => 'P',
-        'number' => 23,
+        'serie' => 'F',
+        'number' => 0,
         'company_id' => 1,
         'documents_type_id' => 2,
         'dt_start' => now(),
@@ -196,6 +219,7 @@ class CompanySeeder extends Seeder
         'company_id' => 2,
     ]);
 
+
     DB::table('addresses')->insert([
         'company_id' => 2,
         'town' => 'Mazarrón',
@@ -230,7 +254,7 @@ class CompanySeeder extends Seeder
 
     
     DB::table('documents_series')->insert([
-        'serie' => 'P24',
+        'serie' => 'F24',
         'number' => 1,
         'company_id' => 2,
         'documents_type_id' => 2,

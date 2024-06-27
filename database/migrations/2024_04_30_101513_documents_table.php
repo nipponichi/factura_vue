@@ -20,10 +20,14 @@ return new class extends Migration
             $table->foreignId('company_id_customer')->constrained();
             $table->foreignId('documents_type_id')->constrained('documents_type');
             $table->foreignId('documents_series_id')->constrained('documents_series');
+            $table->foreignId('payment_methods_id')->constrained('payment_method');
+            $table->foreignId('bank_account_id')->constrained('bank_account');
             $table->date('date');
+            $table->date('expiration')->nullable();
             $table->decimal('amount', 10, 2);
             $table->boolean('paid');
             $table->boolean('active');
+            $table->boolean('invoiced');
             $table->dateTime('dt_updated')->nullable();
             $table->foreignId('user_who_modified')->nullable()->constrained('users');
             $table->decimal('tax', 10, 2)->nullable();

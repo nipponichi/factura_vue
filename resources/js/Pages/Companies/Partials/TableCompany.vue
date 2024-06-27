@@ -1,7 +1,6 @@
 <template>
-    <div>
+    <div v-if="!singleCompany">
         <div class="card">
-
             <DataTable ref="dt" :value="companies" v-model:selection="selectedCompanies" dataKey="id" 
                 :paginator="true" :rows="10" :filters="filters"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
@@ -18,7 +17,6 @@
                             </div>
                         </div>
                     </div>
-                    
                 </template>
 
                 <Column field="name" :header="$t('Name')" sortable class="dateTable"></Column>
@@ -29,70 +27,45 @@
                 <Column field="province" :header="$t('Province')" sortable class="dateTable"></Column>
                 <Column :exportable="false" class="dateTable">
                     <template #body="slotProps">
-                        <Button icon="pi pi-eye" outlined rounded class="mr-2 info-button" @click="handleInfoButtonClick(slotProps.data.id)" />
+                        <Button icon="pi pi-eye" outlined rounded class="mr-2 view-button" @click="handleInfoButtonClick(slotProps.data.id)" />
                     </template>
                 </Column>
             </DataTable>
         </div>
-	</div>
+    </div>
 </template>
-
 
 <script>
 import { FilterMatchMode } from 'primevue/api';
 
+
 export default {
     data() {
-        console.log("PRIMER PASO");
         return {
             companies: null, 
             filters: {}, 
             submitted: false,
+            singleCompany: false
         };
     },
     created() {
-        console.log("Created");
         this.filters = {
             'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
+        };
+
+        
+        // Verificar si solo hay una empresa y redirigir
+        this.companies = this.$page.props.companies;
+        if (this.companies.length === 1) {
+            this.singleCompany = true;
+            this.handleInfoButtonClick(this.companies[0].id);
         }
     },
-    mounted() {
-        
-        this.companies = this.$page.props.companies;
-        
-    },
-
-    
     methods: {
         handleInfoButtonClick(companyId) {
             this.$inertia.get('/companies/' + companyId);
-        }
+        },
+        
     }
 }
-
 </script>
-
-<style>
-
-    .info-button {
-        color:#007BFF;
-        border: 1px solid;
-    }
-
-    .info-button:hover {
-        background-color:rgba(0, 4, 252,0.1);
-        transition-duration: 0.5s;
-        padding:7px;
-    }
-
-    .card{
-        padding: 3% 3% 0% 3%;
-    }
-
-    .dateTable{
-        border-top: #E2E8F0 1px solid;
-        border-bottom: #E2E8F0 1px solid;
-        min-width:10rem;
-    }
-
-</style>

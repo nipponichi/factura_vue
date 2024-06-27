@@ -30,9 +30,9 @@ class EmailController extends Controller
                 ->get();
 
 
-            return response()->json(['message' => 'emails', 'emails' => $emails], 200);
+            return response()->json(['message' => 'emails', 'emails' => $emails]);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Error index emails: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error loading data' ,'type' => 'error']);
         }
     }
 
@@ -57,18 +57,12 @@ class EmailController extends Controller
             }
 
 
-            $newEmailId = DB::table('emails')->insertGetId([
+            DB::table('emails')->insert([
                 'email' => $request->email,
                 'dt_start' => now(),
                 'favourite' => $request->favourite,
                 'company_id' => $companyId,
             ]);
-
-            $email = DB::table('emails')
-            ->select('id','company_id', 'favourite')
-            ->where('id', $newEmailId)
-            ->whereNull('dt_end')
-            ->first();
 
             DB::table('emails')
             ->where('id', $emailId)
@@ -77,10 +71,10 @@ class EmailController extends Controller
             ]);
 
             DB::commit();
-            return response()->json(['message' => 'update','email' => $email, 200]);
+            return response()->json(['message' => 'Successfully updated.', 'type' => 'success']);
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error update '. $e->getMessage()], 500);
+            return response()->json(['message' => 'Error when updating.', 'type' => 'error']);
         }
     }
 
@@ -102,20 +96,13 @@ class EmailController extends Controller
                 $this->favouriteTrue($newEmailId);
             }
 
-            $email = DB::table('emails')
-            ->select('email','id','company_id', 'favourite')
-            ->where('id', $newEmailId)
-            ->whereNull('dt_end')
-            ->first();
-        
-
             DB::commit();
 
-            return response()->json(['message' => 'El email se ha creado correctamente', 'email' => $email]);
-            // Confirma la transacción si todas las operaciones son exitosas
+            return response()->json(['message' => 'It has been created correctly.','type' => 'success']);
+
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error al crear el email: ', $e->getMessage()], 500);
+            return response()->json(['message' => 'Error when creating.','type' => 'error']);
         }
 
     }
@@ -140,7 +127,8 @@ class EmailController extends Controller
                 ->count();
 
             if ($activeEmailsCount <=1) {
-                return response()->json(['message' => 'Debes tener al menos un email activo para poder eliminar.'], 400);
+                DB::rollback();
+                return response()->json(['message' => 'There must be at least one active to be able to delete.','type' => 'warning']);
             }
 
             $companyFav = DB::table('emails')
@@ -154,7 +142,8 @@ class EmailController extends Controller
             }
 
             if ($companyEmail) {
-                return response()->json(['message' => 'No puedes eliminar un email marcado como favorito.'], 400);
+                DB::rollback();
+                return response()->json(['message' => 'You cannot delete if it is marked as a favorite.','type' => 'warning']);
             }
 
             DB::table('emails')
@@ -164,10 +153,10 @@ class EmailController extends Controller
             ]);
 
             DB::commit();
-            return response()->json(['message' => 'Se ha eliminado el email con éxito']);
+            return response()->json(['message' => 'It has been successfully removed.','type' => 'success']);
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error al eliminar el email: '.$e->getMessage()], 500);
+            return response()->json(['message' => 'Error deleting.','type' => 'error']);
         }
     }
 
@@ -176,9 +165,9 @@ class EmailController extends Controller
             
             $this->favouriteTrue($id);
             
-            return response()->json(['message' => 'make favourite',], 200);
+            return response()->json(['message' => 'It has been marked as a favorite.','type' => 'success']);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Error al seleccionar email favorito '.$e->getMessage()], 500);
+            return response()->json(['message' => 'Error when selecting as favorite.','type' => 'error']);
         }
     }
 
