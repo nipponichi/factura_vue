@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-
+import Autoscript from '../../Libcustom/autoscript.js';
 </script>
 <template>
     <div class="no-imprimir">
@@ -669,6 +669,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 
 <script>
 import { FilterMatchMode } from 'primevue/api';
+
 export default {
     data() {
         return {
@@ -1308,6 +1309,7 @@ export default {
             
         },
 
+
         exportToPDF() {
             this.myDocumentSave()
             this.calculateTaxes().then(() => {
@@ -1326,17 +1328,22 @@ export default {
             console.log("contador: " + this.myDocument.document_counter)
             const xmlContent = this.convertToFacturaeXML();
             this.$toast(this.$t('XML document generated correctly.'), 'success');
+            this.addsign(xmlContent);
             this.downloadXML(xmlContent, 'facturae.xml');
             }).catch(error => {
-                this.$toast(this.$t('Could not generate the PDF.'), 'error');
+                this.$toast(this.$t('Could not generate the XML.'), 'error');
             }); 
         },
 
-        calcularImporteBase(porcentajeIva, totalIvaRepercutido) {
-            if (porcentajeIva <= 0) {
-                return 0
-            }
-            return totalIvaRepercutido / (porcentajeIva / 100);
+        addsign(data){
+            AutoScript.setForceWSMode(true);
+            AutoScript.cargarAppAfirma();
+            AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
+            window.location.origin + "/afirma-signature-retriever/RetrieveService");
+            function successCallback() { console.log("OK"); }
+            function errorCallback() { console.log("ERR"); }
+            var dataB64 = AutoScript.getBase64FromText(data);
+            AutoScript.signAndSaveToFile('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "AUTO", "", null, showSignResultCallback, showErrorCallback);
         },
     
         convertToFacturaeXML() {
@@ -1498,19 +1505,14 @@ export default {
         },
 
         downloadXML(content, filename) {
-            console.log("Prueba7");
+
             const blob = new Blob([content], { type: 'application/xml' });
-            console.log("Prueba8");
             const link = document.createElement('a');
-            console.log("Prueba9");
             link.href = URL.createObjectURL(blob);
-            console.log("Prueba10");
             link.download = filename;
-            console.log("Prueba11");
             link.click();
-            console.log("Prueba12");
             URL.revokeObjectURL(link.href);
-            console.log("Prueba13");
+        
         },
 
         cancelInvoice() {
