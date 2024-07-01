@@ -22,7 +22,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                     @click="selectCompany">
                                     <span class="font-bold text-lg">
                                         <i class="pi pi-plus mr-2"></i>
-                                        {{ this.selectedCompany.name }}
+                                        {{ selectedCompany.name }}
                                     </span>
                                 </button>
                             </div>
@@ -41,7 +41,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 
                                         <div class="flex items-center ml-2">
                                             <label for="link-checkbox" class="ms-2 mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark as paid') }}</label>
-                                            <input id="link-checkbox" type="checkbox" v-model="this.myDocument.paid" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                            <input id="link-checkbox" type="checkbox" v-model="myDocument.paid" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                         </div>
                                     </div>
                                 </div>
@@ -54,8 +54,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                 type="button"
                                                 class="px-4 py-2 mr-2 success-button text-white rounded flex items-center justify-between"
                                                 @click="selectDocument()"
-                                                :class="{ 'opacity-50': !this.selectedCompany.id }"
-                                                :disabled="!this.selectedCompany.id">
+                                                :class="{ 'opacity-50': !selectedCompany.id }"
+                                                :disabled="!selectedCompany.id">
                                                 <span>
                                                     <i class="pi pi-plus mr-2"></i>
                                                     {{ $t('Document type') }}
@@ -66,7 +66,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                 class="px-4 py-2 bg-purple-600 text-white rounded-md flex items-center justify-between"
                                                 @click="toggleDropdownExport"
                                                 :disabled="totalConIVA <= 0 || isSaving"
-                                                :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !this.selectedCustomer.id}">
+                                                :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id}">
                                                 <i class="pi pi-upload mr-2"></i>
                                                 {{ $t('Export') }}
                                             </button>
@@ -96,7 +96,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                             @click="checkDocument"
                                             :model="items"
                                             :disabled="totalConIVA <= 0 || isSaving"
-                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !this.selectedCustomer.id}">
+                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id}">
                                             <template v-slot:icon>
                                                 <i class="pi pi-save mr-2" :class="{ 'opacity-50': totalConIVA <= 0 }"></i>
                                             </template>
@@ -114,24 +114,24 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                     <div class="grid md:grid-cols-1 text-m gap-y-1">
                                         <div class="flex items-center justify-between w-full">
                                             <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Customer') }}:</div>
-                                            <div class="text-gray-700 w-full font-bold text-lg">{{ this.selectedCustomer.name }}</div>
+                                            <div class="text-gray-700 w-full font-bold text-lg">{{ selectedCustomer.name }}</div>
                                         </div>
                                         <div class="flex items-center justify-between w-full">
                                             <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Tax number') }}:</div>
-                                            <div class="text-gray-700 w-full uppercase">{{ this.selectedCustomer.tax_number }}</div>
+                                            <div class="text-gray-700 w-full uppercase">{{ selectedCustomer.tax_number }}</div>
                                         </div>
                                         <div class="flex items-center justify-between w-full">
                                             <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Phone') }}:</div>
-                                            <div class="text-gray-700 w-full">{{ this.selectedCustomer.phone }}</div>
+                                            <div class="text-gray-700 w-full">{{ selectedCustomer.phone }}</div>
                                         </div>
                                         <div class="flex items-center justify-between w-full">
                                             <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Email') }}:</div>
-                                            <div class="text-gray-700 w-full">{{ this.selectedCustomer.email }}</div>
+                                            <div class="text-gray-700 w-full">{{ selectedCustomer.email }}</div>
                                         </div>
                                         <div class="flex items-center justify-between w-full">
                                             <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Address') }}:</div>
                                             <div class="text-gray-700 w-full">
-                                                {{ this.selectedCustomer.address }}, {{ this.selectedCustomer.post_code }}, {{ this.selectedCustomer.town }}, {{ this.selectedCustomer.province }} ( {{ this.selectedCustomer.country }} )
+                                                {{ selectedCustomer.address }}, {{ selectedCustomer.post_code }}, {{ selectedCustomer.town }}, {{ selectedCustomer.province }} ( {{ selectedCustomer.country }} )
                                             </div>
                                         </div>
                                     </div>
@@ -241,7 +241,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                             <tbody>
                                                 <tr>
                                                     <td class="text-gray-600 pr-4">{{ $t('Payment method') }}:</td>
-                                                    <td class="pl-4">{{ this.selectedPaymentMethod.name }}</td>
+                                                    <td class="pl-4">{{ selectedPaymentMethod.name }}</td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2">
@@ -257,9 +257,9 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                     </td>
                                                     <td class="pl-4">
                                                         <span v-if="selectedPaymentMethod.id === 2">{{ '' }}</span>
-                                                        <span v-else-if="selectedPaymentMethod.id === 3">{{ this.selectedPhone.phone }}</span>
-                                                        <span v-else-if="selectedPaymentMethod.id === 4">{{ this.selectedEmail.email }}</span>
-                                                        <span v-else>{{ this.selectedBankAccount.complete_bank_account }}</span>
+                                                        <span v-else-if="selectedPaymentMethod.id === 3">{{ selectedPhone.phone }}</span>
+                                                        <span v-else-if="selectedPaymentMethod.id === 4">{{ selectedEmail.email }}</span>
+                                                        <span v-else>{{ selectedBankAccount.complete_bank_account }}</span>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -312,7 +312,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                     <tbody>
                                         <tr>
                                             <td class="text-gray-600 pr-4">{{ $t('Payment method') }}:</td>
-                                            <td class="pl-4">{{ this.selectedPaymentMethod.name }}</td>
+                                            <td class="pl-4">{{ selectedPaymentMethod.name }}</td>
                                         </tr>
                                         <tr>
                                             <td colspan="2">
@@ -321,7 +321,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         </tr>
                                         <tr>
                                             <td class="text-gray-600 pr-4">{{ $t('Bank account') }}:</td>
-                                            <td class="pl-4">{{ this.selectedBankAccount.complete_bank_account }}</td>
+                                            <td class="pl-4">{{ selectedBankAccount.complete_bank_account }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -391,7 +391,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                     </template>
                 </Dropdown>
                 <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select document serie') }}</label>
-                <Dropdown v-model="selectedSerie" :options="this.series" filter optionLabel="serie" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                <Dropdown v-model="selectedSerie" :options="series" filter optionLabel="serie" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class=" flex align-items-center ">
                             <div>{{ slotProps.value.serie }}</div>
@@ -433,7 +433,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 
             <!-- SELECT A CUSTOMER -->
             <Dialog v-model:visible="selectACustomerDialog" :header="$t('Select a customer')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
-                <Dropdown v-model="selectedCustomer" :options="this.customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                <Dropdown v-model="selectedCustomer" :options="customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class=" flex align-items-center ">
                             <div>{{ slotProps.value.name }}</div>
@@ -458,7 +458,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
             <!-- MODAL PAYMENT METHOD -->
             <Dialog v-model:visible="selectAPaymentMethodDialog" :header="$t('Select a payment method')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
                 <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Payment method') }}</label>
-                <Dropdown v-model="selectedPaymentMethod" :options="this.payment_methods" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                <Dropdown v-model="selectedPaymentMethod" :options="payment_methods" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class="flex items-center">
                             <div>{{ slotProps.value.name }}</div>
@@ -471,7 +471,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                     </template>
                 </Dropdown>
                 <label v-if="!isDropdownHidden" for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select an option') }}</label>
-                <Dropdown v-if="!isDropdownHidden" v-model="selectedOption" :options="this.options" filter :optionLabel="dynamicOptionLabel" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                <Dropdown v-if="!isDropdownHidden" v-model="selectedOption" :options="options" filter :optionLabel="dynamicOptionLabel" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class="flex items-center">
                             <div>{{ slotProps.value[dynamicOptionLabel]  }}</div>
@@ -617,10 +617,11 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             <td>{{ subtotal.toFixed(2) }}€</td>
                         </tr>
                         
-                        <tr v-for="(entry, index) in this.taxMap" :key="index">
+                        <!-- <tr v-for="(entry, index) in taxMap" :key="index">
                             <td class="title">{{ $t('Total IVA') }} {{ Object.values(entry)[0] }} %</td>
                             <td> {{ Object.values(entry)[1].toFixed(2) }}€</td>
-                        </tr>
+                        </tr> -->
+                        
 
                         <tr>
                             <td class="title"><strong>{{ $t('Total (with IVA)') }}</strong></td>
@@ -632,7 +633,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                 <table class="bank">  
                     <tr>
                         <td>{{ $t('Payment method') }}:</td>
-                        <td>{{ this.selectedPaymentMethod.name }}</td>    
+                        <td>{{ selectedPaymentMethod.name }}</td>    
                     </tr>
                     <tr>
                         <td class="text-gray-600 pr-4">
@@ -643,9 +644,9 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         </td>
                         <td class="pl-4">
                             <span v-if="selectedPaymentMethod.id === 2">{{ '' }}</span>
-                            <span v-else-if="selectedPaymentMethod.id === 3">{{ this.selectedPhone.phone }}</span>
-                            <span v-else-if="selectedPaymentMethod.id === 4">{{ this.selectedEmail.email }}</span>
-                            <span v-else>{{ this.selectedBankAccount.complete_bank_account }}</span>
+                            <span v-else-if="selectedPaymentMethod.id === 3">{{ selectedPhone.phone }}</span>
+                            <span v-else-if="selectedPaymentMethod.id === 4">{{ selectedEmail.email }}</span>
+                            <span v-else>{{ selectedBankAccount.complete_bank_account }}</span>
                         </td>
                     </tr>
 
@@ -654,6 +655,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
         </div>   
     </div>
 </template>
+
 
 
 <script>
