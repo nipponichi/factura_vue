@@ -1391,7 +1391,7 @@ export default {
             function successCallback() { console.log("OK"); }
             function errorCallback() { console.log("ERR"); }
             var dataB64 = AutoScript.getBase64FromText(data);
-            AutoScript.signAndSaveToFile('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "AUTO", "", null, showSignResultCallback, showErrorCallback);
+            AutoScript.signAndSaveToFile('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "AUTO", "", null, successCallback, errorCallback);
         }, 
 
 

@@ -801,7 +801,7 @@ export default {
         
         this.fetchPayments();
         console.log("payment_methods")
-        console.log(payment_methods)
+        console.log(this.payment_methods)
         
         // Compañia
         this.selectedCompany = this.company
@@ -814,7 +814,6 @@ export default {
         for (let i = 0; i < this.products.length; i++) {
             this.products[i].taxes = parseFloat(this.concepts[i].tax);
         }
-        
         //Documento
         this.myDocument = this.documents
         this.selectedType.name = this.documents.document_type_name
