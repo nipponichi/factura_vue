@@ -3596,7 +3596,7 @@ export var AutoScript = ( function ( window, undefined ) {
 					if (httpRequest.readyState == 4) {
 						 if (httpRequest.status == 200) {
 	
-							url = buildUrlWithoutData(op, fileId, retrieverServletAddress, cipherKey);
+							var url = buildUrlWithoutData(op, fileId, retrieverServletAddress, cipherKey);
 							if (isURLTooLong(url)) {
 								errorCallback("java.lang.IllegalArgumentException", "La URL de invocacion al servicio de firma es demasiado larga.");
 								return;
