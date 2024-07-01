@@ -18,90 +18,80 @@
                                 </span>
                             </button>
                         </div>
-                        
-                        <div class="select flex flex-col md:flex-row justify-between mb-4 items-center">
-                            <div class="flex flex-wrap justify-start md:justify-end items-center mb-3 md:mb-0">
-                                <div class="relative inline-block w-50">
-                                    <Button :label="$t('Customer')" icon="pi pi-plus" class="success-button text-white p-2" @click="selectACustomer()" />
-                                </div>
-                        
-                                <div class="relative inline-block w-50 ml-2"></div>
-                        
-                                <div class="flex items-center ml-2">
-                                    <label for="link-checkbox" class="ms-2 mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark as paid') }}</label>
-                                    <input id="link-checkbox" type="checkbox" v-model="this.myDocument.paid" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                </div>
-                            </div>
-                        </div>
-
+        
 
                         <!-- Botones normales para pantallas grandes -->
-                        <div class=" md:flex justify-end">
-                            <div id="app" class="relative inline-block w-50 ml-2">
-                                <div class="flex">
-                                    <button
-                                        type="button"
-                                        class="px-4 py-2 mr-2 success-button text-white rounded flex items-center justify-between"
-                                        @click="selectDocument()"
-                                        :class="{ 'opacity-50': !this.selectedCompany.id }"
-                                        :disabled="!this.selectedCompany.id">
-                                        <span>
-                                            <i class="pi pi-plus mr-2"></i>
-                                            {{ $t('Document type') }}
-                                        </span>
-                                    </button>
-                                    <button
-                                        type="button"
-                                        class="px-4 py-2 bg-purple-600 text-white rounded-md flex items-center justify-between"
-                                        @click="toggleDropdownExport"
-                                        :disabled="totalConIVA <= 0 || isSaving"
-                                        :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !this.selectedCustomer.id}">
-                                        <i class="pi pi-upload mr-2"></i>
-                                        {{ $t('Export') }}
-                                    </button>
-                                </div>
-                                
-                                
-                                <!-- Desplegable Export -->
-                                <div
-                                    v-show="isDropdownOpenExport"
-                                    class="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
-                                    <button
-                                        type="button"
-                                        class="px-4 py-2 rounded-l flex items-center justify-between"
-                                        @click="exportToPDF()">
-                                        <span>
-                                            <i class="pi pi-file-pdf mr-2"></i>
-                                            {{ $t('PDF') }}
-                                        </span>
-                                    </button>
-                    
-                                    <button
-                                        type="button"
-                                        class="px-4 py-2 rounded-r flex items-center"
-                                        @click="exportToXML()">
-                                        
-                                        <span>
-                                            <i class="pi pi-file-export mr-2"></i>
-                                            {{ $t('XML') }}
-                                        </span>
-                                    </button>
+                        <div class="md:flex justify-between items-center">
+                            <!-- Mueve este div a la izquierda -->
+                            <div class="flex flex-col md:flex-row justify-start items-center">
+                                <div class="flex flex-wrap justify-start items-center">
+                                    <div class="relative inline-block w-50">
+                                        <Button :label="$t('Customer')" icon="pi pi-plus" class="success-button text-white p-2" @click="selectACustomer()" />
+                                    </div>
+
+                                    <div class="flex items-center ml-2">
+                                        <label for="link-checkbox" class="ms-2 mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark as paid') }}</label>
+                                        <input id="link-checkbox" type="checkbox" v-model="this.myDocument.paid" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    </div>
                                 </div>
                             </div>
 
-                            
-                            <div class="split-button-container ml-2">
-                                <SplitButton 
-                                    class="blue-button" 
-                                    :label="$t('Save')" 
-                                    @click="checkDocument" 
-                                    :model="items" 
-                                    :disabled="totalConIVA <= 0 || isSaving"
-                                    :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !this.selectedCustomer.id}">
-                                    <template v-slot:icon>
-                                        <i class="pi pi-save mr-2" :class="{ 'opacity-50': totalConIVA <= 0 }"></i>
-                                    </template>
-                                </SplitButton>
+                            <!-- Mantén estos divs a la derecha -->
+                            <div class="flex items-center">
+                                <div id="app" class="relative inline-block w-50 ml-2">
+                                    <div class="flex">
+                                        <button
+                                            type="button"
+                                            class="px-4 py-2 mr-2 success-button text-white rounded flex items-center justify-between"
+                                            @click="selectDocument()"
+                                            :class="{ 'opacity-50': !this.selectedCompany.id }"
+                                            :disabled="!this.selectedCompany.id">
+                                            <span>
+                                                <i class="pi pi-plus mr-2"></i>
+                                                {{ $t('Document type') }}
+                                            </span>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="px-4 py-2 bg-purple-600 text-white rounded-md flex items-center justify-between"
+                                            @click="toggleDropdownExport"
+                                            :disabled="totalConIVA <= 0 || isSaving"
+                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !this.selectedCustomer.id}">
+                                            <i class="pi pi-upload mr-2"></i>
+                                            {{ $t('Export') }}
+                                        </button>
+                                    </div>
+
+                                    <!-- Desplegable Export -->
+                                    <div v-show="isDropdownOpenExport" class="absolute right-0 w-48 bg-white border border-gray-300 rounded shadow-lg">
+                                        <button type="button" class="px-4 py-2 rounded-l flex items-center justify-between" @click="exportToPDF()">
+                                            <span>
+                                                <i class="pi pi-file-pdf mr-2"></i>
+                                                {{ $t('PDF') }}
+                                            </span>
+                                        </button>
+                                        <button type="button" class="px-4 py-2 rounded-r flex items-center" @click="exportToXML()">
+                                            <span>
+                                                <i class="pi pi-file-export mr-2"></i>
+                                                {{ $t('XML') }}
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="split-button-container ml-2">
+                                    <SplitButton
+                                        class="blue-button"
+                                        :label="$t('Save')"
+                                        @click="checkDocument"
+                                        :model="items"
+                                        :disabled="totalConIVA <= 0 || isSaving"
+                                        :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !this.selectedCustomer.id}">
+                                        <template v-slot:icon>
+                                            <i class="pi pi-save mr-2" :class="{ 'opacity-50': totalConIVA <= 0 }"></i>
+                                        </template>
+                                    </SplitButton>
+                                </div>
                             </div>
                         </div>
 
@@ -808,6 +798,10 @@ export default {
 
     mounted() {
 
+        
+        this.fetchPayments();
+        console.log(payment_methods)
+        
         // Compañia
         this.selectedCompany = this.company
         
@@ -815,12 +809,6 @@ export default {
         this.selectedCustomer = this.customer
 
         // conceptos
-        this.products = this.concepts
-        console.log(this.concepts)
-        console.log(this.documents)
-        console.log(this.company)
-        console.log(this.customer)
-        console.log("aqui")
         this.products = this.concepts
         for (let i = 0; i < this.products.length; i++) {
             this.products[i].taxes = parseFloat(this.concepts[i].tax);
@@ -834,12 +822,12 @@ export default {
 
         this.selectedSerie.serie = this.documents.document_series_serie;
         let number = this.documents.number;
-        console.log("serie: " + this.selectedSerie.serie)
-        console.log("number: " + number)
         let numberWithoutSerie = number.replace(this.selectedSerie.serie, '');
         this.selectedSerie.number = numberWithoutSerie
-
-        this.selectedPaymentMethod = this.documents.payment_methods_id
+        this.selectedPaymentMethod.id = this.documents.payment_methods_id
+        console.log("id metodo pago")
+        console.log(this.selectedPaymentMethod)
+        this.handlePaymentMethodChange(this.selectedPaymentMethod)
         this.fecha = this.documents.date   
         this.myDocument.concept = [];
 
@@ -850,7 +838,7 @@ export default {
         this.selectedCompany.complete_bank_account = this.myDocument.complete_bank_account
         
         this.fetchCompanies();
-        this.fetchPayments();
+        
 
     },
 
@@ -868,20 +856,26 @@ export default {
         },
 
         handlePaymentMethodChange(paymentMethod) {
+            console.log("selector")
+            console.log(paymentMethod.id)
             switch (paymentMethod.id) {
                 case 1:
                     // Pago bancario
+                    console.log("banco")
                     this.fetchBanks();
                     break;
                 case 2:
+                console.log("contado")
                     //Efectivo
                     break;
                 case 3:
                     // Bizum
+                    console.log("bizum")
                     this.fetchPhones();
                     break;
                 case 4:
                     /// Paypal
+                    console.log("paypal")
                     this.fetchEmails();
                     break;
                 default:
@@ -929,7 +923,8 @@ export default {
             axios.get('/payment')
             .then(response => {
                 this.payment_methods = response.data.methods;
-                this.selectedPaymentMethod = this.payment_methods[0]
+                console.log(this.payment_methods)
+                //this.selectedPaymentMethod = this.payment_methods[0]
             })
         },
 
@@ -1364,28 +1359,28 @@ export default {
         },
 
         exportToXML() {
-            this.myDocumentSave()
-            this.calculateTaxes().then(() => {   
-            this.myDocument.document_counter = 1
-            const xmlContent = this.convertToFacturaeXML();
-            this.$toast(this.$t('XML document generated correctly.'), 'success');
-            this.addsign(xmlContent);
-            this.downloadXML(xmlContent, 'facturae.xml');
-            }).catch(error => {
-                this.$toast(this.$t('Could not generate the XML.'), 'error');
-            }); 
+
+            try {
+                this.myDocumentSave();
+                this.calculateTaxes()
+                    .then(() => {
+                        this.myDocument.document_counter = 1;
+                        const xmlContent = this.convertToFacturaeXML();
+                        this.$toast(this.$t('XML document generated correctly.'), 'success');
+                        //this.addsign(xmlContent);
+                        this.downloadXML(xmlContent, 'facturae.xml');
+                    })
+                    .catch(error => {
+                        this.$toast(this.$t('Could not generate the XML.'), 'error');
+                    });
+            } catch (error) {
+                this.$toast(this.$t('An unexpected error occurred.'), 'error');
+            }
+
         },
 
-        addsign(data){
-            AutoScript.setForceWSMode(true);
-            AutoScript.cargarAppAfirma();
-            AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
-            window.location.origin + "/afirma-signature-retriever/RetrieveService");
-            function successCallback() { console.log("OK"); }
-            function errorCallback() { console.log("ERR"); }
-            var dataB64 = AutoScript.getBase64FromText(data);
-            AutoScript.signAndSaveToFile('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "AUTO", "", null, showSignResultCallback, showErrorCallback);
-        }, 
+
+
     
         convertToFacturaeXML() {
             

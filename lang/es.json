@@ -190,6 +190,7 @@
     "Edit invoice":"Editar factura",
     "Expiration":"Vencimiento",
     "Payment method":"Forma de pago",
+    "Could not generate the XML.":"No se pudo generar el XML.",
     "Are you sure you want to delete the selected banks?":"¿Desea eliminar las cuentas bancarias seleccionadas?",
     "Are you sure you want to delete the selected emails?":"¿Desea eliminar los emails seleccionados?",
     "The :attribute must be a valid role.": ":Attribute debe ser un rol válido.",

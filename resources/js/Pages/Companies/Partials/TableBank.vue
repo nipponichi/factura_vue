@@ -74,7 +74,7 @@
                         </div>
                         <div>
                             <label for="swift" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('SWIFT') }}</label>
-                            <input type="text" id="swift" v-model="myBank.swift" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Enter SWIFT')" required />
+                            <input type="text" id="swift" v-model="myBank.swift" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Enter SWIFT')" pattern="[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?" required />
                         </div>
                         <div>
                             <label for="currency" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Currency') }}</label>

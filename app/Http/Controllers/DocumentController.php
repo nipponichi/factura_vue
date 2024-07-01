@@ -260,7 +260,7 @@ class DocumentController extends Controller
             'documents_type.name as document_type_name',
             'documents_series.serie as document_series_serie',
             'companies_names.name as customer_name',
-            'documents.bank_account_id as banck_account_id',
+            'documents.bank_account_id as bank_account_id',
             'bank_account.complete_bank_account',
             'bank_account.swift',
             'bank_account.bank_name',

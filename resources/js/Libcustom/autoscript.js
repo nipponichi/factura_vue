@@ -12,7 +12,7 @@ if (document.all && !window.setTimeout.isPolyfill) {
 
 var originalXMLHttpRequest = window.XMLHttpRequest;
 
-var AutoScript = ( function ( window, undefined ) {
+export var AutoScript = ( function ( window, undefined ) {
 
 		var VERSION = "1.8.2.1";
 		var VERSION_CODE = 2;
@@ -584,7 +584,8 @@ var AutoScript = ( function ( window, undefined ) {
 					try {
 						var element = document.getElementById("iframeAfirma");
 						element.outerHTML = "";
-						delete element;
+						//delete element;
+						element = null;
 					}
 					catch (e) {
 						// No hacemos nada
