@@ -25,12 +25,14 @@ const switchToTeam = (team) => {
 const logout = () => {
     router.post(route('logout'));
 };
+
+
 </script>
 
 <template>
     <div>
         <Head :title="title" />
-
+        
         <Banner />
 
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -46,32 +48,51 @@ const logout = () => {
                                 </Link>
                             </div>
 
-                            <!-- Navigation Links -->
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                                    Dashboard
+                            
+
+                            <!-- Navigation Links 
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')">
+                                <NavLink :href="route('dashboard')" :active="route().current('dashboard') ">
+                                    {{ $t('Dashboard') }}
                                 </NavLink>
                             </div>
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('invoices.index')" :active="route().current('invoices.*')">
-                                    Invoices
+                            -->
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')">
+                                <NavLink :href="route('documents.index')" :active="route().current('documents.*')">
+                                    {{ $t('Invoice') }}
                                 </NavLink>
-                            </div>                          
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" >
+                            </div>  
+                            
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')" >
                                 <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
-                                    My Company
+                                    {{ $t('My Company') }}
                                 </NavLink>
                             </div>
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read consulting')">
-                                <NavLink :href="route('admin.index')" :active="route().current('admin.*')">
-                                    Consulting
+
+                            
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view consulting')">
+                                <NavLink :href="route('companies.index')">
+                                    {{ $t('Consulting') }}
                                 </NavLink>
-                            </div>                             
+                            </div>
+
+
+                            <!-- NAVIGATION ADMIN -->
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
-                                <NavLink :href="route('admin.index')" :active="route().current('admin.*')">
-                                    Admin
+                                <NavLink :href="route('admin-users.index')" :active="route().current('admin-users.*')">
+                                    {{ $t('Users') }}
                                 </NavLink>
-                            </div>                           
+                            </div>    
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
+                                <NavLink :href="route('admin-companies.index')" :active="route().current('admin-companies.*')">
+                                    {{ $t('Companies') }}
+                                </NavLink>
+                            </div>
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
+                                <NavLink :href="route('admin-invoices.index')" :active="route().current('admin-invoices.*')">
+                                    {{ $t('Invoices') }}
+                                </NavLink>
+                            </div>                                           
                         </div>
                         
                         <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -155,16 +176,13 @@ const logout = () => {
                                     <template #content>
                                         <!-- Account Management -->
                                         <div class="block px-4 py-2 text-xs text-gray-400">
-                                            Manage Account
+                                            {{ $t('Manage Account') }}
                                         </div>
 
                                         <DropdownLink :href="route('profile.show')">
-                                            Profile
+                                            {{ $t('Profile') }}
                                         </DropdownLink>
                                         
-                                        <DropdownLink :href="route('profile.show')">
-                                            Pricing
-                                        </DropdownLink>
 
                                         <DropdownLink v-if="$page.props.jetstream.hasApiFeatures" :href="route('api-tokens.index')">
                                             API Tokens
@@ -175,7 +193,7 @@ const logout = () => {
                                         <!-- Authentication -->
                                         <form @submit.prevent="logout">
                                             <DropdownLink as="button">
-                                                Log Out
+                                                {{ $t('Log Out') }}
                                             </DropdownLink>
                                         </form>
                                     </template>
@@ -214,36 +232,51 @@ const logout = () => {
 
                 <!-- Responsive Navigation Menu -->
                 <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}" class="sm:hidden">
-                    <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                            Dashboard
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view company')">
+                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')" >
+                            {{ $t('Dashboard') }}
                         </ResponsiveNavLink>
                     </div>
-                    <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('invoices.index')" :active="route().current('invoices.*')">
-                            Invoices
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view company')">
+                        <ResponsiveNavLink :href="route('documents.index')" :active="route().current('documents.*')">
+                            {{ $t('Invoices') }}
                         </ResponsiveNavLink>
                     </div>
-                    <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('customers.index')" :active="route().current('customers.*')">
-                            My Customer
-                        </ResponsiveNavLink>
-                    </div>
-                    <div class="pt-2 pb-3 space-y-1">
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view company')">
                         <ResponsiveNavLink :href="route('companies.index')" :active="route().current('companies.*')">
-                            My Company
+                            {{ $t('My Company') }}
                         </ResponsiveNavLink>
                     </div>
-                    <div class="pt-2 pb-3 space-y-1">
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view consulting')">
                         <ResponsiveNavLink :href="route('products.index')" :active="route().current('products.*')">
-                            Products
+                            {{ $t('My Consulting') }}
+                        </ResponsiveNavLink>
+                    </div>
+
+
+                    <!-- NAVIGATION ADMIN -->
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
+                        <ResponsiveNavLink :href="route('admin-users.index')" :active="route().current('admin-user.*')">
+                            {{ $t('Users') }}
                         </ResponsiveNavLink>
                     </div>
                     <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
-                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                            Admin
+                        <ResponsiveNavLink :href="route('admin-companies.index')" :active="route().current('admin-companies.*')">
+                            {{ $t('Companies') }}
                         </ResponsiveNavLink>
                     </div>
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
+                        <ResponsiveNavLink :href="route('admin-invoices.index')" :active="route().current('admin-invoice.*')">
+                            {{ $t('Invoices') }}
+                        </ResponsiveNavLink>
+                    </div>
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
+                        <ResponsiveNavLink :href="route('admin-products.index')" :active="route().current('admin-products.*')">
+                            {{ $t('Products') }}
+                        </ResponsiveNavLink>
+                    </div>
+                    
+                    
                     <!-- Responsive Settings Options -->
                     <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
                         <div class="flex items-center px-4">
@@ -263,7 +296,7 @@ const logout = () => {
 
                         <div class="mt-3 space-y-1">
                             <ResponsiveNavLink :href="route('profile.show')" :active="route().current('profile.show')">
-                                Profile
+                                {{ $t('Profile') }}
                             </ResponsiveNavLink>
 
                             <ResponsiveNavLink v-if="$page.props.jetstream.hasApiFeatures" :href="route('api-tokens.index')" :active="route().current('api-tokens.index')">
@@ -273,7 +306,7 @@ const logout = () => {
                             <!-- Authentication -->
                             <form method="POST" @submit.prevent="logout">
                                 <ResponsiveNavLink as="button">
-                                    Log Out
+                                    {{ $t('Log Out') }}
                                 </ResponsiveNavLink>
                             </form>
 
@@ -334,4 +367,28 @@ const logout = () => {
             </main>
         </div>
     </div>
+
+    <footer class="bg-white rounded-lg shadow m-4 dark:bg-gray-800 no-imprimir">
+        <div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
+            <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">©<a href="https://flowbite.com/" class="hover:underline">Ingeoriol S.L.</a>. {{ $t('All Rights Reserved') }}.
+            </span>
+
+            <!--
+            <ul class="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
+                <li>
+                    <a href="" class="hover:underline me-4 md:me-6">{{ __('About') }}</a>
+                </li>
+                <li>
+                    <a href="" class="hover:underline me-4 md:me-6">{{ __('Privacy Policy') }}</a>
+                </li>
+                <li>
+                    <a href="" class="hover:underline me-4 md:me-6">{{ __('Licensing') }}</a>
+                </li>
+                <li>
+                    <a href="" class="hover:underline">{{ __('Contact') }}</a>
+                </li>
+            </ul>
+            -->
+        </div>
+    </footer>
 </template>

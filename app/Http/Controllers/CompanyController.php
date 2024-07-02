@@ -6,10 +6,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CompanyRequest;
 use App\Models\Company;
 use Exception;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\Middleware\Authorize;
+use Illuminate\Support\Facades\DB;
+
 
 
 class CompanyController extends Controller
@@ -17,23 +19,100 @@ class CompanyController extends Controller
     
     public function __construct()
     {
-        $this->middleware(['can:read roles']);   
+        $this->middleware('can:read company')->only(['index', 'show', 'companyInvoice']);
+        $this->middleware('can:create company')->only(['create', 'store']);
+        $this->middleware('can:update company')->only(['edit', 'update']);
+        $this->middleware('can:delete company')->only('destroy');
     }
-    
 
-    public function index()
+
+    public static function index()
     {
         // Obtiene el ID del usuario autenticado
         $userId = Auth::id();
         
-
-        // Recupera las compañías asociadas al usuario actual
-        //$companies = Company::all();
-        $companies = Company::where('user_id', $userId)->get();
-
-        //$companies = Company::all();
+        $companies = DB::table('companies')
+        ->select(
+            'companies.id',
+            'companies.dt_end',
+            'companies_tax_numbers.tax_number',
+            'companies_names.name',
+            'emails.email',
+            'phones.phone',
+            'addresses.address',
+            'addresses.post_code',
+            'addresses.province',
+            'addresses.town',
+            'addresses.country'
+        )
+        ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
+        ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
+        ->leftJoin('companies_tax_numbers', 'companies.id', '=', 'companies_tax_numbers.company_id')
+        ->leftJoin('emails', 'companies.id', '=', 'emails.company_id')
+        ->leftJoin('phones', 'companies.id', '=', 'phones.company_id')
+        ->leftJoin('addresses', 'companies.id', '=', 'addresses.company_id')
         
-        return Inertia::render('Companies/Index', ['companies' => $companies, 'type' => 'companies']);
+        ->where('companies_users.user_id', $userId)
+        ->where('addresses.favourite', 1)
+        ->where('phones.favourite', 1)
+        ->where('emails.favourite', 1)
+        ->whereNull('companies_users.dt_end')
+        ->whereNull('companies_names.dt_end')
+        ->whereNull('companies_tax_numbers.dt_end')
+        ->whereNull('addresses.dt_end')
+        ->whereNull('phones.dt_end')
+        ->whereNull('emails.dt_end')
+        ->get();
+
+        return Inertia::render('Companies/Index', ['companies' => $companies]);
+    
+    }
+
+    public static function companiesInvoice()
+    {
+        // Obtiene el ID del usuario autenticado
+        $userId = Auth::id();
+        
+        $companies = DB::table('companies')
+        ->select(
+            'companies.id',
+            'companies.dt_end',
+            'companies_tax_numbers.tax_number',
+            'companies_names.name',
+            'emails.email',
+            'phones.phone',
+            'addresses.address',
+            'addresses.post_code',
+            'addresses.province',
+            'addresses.town',
+            'addresses.country',
+            'bank_account.complete_bank_account',
+            'bank_account.swift',
+            'bank_account.bank_name',
+            'bank_account.id as bank_account_id'
+        )
+        ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
+        ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
+        ->leftJoin('companies_tax_numbers', 'companies.id', '=', 'companies_tax_numbers.company_id')
+        ->leftJoin('bank_account', 'companies.id', '=', 'bank_account.company_id')
+        ->leftJoin('emails', 'companies.id', '=', 'emails.company_id')
+        ->leftJoin('phones', 'companies.id', '=', 'phones.company_id')
+        ->leftJoin('addresses', 'companies.id', '=', 'addresses.company_id')
+        
+        ->where('companies_users.user_id', $userId)
+        ->where('addresses.favourite', 1)
+        ->where('phones.favourite', 1)
+        ->where('emails.favourite', 1)
+        ->where('bank_account.favourite', 1)
+        ->whereNull('companies_users.dt_end')
+        ->whereNull('companies_names.dt_end')
+        ->whereNull('companies_tax_numbers.dt_end')
+        ->whereNull('addresses.dt_end')
+        ->whereNull('phones.dt_end')
+        ->whereNull('emails.dt_end')
+        ->get();
+
+        return response()->json(['message' => 'Compañía encontrada ahora ', 'companies' => $companies]);
 
     }
     
@@ -52,20 +131,6 @@ class CompanyController extends Controller
      */
     public function store(CompanyRequest $request)
     {
-        try {
-            
-            $user_id = Auth::id();
-            $company = new Company($request->validated());
-            $company->user_id = $user_id;
-            $company->save();
-
-            //return Inertia::render('Companies/Index');
-            return response()->json(['message' => 'La compañía se ha creado correctamente', 'company' => $company]);
-            
-        }catch (Exception $e) {
-            // Devuelve una respuesta JSON con un mensaje de error
-            return response()->json(['message' => 'Error al crear la compañía: ', $e->getMessage()], 500);
-        }
     }
 
     /**
@@ -73,15 +138,69 @@ class CompanyController extends Controller
      */
     public function show(string $id)
     {
-        
         try {
-            $company = Company::findOrFail($id);
 
-            return Inertia::render('Companies/Show', ['company' => $company]);
+            // Obtener el usuario autenticado
+            $userId = Auth::id();
 
-        }catch (Exception $e) {
+            $companies = DB::table('companies_users')
+                ->select('company_id')
+                ->where('user_id', $userId)
+                ->get()
+                ->pluck('company_id');
+
+            // Verificar si el ID de la empresa está entre las empresas asociadas al usuario
+            if (!$companies->contains($id)) {
+                return Redirect::route('companies.index')->with('error', 'No se encontró la empresa o no tiene permisos suficientes');
+            }
+                
+
             
-            return response()->json(['message' => 'Compañía no encontrada ', $e->getMessage()], 500);
+            $companies = DB::table('companies')
+            ->select(
+                'companies.id',
+                'companies.dt_end',
+                'companies_tax_numbers.tax_number',
+                'companies_names.name',
+                'emails.email',
+                'phones.phone',
+                'addresses.address',
+                'addresses.post_code',
+                'addresses.province',
+                'addresses.town',
+                'addresses.country',
+                'bank_account.complete_bank_account',
+                'bank_account.swift',
+                'bank_account.bank_name',
+                'bank_account.id as bank_account_id'
+            )
+            ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
+            ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
+            ->leftJoin('companies_tax_numbers', 'companies.id', '=', 'companies_tax_numbers.company_id')
+            ->leftJoin('bank_account', 'companies.id', '=', 'bank_account.company_id')
+            ->leftJoin('emails', 'companies.id', '=', 'emails.company_id')
+            ->leftJoin('phones', 'companies.id', '=', 'phones.company_id')
+            ->leftJoin('addresses', 'companies.id', '=', 'addresses.company_id')
+            
+            ->where('companies_users.user_id', $userId)
+            ->where('addresses.favourite', 1)
+            ->where('phones.favourite', 1)
+            ->where('emails.favourite', 1)
+            ->where('bank_account.favourite', 1)
+            ->whereNull('companies_users.dt_end')
+            ->whereNull('companies_names.dt_end')
+            ->whereNull('companies_tax_numbers.dt_end')
+            ->whereNull('addresses.dt_end')
+            ->whereNull('phones.dt_end')
+            ->whereNull('emails.dt_end')
+            ->first();
+
+            
+            return Inertia::render('Companies/Show', ['company' => $companies]);
+            
+        }catch (Exception $e) {
+                
+            return response()->json(['message' => 'Compañía no encontrada ahora ', $e->getMessage()], 500);
         }
     }
 
@@ -90,14 +209,7 @@ class CompanyController extends Controller
      */
     public function edit(string $id)
     {
-        try {
-            $product = Company::findOrFail($id);
-            //return response()->json($product);
-            return response()->json(['product' => $product]);
-        }catch (Exception $e) {
-            // Devuelve una respuesta JSON con un mensaje de error
-            return response()->json(['message' => 'Error al editar la compañía: ', $e->getMessage()], 500);
-        }
+        
     }
 
     /**
@@ -105,44 +217,31 @@ class CompanyController extends Controller
      */
     public function update(CompanyRequest $request, string $id)
     {
-        try{
-            $company = Company::findOrFail($id);
-            $company->update($request->validated());
-            return response()->json(['message' => 'Company updated successfully','company'=> $company]);
-        }catch (Exception $e) {
-            // Devuelve una respuesta JSON con un mensaje de error
-            return response()->json(['message' => 'Error al editar la compañía: ', $e->getMessage()], 500);
-        }
+    
     }
+    
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy($id)
     {
-
-        try {
-
-            $company = Company::findOrFail($id);
-            $company->delete();
-            
-            return response()->json(['message' => 'Error al eliminiar la compañia: '. $id]);
-        } catch (Exception $e) {
-            
-            return response()->json(['message' => 'Error al eliminiar la compañia: '. $id . $e->getMessage()], 500);
-        }
+        
     }
 
     public function hasCompany()
     {
-    $user_id = Auth::id();
+        $user_id = Auth::id();
 
-    // Busca empresas relacionadas con el usuario actual
-    $company = Company::where('user_id', $user_id)->get();
+        $company = DB::table('companies_users')
+            ->select('company_id')
+            ->where('user_id', $user_id)
+            ->whereNull('dt_end')
+            ->first();
 
-
-    // Si la colección de empresas está vacía, devuelve false, de lo contrario, devuelve true
-    return $company->isEmpty() ? false : true;
+        // Si no hay una compañía asociada, devuelve false, de lo contrario, devuelve true
+        return $company === null ? false : true;
     }
+
 
 }

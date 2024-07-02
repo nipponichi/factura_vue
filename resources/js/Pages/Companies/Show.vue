@@ -2,7 +2,7 @@
     <AppLayout title="Dashboard">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                My company
+                {{ company.name }}
             </h2>
         </template>
         <div class="py-12">
@@ -18,61 +18,46 @@
                                         <div class="text-center mt-2">
                                             <h3 class="text-2xl text-slate-700 font-bold leading-normal mb-1">{{ company.name }}</h3>
                                             <div class="text-xs text-slate-400 font-bold uppercase">
-                                                <i class="fas fa-map-marker-alt mr-2 text-slate-400 opacity-75"></i> {{ company.postCode }}, {{ company.town }}, {{ company.province }}
+                                                <i class="fas fa-map-marker-alt mr-2 text-slate-400 opacity-75"></i> {{ company.post_code }}, {{ company.town }}, {{ company.province }}
                                                 <strong><p class=" text-slate-400 font-bold mt-2">{{ company.country }}</p></strong>
                                             </div>
                                         </div>
                                         <div class="flex justify-center lg:pt-0 pt-8">
                                             <div class="p-3 text-center">
                                                 <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">33</span>
-                                                <span class="text-sm text-slate-400">Customers</span>
+                                                <span class="text-sm text-slate-400"> {{ $t('Customers') }}</span>
                                             </div>
-                                            <div class="p-3 text-center">
-                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">24</span>
-                                                <span class="text-sm text-slate-400">Products</span>
-                                            </div>
-
                                             <div class="p-3 text-center">
                                                 <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">564</span>
-                                                <span class="text-sm text-slate-400">Invoices</span>
+                                                <span class="text-sm text-slate-400"> {{ $t('Invoices') }}</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <div class="py-5 border-t border-slate-200 text-center">
-                                    <h1 class="text-lg text-slate-700 leading-normal mb-1">Company details:</h1>
+                                    <h1 class="text-lg text-slate-700 leading-normal mb-1"> {{ $t('Company details') }}:</h1>
                                     <div class="flex flex-wrap justify-center">
                                         <div>
-
                                             <div class="text-gray-700">
                                                 <div class="grid md:grid-cols-2 text-sm">
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Tax Number:</div>
-                                                        <div class=" py-2">{{ company.taxNumber }}</div>
+                                                        <div class=" py-2 font-semibold"> {{ $t('Tax number') }}:</div>
+                                                        <div class=" py-2">{{ company.tax_number }}</div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Email:</div>
+                                                        <div class=" py-2 font-semibold"> {{ $t('Email') }}:</div>
                                                         <div class=" py-2">
                                                             <a class="text-blue-800" :href="emailLink">{{ company.email }}</a>
                                                         </div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Phone 1:</div>
-                                                        <div class=" py-2">{{ company.phone1 }}</div>
+                                                        <div class=" py-2 font-semibold"> {{ $t('Phone') }}:</div>
+                                                        <div class=" py-2">{{ company.phone }}</div>
                                                     </div>
                                                     <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Phone 2:</div>
-                                                        <div class="py-2">{{ company.phone2 }}</div>
-                                                    </div>
-
-                                                    <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Address 1:</div>
-                                                        <div class=" py-2">{{ company.address1}} </div>
-                                                    </div>
-                                                    <div class="grid grid-cols-2">
-                                                        <div class=" py-2 font-semibold">Address 2:</div>
-                                                        <div class=" py-2">{{ company.address2 }} </div>
+                                                        <div class=" py-2 font-semibold"> {{ $t('Address') }}:</div>
+                                                        <div class=" py-2">{{ company.address}} </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -82,44 +67,70 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="flex flex-col justify-center items-center h-full">
 
                         <div class="border-b border-gray-200 dark:border-gray-700">
                             <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
                                 <li class="me-2">
+                                    <button @click="changeTab('documents')" :class="{'border-b-2 border-blue-500': activeTab === 'documents'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-file w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                        {{ $t('Invoices') }}
+                                    </button>
+                                </li>
+                                <li class="me-2">
                                     <button @click="changeTab('customers')" :class="{'border-b-2 border-blue-500': activeTab === 'customers'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-users w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        Customers
+                                        {{ $t('Customers') }}
                                     </button>
                                 </li>
                                 <li class="me-2">
-                                    <button @click="changeTab('products')" :class="{'border-b-2 border-blue-500': activeTab === 'products'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
-                                        <i class="pi pi-shopping-cart w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        Products
+                                    <button @click="changeTab('phone')" :class="{'border-b-2 border-blue-500': activeTab === 'phone'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-phone w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                        {{ $t('Phone') }}
                                     </button>
                                 </li>
                                 <li class="me-2">
-                                    <button @click="changeTab('invoices')" :class="{'border-b-2 border-blue-500': activeTab === 'invoices'}" class="inline-flex items-center justify-center p-4 border-transparent rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
-                                        <i class="pi pi-file w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        Invoices
+                                    <button @click="changeTab('email')" :class="{'border-b-2 border-blue-500': activeTab === 'email'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-envelope w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                        {{ $t('Email') }}
+                                    </button>
+                                </li>
+                                <li class="me-2">
+                                    <button @click="changeTab('address')" :class="{'border-b-2 border-blue-500': activeTab === 'address'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-home w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                        {{ $t('Address') }}
+                                    </button>
+                                </li>
+                                <li class="me-2">
+                                    <button @click="changeTab('bank')" :class="{'border-b-2 border-blue-500': activeTab === 'bank'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-wallet w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>     
+                                        {{ $t('Bank account') }}
                                     </button>
                                 </li>
                             </ul>
                         </div>
             
-                        <div class="flex flex-col items-center justify-center w-full">
-                            <table v-if="activeTab === 'customers'" class="w-full">
+                        <div class="flex flex-col items-center justify-center w-full overflow-x-auto">
+                            <div v-if="activeTab === 'documents'" class="w-full">
+                                <TableDocument />
+                            </div>
+                            <div v-else-if="activeTab === 'customers'" class="w-full">
                                 <TableCustomers />
-                            </table>
-                            <table v-else-if="activeTab === 'products'" class="w-full">
-                                <Tables />
-                            </table>
-                            <table v-else-if="activeTab === 'invoices'" class="w-full">
-                                <TableInvoice />
-                            </table>
+                            </div>
+                            <div v-else-if="activeTab === 'phone'" class="w-full">
+                                <TablePhone @updatePhone="handlePhoneUpdate" />
+                            </div>
+                            <div v-else-if="activeTab === 'email'" class="w-full">
+                                <TableEmail @updateEmail="handleEmailUpdate" />
+                            </div>
+                            <div v-else-if="activeTab === 'address'" class="w-full">
+                                <TableAddress @updateAddress="handleAddressUpdate"/>
+                            </div>
+                            <div v-else-if="activeTab === 'bank'" class="w-full">
+                                <TableBank />
+                            </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -128,43 +139,45 @@
 </template>
 
 <script setup>
-    import AppLayout from '@/Layouts/AppLayout.vue';
-    import TableCustomers from '@/Components/TableCustomer.vue';
-    import TableInvoice from '@/Components/TableInvoice.vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import TableCustomers from '@/Pages/Companies/Partials/TableCustomer.vue';
+import TableDocument from '@/Pages/Companies/Partials/TableDocument.vue';
+import TablePhone from '@/Pages/Companies/Partials/TablePhone.vue';
+import TableBank from '@/Pages/Companies/Partials/TableBank.vue';
+import TableEmail from '@/Pages/Companies/Partials/TableEmail.vue';
+import TableAddress from '@/Pages/Companies/Partials/TableAddress.vue';
+import { ref } from 'vue';
 
+const activeTab = ref('documents');
 
-    import { ref } from 'vue';
-
-    // Definimos la variable reactive para almacenar la pestaña activa
-    const activeTab = ref('customers');
-
-    // Método para cambiar la pestaña activa
-    const changeTab = (tabName) => {
-        activeTab.value = tabName;
-    };
+const changeTab = (tabName) => {
+    activeTab.value = tabName;
+};
 </script>
-
 
 <script>
-    export default {
-        props: ["company"],
-
-        data() {
-            return {
-                
-                email: ""
-            };
-        },
-
-        computed: {
-            emailLink() {
-                return "mailto:" + this.company.email;
-            }
-        },
-
-        methods: {
-            
+export default {
+    props: ["company"],
+    computed: {
+        emailLink() {
+            return "mailto:" + this.company.email;
         }
-    };
-</script>
+    },
+    
+    methods: {
+        handlePhoneUpdate(phone) {
+            this.company.phone = phone;
+        },
 
+        handleEmailUpdate(email) {
+            this.company.email = email;
+        },
+
+        handleAddressUpdate(address) {
+            this.company.address = address;
+        },
+        
+    }
+    
+};
+</script>

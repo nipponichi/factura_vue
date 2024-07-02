@@ -8,33 +8,29 @@ use Illuminate\Database\Eloquent\Model;
 class Company extends Model
 {
     use HasFactory;
+    public $timestamps = false;
     protected $fillable = [
         'name', 
         'taxNumber', 
-        'address1', 
-        'address2', 
+        'address', 
         'email', 
-        'phone1', 
-        'phone2',
+        'phone', 
         'province', 
         'town', 
         'postCode',
         'country'
     ];
 
-    // Tiene key user_id foránea
-    
     public function users(){
         return $this -> belongsTo(User::class);
     }
 
-    
-    public function customers() {
-        return $this -> hasMany(Customer::class);
+    public function products() {
+        return $this -> hasMany(Product::class);
     }
 
     public function invoices() {
-        return $this -> hasMany(Invoice::class);
+        return $this ->hasMany(Invoice::class);
     }
 }
 

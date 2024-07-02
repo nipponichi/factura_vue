@@ -8,18 +8,21 @@ use Illuminate\Database\Eloquent\Model;
 class Invoice extends Model
 {
     use HasFactory;
-
-    protected $fillable = [];
+    public $timestamps = false;
+    protected $fillable = [
+        'number', 
+        'company_id', 
+        'customer_id', 
+        'date', 
+        'amount', 
+        'type', 
+        'isPaid', 
+        'active',
+        'design_id'
+    ];
 
     public function companies() {
         return $this -> belongsTo(Company::class);
     }
 
-    public function customers() {
-        return $this -> belongsTo(Customer::class);
-    }
-
-    public function customerOfCustomers() {
-        return $this -> hasMany(CustomerOfCustomer::class);
-    }
 }

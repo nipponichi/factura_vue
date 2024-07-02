@@ -24,11 +24,9 @@ class CustomerRequest extends FormRequest
         return [
             'name' => 'string|max:255',
             'taxNumber' => 'string',
-            'address1' => 'string|max:255',
-            'address2' => 'nullable|string|max:255',
+            'address' => 'string|max:255',
             'email' => 'string',
-            'phone1' => 'string',
-            'phone2' => 'string',
+            'phone' => 'string',
             'province' => 'string',
             'town' => 'string',
             'postCode' => 'string',

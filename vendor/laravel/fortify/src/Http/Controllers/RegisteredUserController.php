@@ -6,11 +6,13 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Fortify\Contracts\RegisterResponse;
 use Laravel\Fortify\Contracts\RegisterViewResponse;
 use Laravel\Fortify\Fortify;
+
 
 class RegisteredUserController extends Controller
 {
@@ -50,19 +52,36 @@ class RegisteredUserController extends Controller
      * @param  \Laravel\Fortify\Contracts\CreatesNewUsers  $creator
      * @return \Laravel\Fortify\Contracts\RegisterResponse
      */
-    public function store(Request $request,
-                          CreatesNewUsers $creator): RegisterResponse
-    {
-        if (config('fortify.lowercase_usernames')) {
-            $request->merge([
-                Fortify::username() => Str::lower($request->{Fortify::username()}),
-            ]);
-        }
+    public function store(Request $request, CreatesNewUsers $creator): RegisterResponse
+{
 
-        event(new Registered($user = $creator->create($request->all())));
+    Validator::make($request->all(), [
+        'name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+        'password' => 'required',
+        'company_type' => 'required|in:freelancer,company,consulting',
+    ])->validate();
 
-        $this->guard->login($user);
+    // Crea el nuevo usuario sin el campo company_type
+    $userData = $request->except('company_type');
 
-        return app(RegisterResponse::class);
+    if (config('fortify.lowercase_usernames') && isset($userData[Fortify::username()])) {
+        $userData[Fortify::username()] = Str::lower($userData[Fortify::username()]);
     }
+
+    $user = $creator->create($userData);
+
+    // Asigna el rol al usuario si se encontró
+    
+    $user->assignRole($request->company_type);
+    
+
+    // Dispara el evento Registered y loguea al usuario
+    event(new Registered($user));
+    //$this->guard->login($user);
+
+    return app(RegisterResponse::class);
+}
+
+    
 }
