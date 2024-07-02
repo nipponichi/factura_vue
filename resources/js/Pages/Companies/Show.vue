@@ -125,7 +125,7 @@
                                 <TableEmail @updateEmail="handleEmailUpdate" />
                             </div>
                             <div v-else-if="activeTab === 'address'" class="w-full">
-                                <TableAddress />
+                                <TableAddress @updateAddress="handleAddressUpdate"/>
                             </div>
                             <div v-else-if="activeTab === 'bank'" class="w-full">
                                 <TableBank />
@@ -171,6 +171,10 @@ export default {
 
         handleEmailUpdate(email) {
             this.company.email = email;
+        },
+
+        handleAddressUpdate(address) {
+            this.company.address = address;
         },
         
     }
