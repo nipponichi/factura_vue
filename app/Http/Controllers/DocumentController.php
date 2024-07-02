@@ -234,7 +234,7 @@ class DocumentController extends Controller
         ->first();
 
         if ($invoiceUser == null) {
-            return Redirect::to('/dashboard')->with('error', 'No se encontró la factura');
+            return Redirect::to('/companies')->with('error', 'No se encontró la factura');
         }
         
         if ($userId != $invoiceUser->user_id) {
@@ -424,7 +424,7 @@ class DocumentController extends Controller
             ->first();
     
             if ($invoiceUser == null) {
-                return Redirect::to('/dashboard')->with('error', 'No se encontró la factura');
+                return Redirect::to('/companies')->with('error', 'No se encontró la factura');
             }
             
             if ($userId != $invoiceUser->user_id) {
