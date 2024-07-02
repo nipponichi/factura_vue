@@ -783,6 +783,8 @@ export default {
     },
 
     created() {
+
+        
         this.filters = {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
         };
@@ -795,13 +797,15 @@ export default {
         this.fecha = `${year}-${month}-${day}`;
         this.expiration = `${year}-${month}-${day}`;
     },
-
+    /*
     mounted() {
 
-        
+        console.log("payment_methods mounted1")
         this.fetchPayments();
-        console.log("payment_methods")
         console.log(this.payment_methods)
+        console.log("payment_methods mounted2")
+        
+        
         
         // Compañia
         this.selectedCompany = this.company
@@ -840,6 +844,55 @@ export default {
         this.fetchCompanies();
         
 
+    },*/
+
+    async mounted() {
+
+        console.log("payment_methods mounted1");
+        
+        await this.fetchPayments();
+        
+        console.log(this.payment_methods);
+        console.log("payment_methods mounted2");
+        
+        // Compañia
+        this.selectedCompany = this.company;
+        
+        // Cliente
+        this.selectedCustomer = this.customer;
+
+        // Conceptos
+        this.products = this.concepts;
+        for (let i = 0; i < this.products.length; i++) {
+            this.products[i].taxes = parseFloat(this.concepts[i].tax);
+        }
+
+        // Documento
+        this.myDocument = this.documents;
+        this.selectedType.name = this.documents.document_type_name;
+        this.selectedType.id = this.documents.documents_type_id;
+        this.selectedSerie.id = this.documents.documents_series_id;
+        this.selectedSerie.serie = this.documents.document_series_serie;
+
+        let number = this.documents.number;
+        let numberWithoutSerie = number.replace(this.selectedSerie.serie, '');
+        this.selectedSerie.number = numberWithoutSerie;
+        
+        this.selectedPaymentMethod.id = this.documents.payment_methods_id;
+        console.log("id metodo pago");
+        console.log(this.selectedPaymentMethod);
+        this.handlePaymentMethodChange(this.selectedPaymentMethod);
+        
+        this.fecha = this.documents.date;   
+        this.myDocument.concept = [];
+
+        // Método pago
+        this.selectedCompany.bank_account_id = this.myDocument.bank_account_id;
+        this.selectedCompany.bank_name = this.myDocument.bank_name;
+        this.selectedCompany.swift = this.myDocument.swift;
+        this.selectedCompany.complete_bank_account = this.myDocument.complete_bank_account;
+
+        this.fetchCompanies();
     },
 
     watch: {
@@ -913,8 +966,8 @@ export default {
                     this.$toast(this.$t('Error connecting to the server'), 'error');
                 });
         },
-
-        fetchPayments () {
+        
+        async fetchPayments () {
             axios.get('/payment')
             .then(response => {
                 this.payment_methods = response.data.methods;

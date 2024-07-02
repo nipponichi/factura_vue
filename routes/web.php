@@ -27,7 +27,7 @@ Route::middleware([
 ])->group(function () {
 
 
-    Route::get('/', [RouteController::class, 'documents'])->name('dashboard');
+    Route::get('/', [RouteController::class, 'documents']);
 
     //Companies
     Route::resource('/companies', CompanyController::class);
