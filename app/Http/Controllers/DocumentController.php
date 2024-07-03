@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Http\Requests\DocumentRequest;
+use App\Http\Requests\CompanyRequest;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ class DocumentController extends Controller
     public function __construct()
     {
 
-        $this->middleware(['can:read company'])->only(['index', 'show','indexDocuments','documentType','documentSerieCheck','documentSerie','documentDateCheck','fromBudgetToInvoice']);
+        $this->middleware(['can:read company'])->only(['index', 'show','indexDocuments','documentType','documentSerieCheck','documentSerie','documentDateCheck','fromBudgetToInvoice', 'showDocument']);
         $this->middleware(['can:create company'])->only(['create', 'store']);
         $this->middleware(['can:update company'])->only(['edit', 'update']);
         $this->middleware(['can:delete company'])->only('destroy');
@@ -136,7 +137,7 @@ class DocumentController extends Controller
             $userId = Auth::id();
 
             // Buscamos si un documento coincide en tipo y numero con uno ya existente para la misma empresa
-            $repatedInvoice = DB::table('documents')
+            $repeatedInvoice = DB::table('documents')
             ->select('id')
             ->where('number', $request->documentData['number'])
             ->where('documents_type_id', $request->documentData['documents_type_id'])
@@ -144,8 +145,19 @@ class DocumentController extends Controller
             ->whereNull('dt_end')
             ->first();
 
-            if($repatedInvoice) {
-                return response()->json(['message' => 'El número de factura ya existe, puedes modificarla desde el listado de facturas']);
+            
+
+            if($repeatedInvoice) {
+                
+                // Asigna los conceptos en el detalle de factura
+                DB::table('documents')
+                ->where('id', $repeatedInvoice->id)
+                ->update(['dt_end' => now()]);
+
+                DB::table('documents_details')
+                ->where('documents_id', $repeatedInvoice->id)
+                ->update(['dt_end' => now()]);
+                
             }
 
             
@@ -189,11 +201,15 @@ class DocumentController extends Controller
                 ]);
             }
 
-            // Incrementa el contador de documentos en su respectivo tipo
-            DB::table('documents_series')
-            ->where('company_id', $request->documentData['company_id_company'])
-            ->where('documents_type_id', $request->documentData['documents_type_id'])
-            ->increment('number');
+            
+            if(!$repeatedInvoice) {
+                // Incrementa el contador de documentos en su respectivo tipo
+                DB::table('documents_series')
+                ->where('company_id', $request->documentData['company_id_company'])
+                ->where('documents_type_id', $request->documentData['documents_type_id'])
+                ->increment('number');
+                
+            }
 
             DB::commit();
 
@@ -213,14 +229,13 @@ class DocumentController extends Controller
     {
         $userId = Auth::id();
 
-
         $invoiceUser = DB::table('companies_users')
         ->select('user_id')
         ->where('company_id', $companyId)
         ->first();
 
         if ($invoiceUser == null) {
-            return Redirect::to('/dashboard')->with('error', 'No se encontró la factura');
+            return Redirect::to('documents/')->with('error', 'No se encontró la factura');
         }
         
         if ($userId != $invoiceUser->user_id) {
@@ -242,24 +257,28 @@ class DocumentController extends Controller
             'documents.paid',
             'documents.invoiced',
             'documents.active',
+            'documents.payment_methods_id',
             'documents_type.name as document_type_name',
             'documents_series.serie as document_series_serie',
             'companies_names.name as customer_name',
-            'documents.bank_account_id as banck_account_id',
+            'documents.bank_account_id as bank_account_id',
             'bank_account.complete_bank_account',
             'bank_account.swift',
-            'bank_account.bank_name'
+            'bank_account.bank_name',
+            'payment_method.name'
         )
         ->leftJoin('documents_type', 'documents.documents_type_id', '=', 'documents_type.id')
         ->leftJoin('documents_series', 'documents.documents_series_id', '=', 'documents_series.id')
         ->leftJoin('companies_names', 'documents.company_id_customer', '=', 'companies_names.company_id')
         ->leftJoin('bank_account', 'documents.bank_account_id', '=', 'bank_account.id')
+        ->leftJoin('payment_method', 'documents.payment_methods_id', '=', 'payment_method.id')
         ->where('documents.company_id_company', $companyId)
         ->where('documents_series.company_id', $companyId)
         ->where('documents.id', $documentId)
         ->whereNull('documents.dt_end')
         ->first();
-        
+
+
         if ($documents == null) {
             return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
         }
@@ -276,6 +295,7 @@ class DocumentController extends Controller
             'price',
             'total',
         )
+
         ->whereNull('dt_end')
         ->where('documents_id',$documentId)
         ->get();
@@ -310,7 +330,6 @@ class DocumentController extends Controller
         ->first();
 
 
-
         if ($company == null) {
             return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
         }
@@ -341,10 +360,8 @@ class DocumentController extends Controller
         if ($customer == null) {
             return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
         }
-
-        return Inertia::render('Companies/Documents/DocumentEdit', ['documents' => $documents, 'concepts' => $concepts, 'company'=>$company, 'customer'=>$customer]);
+        return response()->json(['message' => 'Datos de las facturas cargadas correctamente', 'documents' => $documents, 'concepts' => $concepts, 'company'=>$company, 'customer'=>$customer]);
     }
-    
 
     public function indexDocuments($id)
     {
@@ -376,7 +393,6 @@ class DocumentController extends Controller
         ->whereNull('companies_names.dt_end')
         ->get();
 
-        //dd($documents);
 
         return response()->json(['message' => 'Datos de las facturas cargadas correctamente', 'documents'=>$documents]);
 
@@ -408,7 +424,7 @@ class DocumentController extends Controller
             ->first();
     
             if ($invoiceUser == null) {
-                return Redirect::to('/dashboard')->with('error', 'No se encontró la factura');
+                return Redirect::to('documents/')->with('error', 'No se encontró la factura');
             }
             
             if ($userId != $invoiceUser->user_id) {

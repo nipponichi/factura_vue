@@ -46,9 +46,6 @@
                         <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" 
                             @click="confirmDeleteProduct(slotProps.data)" />
                     </template>
-                    
-                    
-                    
                 </Column>
             </DataTable>
         </div>
@@ -133,9 +130,10 @@ export default {
     },
     
     methods: {
+
         fetchDocuments() {
             let myCompanyId = window.location.pathname.split('/').pop();
-            console.log("ID company " + myCompanyId)
+            console.log("ID company " + myCompanyId + " hola")
             axios.get('/documents-serie/' + myCompanyId)
                 .then(response => {
                     this.documents = response.data.documents;
@@ -208,21 +206,8 @@ export default {
         handleInfoButtonClick(slotProps) {
             let companyID = window.location.pathname.split('/').pop();
             this.myDocument.id = slotProps.id;
-            this.myDocument.number = slotProps.number;
-            this.myDocument.company_id_company = slotProps.company_id_company;
-            this.myDocument.company_id_customer = slotProps.company_id_customer;
-            this.myDocument.documents_type_id = slotProps.documents_type_id;
-            this.myDocument.documents_series_id = slotProps.documents_series_id;
-            this.myDocument.date = slotProps.date;
-            this.myDocument.subTotal = slotProps.subTotal;
-            this.myDocument.amount = slotProps.amount;
-            this.myDocument.totalTax = slotProps.totalTax;
-            this.myDocument.paid = slotProps.paid;
-            this.myDocument.invoiced = slotProps.invoiced;
-            this.myDocument.customer_name = slotProps.customer_name;
-
             let url = `/companies/${companyID}/document/${this.myDocument.id}`;
-            window.open(url, '_blank'); // Abre la URL en una nueva pestaña
+            window.open(url, '_blank');
         },
 
 

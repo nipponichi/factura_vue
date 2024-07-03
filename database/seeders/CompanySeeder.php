@@ -167,6 +167,7 @@ class CompanySeeder extends Seeder
         'dt_start' => now(),
     ]);
 
+    
     //SEGUNDA COMPAÑIA
 
     DB::table('companies')->insert([
@@ -259,6 +260,7 @@ class CompanySeeder extends Seeder
         'documents_type_id' => 2,
         'dt_start' => now(),
     ]);
+
 
 
 
