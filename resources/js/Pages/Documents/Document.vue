@@ -28,16 +28,11 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             </div>
                             
                             
-<<<<<<< HEAD
 
 
                             <!-- Botones normales para pantallas grandes -->
                             <div class="md:flex justify-between items-center">
                                 <!-- Mueve este div a la izquierda -->
-=======
-                            <!-- Botones normales para pantallas grandes -->
-                            <div class="md:flex justify-between items-center">
->>>>>>> javier_develop
                                 <div class="flex flex-col md:flex-row justify-start items-center">
                                     <div class="flex flex-wrap justify-start items-center">
                                         <div class="relative inline-block w-50">
@@ -57,20 +52,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         <div class="flex">
                                             <button
                                                 type="button"
-<<<<<<< HEAD
-=======
-                                                class="px-4 py-2 mr-2 danger-button text-white rounded flex items-center justify-between"
-                                                @click="handleListDocument()"
-                                                :class="{ 'opacity-50': !selectedCompany.id }"
-                                                :disabled="!selectedCompany.id">
-                                                <span>
-                                                    <i class="pi pi-plus mr-2"></i>
-                                                    {{ $t('Document list') }}
-                                                </span>
-                                            </button>
-                                            <button
-                                                type="button"
->>>>>>> javier_develop
                                                 class="px-4 py-2 mr-2 success-button text-white rounded flex items-center justify-between"
                                                 @click="selectDocument()"
                                                 :class="{ 'opacity-50': !selectedCompany.id }"
@@ -422,15 +403,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         </div>
                     </template>
                 </Dropdown>  
-<<<<<<< HEAD
 
-=======
-            </Dialog>
-
-            <!-- MODAL DOCUMENT LIST -->
-            <Dialog v-model:visible="documentListDialog" class="w-3/4" :header="$t('Select document')" :modal="true">
-                <TableDocumentSelector :companyId="selectedCompany.id" @document-selected="handleDocumentSelected" />
->>>>>>> javier_develop
             </Dialog>
 
             <!-- MODAL DELETE SIMPLE -->
@@ -689,17 +662,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { FilterMatchMode } from 'primevue/api';
 import '../../../css/document.css';
 import { AutoScript } from '@/Libcustom/autoscript.js';
-<<<<<<< HEAD
 
 export default {
-=======
-import TableDocumentSelector from '@/Pages/Companies/Partials/TableDocumentSelector.vue';
-
-export default {
-    components: {
-        TableDocumentSelector
-    },
->>>>>>> javier_develop
     data() {
         return {
             items: [
@@ -726,10 +690,6 @@ export default {
             saveRestart: false,
             taxTypes: [],
             taxValues: [],
-<<<<<<< HEAD
-=======
-            documents1: [],
->>>>>>> javier_develop
             taxOptions: [
                 { label: '0', value: 0 },
                 { label: '4', value: 4 },
@@ -763,15 +723,8 @@ export default {
             deleteProductsDialog: false,
             selectACustomerDialog: false,
             selectAPaymentMethodDialog: false,
-<<<<<<< HEAD
             selectedOption: [],
             options: [],
-=======
-            documentListDialog: false,
-            selectedOption: [],
-            options: [],
-            concepts: [],
->>>>>>> javier_develop
             selectedBankAccount: [],
             selectedEmail: [],
             selectedPhone: [],
@@ -817,23 +770,7 @@ export default {
                 province: '',
                 country: ''
             },
-<<<<<<< HEAD
             
-=======
-            company: {
-                id:'',
-                name: '',
-                tax_number: '',
-                email: '',
-                phone: '',
-                address: '',
-                post_code: '',
-                town: '',
-                province: '',
-                country: '',
-                documentId: ''
-            },
->>>>>>> javier_develop
         };
     },
 
@@ -868,11 +805,6 @@ export default {
 
     },
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> javier_develop
     created() {
         this.filters = {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -902,89 +834,26 @@ export default {
     
     methods: {
 
-<<<<<<< HEAD
         logWindowInfo() {
         // Llama a la función importada
         
-=======
-        handleDocumentSelected(documentId) {
-            if (documentId) {
-                this.documentListDialog = false
-            }
-            this.company = this.selectedCompany;
-            this.company.documentId = documentId
-
-            axios.get('/documents-show/' + this.company.id + '/' + this.company.documentId)
-                .then(response => {
-
-                    // Document
-                    this.myDocument = response.data.documents;
-                    this.fecha = this.myDocument.date;
-                    this.expiration = this.myDocument.expiration;
-                    this.selectedType.name = this.myDocument.document_type_name;
-                    this.selectedType.id = this.myDocument.documents_type_id;
-                    this.selectedSerie.id = this.myDocument.documents_series_id;
-                    this.selectedSerie.serie = this.myDocument.document_series_serie;
-                    let number = this.myDocument.number;
-                    let numberWithoutSerie = number.replace(this.selectedSerie.serie, '');
-                    this.selectedSerie.number = numberWithoutSerie;
-
-                    // Company
-                    this.selectedCompany = response.data.company;
-
-                    // Customer
-                    this.selectedCustomer = response.data.customer;
-
-                    // Concepts
-                    this.concepts = response.data.concepts;
-                    this.products = response.data.concepts;
-
-                    for (let i = 0; i < this.concepts.length; i++) {
-                        this.products[i].taxes = parseFloat(this.concepts[i].tax);
-                    }
-
-                    // Payment
-                    this.selectedPaymentMethod = [];
-                    this.selectedPaymentMethod.id = this.myDocument.payment_methods_id;
-
-                })
-                .catch(error => {
-                    this.$toast(this.$t('Error connecting to the server'), 'error');
-                });   
->>>>>>> javier_develop
         },
 
         handlePaymentMethodChange(paymentMethod) {
             switch (paymentMethod.id) {
                 case 1:
                     // Pago bancario
-<<<<<<< HEAD
-=======
-                    this.selectedPaymentMethod.name = "Transferencia"
->>>>>>> javier_develop
                     this.fetchBanks();
                     break;
                 case 2:
                     //Efectivo
-<<<<<<< HEAD
                     break;
                 case 3:
                     // Bizum
-=======
-                    this.selectedPaymentMethod.name = "Efectivo"
-                    break;
-                case 3:
-                    // Bizum
-                    this.selectedPaymentMethod.name = "Bizum"
->>>>>>> javier_develop
                     this.fetchPhones();
                     break;
                 case 4:
                     /// Paypal
-<<<<<<< HEAD
-=======
-                    this.selectedPaymentMethod.name = "Paypal"
->>>>>>> javier_develop
                     this.fetchEmails();
                     break;
                 default:
@@ -1063,11 +932,7 @@ export default {
             this.companies = response.data.companies;
             if (this.companies.length === 1) {
                 this.selectedCompany = this.companies[0];
-<<<<<<< HEAD
             
-=======
-                this.companyId = this.selectedCompany.id;
->>>>>>> javier_develop
                 return axios.get('/customers/' + this.selectedCompany.id);
             } else {
 
@@ -1170,12 +1035,6 @@ export default {
                 });
         },
 
-<<<<<<< HEAD
-=======
-        handleListDocument() {
-            this.documentListDialog = true
-        },
->>>>>>> javier_develop
 
         handleTypeSelection() {
             this.selectedSerie = [];
@@ -1238,12 +1097,8 @@ export default {
             this.checkDocument(); 
         },
 
-<<<<<<< HEAD
         checkDocument() {
             
-=======
-        checkDocument() { 
->>>>>>> javier_develop
             axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
             .then(response => {             
                 this.date = response.data.date.date
