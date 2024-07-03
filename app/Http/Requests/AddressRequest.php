@@ -28,7 +28,7 @@ class AddressRequest extends FormRequest
             'town' => 'string',
             'postCode' => 'string',
             'country' => 'string',
-            'favorite' => 'boolean',
+            'favourite' => 'boolean',
             'CompanyID' => 'string'
         ];
     }

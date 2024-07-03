@@ -126,6 +126,7 @@ export default {
                 isMobile: 0,
                 companyID: window.location.pathname.split('/').pop(),
             },
+            originalPhone: {},
             selectedPhones: [], 
             filters: {}, 
             submitted: false,
@@ -193,6 +194,8 @@ export default {
         },
 
         editMyPhone(slotProps) {
+
+            this.originalPhone = { ...slotProps };
             this.myPhone.phone = slotProps.phone;
             this.myPhone.id = slotProps.id;
             this.myPhone.favourite = slotProps.favourite;
@@ -201,6 +204,18 @@ export default {
         },
 
         updateMyPhone() {
+
+            
+            this.originalPhone.companyID = this.myPhone.companyID;
+            this.originalPhone.isMobile = this.myPhone.isMobile;
+            console.log(JSON.stringify(this.originalPhone) );
+            console.log(JSON.stringify(this.myPhone));
+            if (JSON.stringify(this.originalPhone) === JSON.stringify(this.myPhone)) {
+                this.$toast(this.$t('Successfully updated.'), 'success');
+                this.phoneDialog = false;
+                return;
+            }
+
             axios.put('/phone/' + this.myPhone.id, this.myPhone)
                 .then(async response => {
                     this.$toast(this.$t(response.data.message), response.data.type);
@@ -242,14 +257,13 @@ export default {
         },
         
         deleteMyPhone() {
-            const phoneId = this.myPhone.id;
 
             // Realizar la solicitud de eliminación al servidor
             axios.delete('/phone/' + this.myPhone.id)
                 .then(response => {
                     if(response.data.type === 'success'){
                         // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
-                        this.phones = this.phones.filter(val => val.id !== phoneId);
+                        this.phones = this.phones.filter(val => val.id !== this.myPhone.id);
 
                     }
                     this.$toast(this.$t(response.data.message), response.data.type);

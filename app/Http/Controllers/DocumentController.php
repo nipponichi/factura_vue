@@ -525,16 +525,25 @@ class DocumentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
         DB::beginTransaction();
         try {
+
             DB::table('documents')
             ->where('id', $id)
             ->update([
                 'dt_end' => now(),
             ]);
 
+            DB::table('documents_details')
+            ->where('documents_id', $id)
+            ->update([
+                'dt_end' => now(),
+            ]);
+            
+
+            DB::commit();
             return response()->json(['message' => 'It has been successfully removed.','type' => 'success']);
         
         } catch (Exception $e) {

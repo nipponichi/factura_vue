@@ -101,7 +101,7 @@
                 
                 <div class="grid gap-3 md:grid-cols-1 justify-items-end">
                     <div>
-                        <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" text @click="hideDialog">{{ $t('Close') }} </button>
+                        <button type="button" class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog">{{ $t('Close') }}</button>
                         <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ company.id ? $t('Update') : $t('Save') }}</button>
                     </div>    
                 </div>
@@ -244,7 +244,7 @@ export default {
 
             axios.put('/customer/' + this.company.id, this.company)
             .then(response => {
-                
+                console.log("AQIUO")
                 this.$toast(this.$t(response.data.message), response.data.type);
                 this.fetchCustomers();
                 this.companyDialog = false; 
