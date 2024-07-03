@@ -234,7 +234,7 @@ class DocumentController extends Controller
         ->first();
 
         if ($invoiceUser == null) {
-            return Redirect::to('/dashboard')->with('error', 'No se encontró la factura');
+            return Redirect::to('documents/')->with('error', 'No se encontró la factura');
         }
         
         if ($userId != $invoiceUser->user_id) {
@@ -359,7 +359,7 @@ class DocumentController extends Controller
         if ($customer == null) {
             return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
         }
-        return Inertia::render('Companies/Documents/DocumentEdit', ['documents' => $documents, 'concepts' => $concepts, 'company'=>$company, 'customer'=>$customer]);
+        return response()->json(['message' => 'Datos de las facturas cargadas correctamente', 'documents' => $documents, 'concepts' => $concepts, 'company'=>$company, 'customer'=>$customer]);
     }
     
 

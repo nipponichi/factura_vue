@@ -28,11 +28,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             </div>
                             
                             
-
-
                             <!-- Botones normales para pantallas grandes -->
                             <div class="md:flex justify-between items-center">
-                                <!-- Mueve este div a la izquierda -->
                                 <div class="flex flex-col md:flex-row justify-start items-center">
                                     <div class="flex flex-wrap justify-start items-center">
                                         <div class="relative inline-block w-50">
@@ -50,6 +47,17 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <div class="flex items-center">
                                     <div id="app" class="relative inline-block w-50 ml-2">
                                         <div class="flex">
+                                            <button
+                                                type="button"
+                                                class="px-4 py-2 mr-2 danger-button text-white rounded flex items-center justify-between"
+                                                @click="handleListDocument()"
+                                                :class="{ 'opacity-50': !selectedCompany.id }"
+                                                :disabled="!selectedCompany.id">
+                                                <span>
+                                                    <i class="pi pi-plus mr-2"></i>
+                                                    {{ $t('Document list') }}
+                                                </span>
+                                            </button>
                                             <button
                                                 type="button"
                                                 class="px-4 py-2 mr-2 success-button text-white rounded flex items-center justify-between"
@@ -403,7 +411,11 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         </div>
                     </template>
                 </Dropdown>  
+            </Dialog>
 
+            <!-- MODAL DOCUMENT LIST -->
+            <Dialog v-model:visible="documentListDialog" class="w-3/4" :header="$t('Select document')" :modal="true">
+                <TableDocumentSelector :companyId="selectedCompany.id" @document-selected="handleDocumentSelected" />
             </Dialog>
 
             <!-- MODAL DELETE SIMPLE -->
@@ -662,8 +674,12 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { FilterMatchMode } from 'primevue/api';
 import '../../../css/document.css';
 import { AutoScript } from '@/Libcustom/autoscript.js';
+import TableDocumentSelector from '@/Pages/Companies/Partials/TableDocumentSelector.vue';
 
 export default {
+    components: {
+        TableDocumentSelector
+    },
     data() {
         return {
             items: [
@@ -690,6 +706,7 @@ export default {
             saveRestart: false,
             taxTypes: [],
             taxValues: [],
+            documents1: [],
             taxOptions: [
                 { label: '0', value: 0 },
                 { label: '4', value: 4 },
@@ -723,8 +740,10 @@ export default {
             deleteProductsDialog: false,
             selectACustomerDialog: false,
             selectAPaymentMethodDialog: false,
+            documentListDialog: false,
             selectedOption: [],
             options: [],
+            concepts: [],
             selectedBankAccount: [],
             selectedEmail: [],
             selectedPhone: [],
@@ -770,7 +789,19 @@ export default {
                 province: '',
                 country: ''
             },
-            
+            company: {
+                id:'',
+                name: '',
+                tax_number: '',
+                email: '',
+                phone: '',
+                address: '',
+                post_code: '',
+                town: '',
+                province: '',
+                country: '',
+                documentId: ''
+            },
         };
     },
 
@@ -805,6 +836,8 @@ export default {
 
     },
 
+
+
     created() {
         this.filters = {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -834,26 +867,80 @@ export default {
     
     methods: {
 
-        logWindowInfo() {
-        // Llama a la función importada
-        
+        handleDocumentSelected(documentId) {
+            if (documentId) {
+                this.documentListDialog = false
+            }
+            this.company = this.selectedCompany;
+            this.company.documentId = documentId
+
+            axios.get('/documents-show/' + this.company.id + '/' + this.company.documentId)
+                .then(response => {
+
+                    // Document
+                    this.myDocument = response.data.documents;
+                    console.log(this.myDocument.paid);
+                    this.fecha = this.myDocument.date;
+                    this.expiration = this.myDocument.expiration;
+                    this.selectedType.name = this.myDocument.document_type_name;
+                    this.selectedType.id = this.myDocument.documents_type_id;
+                    this.selectedSerie.id = this.myDocument.documents_series_id;
+                    this.selectedSerie.serie = this.myDocument.document_series_serie;
+                    let number = this.myDocument.number;
+                    let numberWithoutSerie = number.replace(this.selectedSerie.serie, '');
+                    this.selectedSerie.number = numberWithoutSerie;
+
+                    if (this.myDocument.paid === 0 ) {
+                        this.myDocument = false
+                    } else {
+                        this.myDocument.paid = true
+                    }
+
+                    // Company
+                    this.selectedCompany = response.data.company;
+
+                    // Customer
+                    this.selectedCustomer = response.data.customer;
+
+                    // Concepts
+                    this.concepts = response.data.concepts;
+                    this.products = response.data.concepts;
+
+                    for (let i = 0; i < this.concepts.length; i++) {
+                        this.products[i].taxes = parseFloat(this.concepts[i].tax);
+                    }
+
+                    // Payment
+                    this.selectedPaymentMethod = [];
+                    this.selectedPaymentMethod.id = this.myDocument.payment_methods_id;
+                    //this.handlePaymentMethodChange(this.selectedPaymentMethod)
+
+                })
+                .catch(error => {
+                    this.$toast(this.$t('Error connecting to the server'), 'error');
+                });   
         },
 
         handlePaymentMethodChange(paymentMethod) {
             switch (paymentMethod.id) {
                 case 1:
                     // Pago bancario
+                    console.log("aqui")
+                    this.selectedPaymentMethod.name = "Transferencia"
                     this.fetchBanks();
                     break;
                 case 2:
                     //Efectivo
+                    this.selectedPaymentMethod.name = "Efectivo"
                     break;
                 case 3:
                     // Bizum
+                    this.selectedPaymentMethod.name = "Bizum"
                     this.fetchPhones();
                     break;
                 case 4:
                     /// Paypal
+                    this.selectedPaymentMethod.name = "Paypal"
                     this.fetchEmails();
                     break;
                 default:
@@ -932,7 +1019,7 @@ export default {
             this.companies = response.data.companies;
             if (this.companies.length === 1) {
                 this.selectedCompany = this.companies[0];
-            
+                this.companyId = this.selectedCompany.id;
                 return axios.get('/customers/' + this.selectedCompany.id);
             } else {
 
@@ -1035,6 +1122,9 @@ export default {
                 });
         },
 
+        handleListDocument() {
+            this.documentListDialog = true
+        },
 
         handleTypeSelection() {
             this.selectedSerie = [];
@@ -1097,8 +1187,7 @@ export default {
             this.checkDocument(); 
         },
 
-        checkDocument() {
-            
+        checkDocument() { 
             axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
             .then(response => {             
                 this.date = response.data.date.date

@@ -21,8 +21,8 @@ class RouteController extends Controller
     public function dashboard(){
 
         
-        return Inertia::render('Dashboard');
-        //return Inertia::render('Documents/Document'); {{ route('dashboard') }}
+        //return Inertia::render('Dashboard');
+        return Inertia::render('Documents/Document');
         
     }
     
