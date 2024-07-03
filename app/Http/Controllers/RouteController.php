@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Auth;
+
 
 class RouteController extends Controller
 {
@@ -20,7 +20,9 @@ class RouteController extends Controller
 
     public function dashboard(){
 
-        return redirect()->route('dashboard');
+        
+        return Inertia::render('Dashboard');
+        //return Inertia::render('Documents/Document'); {{ route('dashboard') }}
         
     }
     
