@@ -44,34 +44,55 @@
         </div>
 
         <!-- MODAL -->
+<<<<<<< HEAD
         <Dialog v-model:visible="companyDialog" :header="myCompany.id ? $t('Modify myCompany') : $t('Create myCompany')" id="titleCompany" :modal="true" class="p-fluid">
+=======
+        <Dialog v-model:visible="companyDialog" :header="company.id ? $t('Modify company') : $t('Create company')" id="titleCompany" :modal="true" class="p-fluid">
+>>>>>>> javier_develop
             
             <form style="width: 800px;" @submit.prevent="saveCompany">
                 <div class="grid gap-3 mb-6 md:grid-cols-2">
                 <div>
                         <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Company name') }}</label>
+<<<<<<< HEAD
                         <input type="text" id="name" v-model="myCompany.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Company name')" required />
                     </div>
                     <div>
                         <label for="tax_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Tax number') }}</label>
                         <input type="text" id="tax_number" v-model="myCompany.tax_number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Tax number')" required />
+=======
+                        <input type="text" id="name" v-model="company.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Company name')" required />
+                    </div>
+                    <div>
+                        <label for="tax_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Tax number') }}</label>
+                        <input type="text" id="tax_number" v-model="company.tax_number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Tax number')" required />
+>>>>>>> javier_develop
                     </div>
                 </div>
 
                 
+<<<<<<< HEAD
                 <div v-if="!this.myCompany.id">
+=======
+                <div v-if="!this.company.id">
+>>>>>>> javier_develop
 
                     <div class="mb-6">
 
                         <div>
                             <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Address') }}</label>
+<<<<<<< HEAD
                             <input type="text" id="address1" v-model="myCompany.address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Address')" required />
+=======
+                            <input type="text" id="address1" v-model="company.address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Address')" required />
+>>>>>>> javier_develop
                         </div>
                     </div>
                     <div class="grid gap-3 mb-6 md:grid-cols-2"> 
                         
                         <div>
                             <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Town') }}</label>
+<<<<<<< HEAD
                             <input type="text" id="town" v-model="myCompany.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Town')" required />
                         </div>  
                         <div>
@@ -93,6 +114,29 @@
                         <div>
                             <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Phone') }}</label>
                             <input type="tel" id="phone" v-model="myCompany.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Phone')" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
+=======
+                            <input type="text" id="town" v-model="company.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Town')" required />
+                        </div>  
+                        <div>
+                            <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Province') }}</label>
+                            <input type="text" id="province" v-model="company.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Province')" required />
+                        </div>  
+                        <div>
+                            <label for="post_code" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Post code') }}</label>
+                            <input type="text" id="post_code" v-model="company.post_code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Post code')" pattern="^\d+$" required />
+                        </div>
+                        <div>
+                            <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Country') }}</label>
+                            <input type="text" id="country" v-model="company.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Country')" required />
+                        </div>
+                        <div>
+                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Email') }}</label>
+                            <input type="email" id="email" v-model="company.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('info@mycompany.com')" required />
+                        </div>    
+                        <div>
+                            <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Phone') }}</label>
+                            <input type="tel" id="phone" v-model="company.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Phone')" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
+>>>>>>> javier_develop
                         </div>
 
                         
@@ -101,8 +145,13 @@
                 
                 <div class="grid gap-3 md:grid-cols-1 justify-items-end">
                     <div>
+<<<<<<< HEAD
                         <button type="button" class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog">{{ $t('Close') }}</button>
                         <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ myCompany.id ? $t('Update') : $t('Save') }}</button>
+=======
+                        <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" text @click="hideDialog">{{ $t('Close') }} </button>
+                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ company.id ? $t('Update') : $t('Save') }}</button>
+>>>>>>> javier_develop
                     </div>    
                 </div>
             </form>
@@ -112,7 +161,11 @@
         <Dialog v-model:visible="deleteCompanyDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+<<<<<<< HEAD
                 <span v-if="myCompany"> {{$t('Are you sure you want to delete')}}<b>{{myCompany.name}}</b>?</span>
+=======
+                <span v-if="company"> {{$t('Are you sure you want to delete')}}<b>{{company.name}}</b>?</span>
+>>>>>>> javier_develop
             </div>
             <template #footer>
                 <Button :label="$t('No')" icon="pi pi-times" text @click="deleteCompanyDialog = false"/>
@@ -124,7 +177,11 @@
         <Dialog v-model:visible="deleteCompaniesDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+<<<<<<< HEAD
                 <span v-if="myCompany">{{ $t('Are you sure you want to delete the selected customers?') }}</span>
+=======
+                <span v-if="company">{{ $t('Are you sure you want to delete the selected customers?') }}</span>
+>>>>>>> javier_develop
             </div>
             <template #footer>
                 <Button :label="$t('No')" icon="pi pi-times" text @click="deleteCompaniesDialog = false"/>
@@ -154,7 +211,11 @@ export default {
             companyDialog: false, 
             deleteCompanyDialog: false, 
             deleteCompaniesDialog: false, 
+<<<<<<< HEAD
             myCompany: {
+=======
+            company: {
+>>>>>>> javier_develop
                 id:'',
                 name: '',
                 tax_number: '',
@@ -166,7 +227,10 @@ export default {
                 province: '',
                 country: ''
             },
+<<<<<<< HEAD
             originalCompany: [],
+=======
+>>>>>>> javier_develop
             selectedCompanies: [], 
             filters: {}, 
             submitted: false,
@@ -200,7 +264,11 @@ export default {
 
         openNew() {
             // Para hacer asociación en tabla Companies_Customers
+<<<<<<< HEAD
             this.myCompany = {
+=======
+            this.company = {
+>>>>>>> javier_develop
                 companyID: window.location.pathname.split('/').pop(),
             };
             this.submitted = false;
@@ -213,9 +281,15 @@ export default {
         },
         
         saveCompany() {
+<<<<<<< HEAD
             if (!this.myCompany.id) {
 
                 axios.post('/customer', this.myCompany)
+=======
+            if (!this.company.id) {
+
+                axios.post('/customer', this.company)
+>>>>>>> javier_develop
                 .then(response => {
 
                     this.$toast(this.$t(response.data.message), response.data.type);
@@ -234,6 +308,7 @@ export default {
 
 
         editCompany(slotCompany) {
+<<<<<<< HEAD
 
             this.originalCompany = {
                 tax_number: slotCompany.tax_number,
@@ -242,12 +317,18 @@ export default {
             this.myCompany.id = slotCompany.id;    
             this.myCompany.name = slotCompany.name;
             this.myCompany.tax_number = slotCompany.tax_number;
+=======
+            this.company.id = slotCompany.id;    
+            this.company.name = slotCompany.name;
+            this.company.tax_number = slotCompany.tax_number;
+>>>>>>> javier_develop
             this.companyDialog = true;
             
         },
 
         updateCompany() {
 
+<<<<<<< HEAD
             if (this.originalCompany.tax_number === this.myCompany.tax_number &&
                 this.originalCompany.name === this.myCompany.name) {
                 this.$toast(this.$t('Successfully updated.'), 'success');
@@ -256,6 +337,11 @@ export default {
             }
             axios.put('/customer/' + this.myCompany.id, this.myCompany)
             .then(response => {
+=======
+            axios.put('/customer/' + this.company.id, this.company)
+            .then(response => {
+                
+>>>>>>> javier_develop
                 this.$toast(this.$t(response.data.message), response.data.type);
                 this.fetchCustomers();
                 this.companyDialog = false; 
@@ -267,20 +353,33 @@ export default {
             });
         },        
 
+<<<<<<< HEAD
         confirmDeleteCompany(myCompany) {
             this.myCompany = myCompany;
+=======
+        confirmDeleteCompany(company) {
+            this.company = company;
+>>>>>>> javier_develop
             this.deleteCompanyDialog = true;       
         },
 
         deleteCompany() {
             
 
+<<<<<<< HEAD
             axios.delete('/customer/'+ this.myCompany.id)
+=======
+            axios.delete('/customer/'+ this.company.id)
+>>>>>>> javier_develop
                 .then(response => {
                     
                     if(response.data.type === 'success'){
                         // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
+<<<<<<< HEAD
                         this.companies = this.companies.filter(val=> val.id !== this.myCompany.id);
+=======
+                        this.companies = this.companies.filter(val=> val.id !== this.company.id);
+>>>>>>> javier_develop
 
                     }
                     this.$toast(this.$t(response.data.message), response.data.type);
@@ -300,6 +399,7 @@ export default {
         
         deleteSelectedCompanies() {
             // Envía una solicitud de eliminación para cada compañia seleccionado
+<<<<<<< HEAD
             this.selectedCompanies.forEach(myCompany => {
                 axios.delete('/customer/' + myCompany.id)
                 .then(response => {
@@ -307,6 +407,15 @@ export default {
                     if(response.data.type === 'success'){
                         // Elimina el compañia de la lista de myCompany
                         this.companies = this.companies.filter(p => p.id !== myCompany.id);
+=======
+            this.selectedCompanies.forEach(company => {
+                axios.delete('/customer/' + company.id)
+                .then(response => {
+
+                    if(response.data.type === 'success'){
+                        // Elimina el compañia de la lista de company
+                        this.companies = this.companies.filter(p => p.id !== company.id);
+>>>>>>> javier_develop
                     }
                     this.$toast(this.$t(response.data.message), response.data.type);
                         

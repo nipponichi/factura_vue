@@ -108,7 +108,6 @@ class AddressController extends Controller
             ->where('id',$request->id)
             ->update(['dt_end' => now()]);
 
-        
 
     
             DB::commit();

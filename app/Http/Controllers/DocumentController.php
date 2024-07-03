@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Http\Requests\DocumentRequest;
+use App\Http\Requests\CompanyRequest;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ class DocumentController extends Controller
     public function __construct()
     {
 
-        $this->middleware(['can:read company'])->only(['index', 'show','indexDocuments','documentType','documentSerieCheck','documentSerie','documentDateCheck','fromBudgetToInvoice']);
+        $this->middleware(['can:read company'])->only(['index', 'show','indexDocuments','documentType','documentSerieCheck','documentSerie','documentDateCheck','fromBudgetToInvoice', 'showDocument']);
         $this->middleware(['can:create company'])->only(['create', 'store']);
         $this->middleware(['can:update company'])->only(['edit', 'update']);
         $this->middleware(['can:delete company'])->only('destroy');
@@ -359,9 +360,8 @@ class DocumentController extends Controller
         if ($customer == null) {
             return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
         }
-        return Inertia::render('Companies/Documents/DocumentEdit', ['documents' => $documents, 'concepts' => $concepts, 'company'=>$company, 'customer'=>$customer]);
+        return response()->json(['message' => 'Datos de las facturas cargadas correctamente', 'documents' => $documents, 'concepts' => $concepts, 'company'=>$company, 'customer'=>$customer]);
     }
-    
 
     public function indexDocuments($id)
     {

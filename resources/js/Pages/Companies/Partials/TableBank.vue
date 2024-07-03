@@ -150,7 +150,11 @@ export default {
                 complete_bank_account: '',
                 companyID: window.location.pathname.split('/').pop(),
             },
+<<<<<<< HEAD
             originalBanks: {},
+=======
+
+>>>>>>> javier_develop
             selectedBanks: [], 
             filters: {}, 
             submitted: false,
@@ -247,7 +251,10 @@ export default {
 
         editMyBank(slotProps) {    
 
+<<<<<<< HEAD
             this.originalBank = { ...slotProps };
+=======
+>>>>>>> javier_develop
             this.myBank.id = slotProps.id;
             this.myBank.complete_bank_account = slotProps.complete_bank_account;
             this.myBank.bank_name = slotProps.bank_name;
@@ -260,6 +267,7 @@ export default {
 
         updateMyBank() {
 
+<<<<<<< HEAD
             
             this.originalBank.companyID = this.myBank.companyID;
             if (JSON.stringify(this.originalBank) === JSON.stringify(this.myBank)) {
@@ -268,6 +276,8 @@ export default {
                 return;
             }
 
+=======
+>>>>>>> javier_develop
             axios.put('/bank/' + this.myBank.id, this.myBank)
             .then(response => {
 

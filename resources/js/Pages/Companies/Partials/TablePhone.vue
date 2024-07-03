@@ -126,7 +126,10 @@ export default {
                 isMobile: 0,
                 companyID: window.location.pathname.split('/').pop(),
             },
+<<<<<<< HEAD
             originalPhone: {},
+=======
+>>>>>>> javier_develop
             selectedPhones: [], 
             filters: {}, 
             submitted: false,
@@ -194,8 +197,11 @@ export default {
         },
 
         editMyPhone(slotProps) {
+<<<<<<< HEAD
 
             this.originalPhone = { ...slotProps };
+=======
+>>>>>>> javier_develop
             this.myPhone.phone = slotProps.phone;
             this.myPhone.id = slotProps.id;
             this.myPhone.favourite = slotProps.favourite;
@@ -204,6 +210,7 @@ export default {
         },
 
         updateMyPhone() {
+<<<<<<< HEAD
 
             
             this.originalPhone.companyID = this.myPhone.companyID;
@@ -216,6 +223,8 @@ export default {
                 return;
             }
 
+=======
+>>>>>>> javier_develop
             axios.put('/phone/' + this.myPhone.id, this.myPhone)
                 .then(async response => {
                     this.$toast(this.$t(response.data.message), response.data.type);
@@ -257,13 +266,21 @@ export default {
         },
         
         deleteMyPhone() {
+<<<<<<< HEAD
+=======
+            const phoneId = this.myPhone.id;
+>>>>>>> javier_develop
 
             // Realizar la solicitud de eliminación al servidor
             axios.delete('/phone/' + this.myPhone.id)
                 .then(response => {
                     if(response.data.type === 'success'){
                         // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
+<<<<<<< HEAD
                         this.phones = this.phones.filter(val => val.id !== this.myPhone.id);
+=======
+                        this.phones = this.phones.filter(val => val.id !== phoneId);
+>>>>>>> javier_develop
 
                     }
                     this.$toast(this.$t(response.data.message), response.data.type);
