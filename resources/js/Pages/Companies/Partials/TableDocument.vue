@@ -57,7 +57,7 @@
         <Dialog v-model:visible="deleteDocumentDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
             <div class="confirmation-content">
                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                <span v-if="document">{{$t('Are you sure you want to delete')}}<b>{{document.number}}</b>?</span>
+                <span v-if="myDocument">{{$t('Are you sure you want to delete')}}<b>{{myDocument.number}}</b>?</span>
             </div>
             <template #footer>
                 <Button label="No" icon="pi pi-times" text @click="deleteDocumentDialog = false"/>
@@ -145,28 +145,24 @@ export default {
             });
         },
 
-        confirmDeleteProduct(myDocument) {
-            console.log("Confirm deletee");
-            this.document = myDocument;
+        confirmDeleteProduct(document) {
+            this.myDocument = document;
             this.deleteDocumentDialog = true;       
         },
 
         deleteProduct() {
-            console.log("DELETE")
-            
-            this.deleteDocumentDialog = false;
+            axios.delete('/documents/'+ this.myDocument.id)
+                .then(response => {
+                    if(response.data.type === 'success'){
+                        
+                        this.documents = this.documents.filter(p => p.id !== this.myDocument.id);
 
-            axios.delete('/documents/'+ this.document.id)
-            .then(response => {
-                if(response.data.type === 'success'){
+
+                    }
+                    this.$toast(this.$t(response.data.message), response.data.type);
                     
-                    this.documents = this.documents.filter(val => val.id !== this.document.id);
-
-                }
-                this.$toast(this.$t(response.data.message), response.data.type);
                 
-            
-            })
+                })
             .catch(error => {
                 this.$toast(this.$t(error.response.message), error.response.type);
             });
@@ -260,13 +256,11 @@ export default {
 
             axios.post('/documents-serie/' + this.myDocument.id +'/'+this.fecha)
             .then(response => {
-                console.log("ha pasao")
                 
                 //this.resetData();
 
             })
             .catch(error => {
-                console.log("ha fallao")
                 console.error('Error al guardar los datos del documento:', error.response);
                // this.resetData();
                 

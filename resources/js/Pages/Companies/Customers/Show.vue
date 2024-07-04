@@ -92,13 +92,13 @@
             
                         <div class="flex flex-col items-center justify-center w-full overflow-x-auto">
                             <div v-if="activeTab === 'phone'" class="w-full">
-                                <TablePhone />
+                                <TablePhone @updatePhone="handlePhoneUpdate" />
                             </div>
                             <div v-else-if="activeTab === 'email'" class="w-full">
-                                <TableEmail />
+                                <TableEmail @updateEmail="handleEmailUpdate" />
                             </div>
                             <div v-else-if="activeTab === 'address'" class="w-full">
-                                <TableAddress />
+                                <TableAddress @updateAddress="handleAddressUpdate"/>
                             </div>
                             <div v-else-if="activeTab === 'bank'" class="w-full">
                                 <TableBank />
@@ -150,6 +150,21 @@
 
         methods: {
         
+            handlePhoneUpdate(phone) {
+            this.company.phone = phone;
+            },
+
+            handleEmailUpdate(email) {
+                this.company.email = email;
+            },
+
+            handleAddressUpdate(address) {
+                this.company.address = address.address;
+                this.company.town = address.town;
+                this.company.post_code = address.post_code;
+                this.company.province = address.province;
+                this.company.country = address.country;
+            },
 
         },
     };

@@ -91,35 +91,24 @@ class AddressController extends Controller
         DB::beginTransaction();
         try {
 
-            $companyFav = DB::table('addresses')
-            ->select('favourite')
-            ->where('id', $companyAddressId)
-            ->first();
-            
-
-            if ($companyFav->favourite && $request->favourite === false) {
-                DB::rollback();
-                return response()->json(['message' => 'You need to mark at least one as a favorite.', 'type' => 'warning']);
-            }
 
             DB::table('addresses')
-            ->where('id',$request->id)
-            ->update(['dt_end' => now()]);
-
-            $newAddressId = DB::table('addresses')
-            ->insertGetId([
+            ->insert([
                 'company_id' => $request->companyID,
                 'address' => $request->address,
                 'town' => $request->town,
                 'post_code' => $request->post_code,
                 'province' => $request->province,
+                'favourite' => $request->favourite,
                 'country' => $request->country,
                 'dt_start' => now()
             ]);
 
-            if ($request->favourite === true) {
-                $this->favouriteTrue($newAddressId);
-            }
+            DB::table('addresses')
+            ->where('id',$request->id)
+            ->update(['dt_end' => now()]);
+
+        
 
     
             DB::commit();

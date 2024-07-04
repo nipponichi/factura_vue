@@ -78,6 +78,7 @@ class BankController extends Controller
             DB::table('bank_account')
                 ->where('id', $bankAccountId)
                 ->update([
+                    'favourite' => 0,
                     'dt_end' => now(),
                 ]);
 

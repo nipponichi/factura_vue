@@ -174,7 +174,11 @@ export default {
         },
 
         handleAddressUpdate(address) {
-            this.company.address = address;
+            this.company.address = address.address;
+            this.company.town = address.town;
+            this.company.post_code = address.post_code;
+            this.company.province = address.province;
+            this.company.country = address.country;
         },
         
     }

@@ -57,6 +57,7 @@ const logout = () => {
                                 </NavLink>
                             </div>
                             -->
+                            
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')">
                                 <NavLink :href="route('documents.index')" :active="route().current('documents.*')">
                                     {{ $t('Invoice') }}

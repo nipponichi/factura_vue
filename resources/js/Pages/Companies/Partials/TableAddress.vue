@@ -89,12 +89,6 @@
                         </div>            
                     </div>
                     
-                        
-                    <div class="flex items-center">
-                        <input id="link-checkbox" type="checkbox" v-model="myAddress.favourite" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark this email as a favourite') }}</label>
-                    </div>
-                    
                     <div class="grid gap-3 md:grid-cols-1 justify-items-end">
                     <div>
                         <button type="button" class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog">{{ $t('Close') }}</button>
@@ -148,13 +142,14 @@ export default {
             myAddress: { 
                 id: '',             
                 address: '',
-                post_code: '',
-                town: '',
-                province: '',
                 country: '',
+                province: '',
+                town: '',
+                post_code: '',
                 favourite: '',
                 companyID: window.location.pathname.split('/').pop(),
             },
+            originalAddresses: {},
             selectedAddresses: [], 
             filters: {}, 
             submitted: false,
@@ -171,9 +166,10 @@ export default {
             
     },
     methods: {
+        
         fetchAddresses() {
             let myCompanyId = window.location.pathname.split('/').pop();
-            axios.get('/addresses/' + myCompanyId)
+            return axios.get('/addresses/' + myCompanyId)
                 .then(response => {
                     this.addresses = response.data.addresses;
                     
@@ -196,85 +192,89 @@ export default {
         },
 
 
-        saveMyAddress() {
-
-            if(this.myAddress.favourite == null) {
-                this.myAddress.favourite = false
+        async saveMyAddress() {
+            if (this.myAddress.favourite == null) {
+                this.myAddress.favourite = false;
             }
-            if (!this.myAddress.id) {
-                axios.post('/address', this.myAddress)
-                .then(response => {
-                    this.$toast(this.$t(response.data.message), response.data.type);
-                    this.fetchAddresses();
-                    
-                    this.addressDialog = false;
-                        
-                })
-                .catch(error => {
-                    this.$toast(this.$t('Error connecting to the server'), 'error');
-                    this.addressDialog = false;
-                });
 
-            }else {               
-                this.updateMyAddress();
+            try {
+                if (!this.myAddress.id) {
+                    const response = await axios.post('/address', this.myAddress);
+                    this.$toast(this.$t(response.data.message), response.data.type);
+                } else {
+                    await this.updateMyAddress();
+                }
+
+                await this.fetchAddresses();
+                this.addressDialog = false;
+                this.updateFields();
+            } catch (error) {
+                this.$toast(this.$t('Error connecting to the server'), 'error');
+                this.addressDialog = false;
             }
         },
 
+
         editMyAddress(slotProps) { 
+
+            this.originalAddresses = { ...slotProps };
             this.myAddress.id = slotProps.id;
             this.myAddress.address = slotProps.address;
             this.myAddress.town = slotProps.town;
             this.myAddress.post_code = slotProps.post_code;
             this.myAddress.country = slotProps.country;
             this.myAddress.province = slotProps.province;
-            this.updateFavoriteStatus(slotProps.favourite)
+            this.myAddress.favourite =slotProps.favourite;
             this.addressDialog = true;
         },
 
-        updateFavoriteStatus(favourite) {
-            if (favourite == 1) {
-                this.myAddress.favourite = true;
-            } else {
-                this.myAddress.favourite = false;
+
+        async updateMyAddress() {
+
+            this.originalAddresses.companyID = this.myAddress.companyID;
+            if (JSON.stringify(this.originalAddresses) === JSON.stringify(this.myAddress)) {
+                this.$toast(this.$t('Successfully updated.'), 'success');
+                this.addressDialog = false;
+                return;
             }
-        },
 
-
-        updateMyAddress() {
 
             axios.put('/address/' + this.myAddress.id, this.myAddress)
-
-            .then(response => {
-
+            .then(async response => {
                 this.$toast(this.$t(response.data.message), response.data.type);
-                this.fetchAddresses();
                 this.addressDialog = false;
+
+                await this.fetchAddresses()
+                this.updateFields();
             })
             .catch(error => {
                 this.$toast(this.$t('Error connecting to the server'), 'error');
-                this.addressDialog = false; 
-                // Mostrar un mensaje de error al usuario
-                
+                this.addressDialog = false;
             });
+
+
         },
 
-        makeFavourite(slotProps) {
 
+        async makeFavourite(slotProps) {
             if (slotProps.favourite) {
                 return this.$toast(this.$t('Already selected as a favorite.'), 'warning');
             }
 
-            axios.put('/addresses/' + slotProps.id)
-            .then(response => {
+            try {
+                const response = await axios.put('/addresses/' + slotProps.id);
                 this.$toast(this.$t(response.data.message), response.data.type);
                 this.addressDialog = false;
-                this.fetchAddresses();             
-            })         
-            .catch(error => {
+
+                await this.fetchAddresses(); // Espera a que fetchAddresses() complete
+
+                this.updateFields(); // Se ejecuta después de que fetchAddresses() haya completado
+            } catch (error) {
                 this.$toast(this.$t('Error connecting to the server'), 'error');
                 this.addressDialog = false;
-            });
+            }
         },
+
         
         confirmDeleteAddress(address) {
             this.myAddress.address = address.address;
@@ -283,14 +283,13 @@ export default {
         },
 
         deleteMyAddress() {
-            let addressId = this.myAddress.id
 
             // Realizar la solicitud de eliminación al servidor
             axios.delete('/address/' + this.myAddress.id)
                 .then(response => {
                     if(response.data.type === 'success'){
                         // Filtrar los teléfonos que no coincidan con el ID del teléfono a eliminar
-                        this.addresses = this.addresses.filter(val => val.id !== addressId);
+                        this.addresses = this.addresses.filter(val => val.id !== this.myAddress.id);
 
                     }
                     this.$toast(this.$t(response.data.message), response.data.type);
@@ -329,6 +328,15 @@ export default {
             });
             this.deleteAddressesDialog = false;
         },
+
+        updateFields() {
+            this.addresses.forEach(address => {
+                if (address.favourite) {
+                    this.$emit('updateAddress', address);
+                }
+            });
+        },
+
 
     }
 }
