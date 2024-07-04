@@ -852,10 +852,10 @@ export default {
         this.expiration = `${year}-${month}-${day}`;
     },
 
-    mounted() {
-        this.fetchCompanies();
-        this.fetchDocuments();
-        this.fetchPayments();
+    async mounted() {
+        await this.fetchCompanies();
+        await this.fetchDocuments();
+        await this.fetchPayments();
 
     },
 
@@ -984,7 +984,7 @@ export default {
                 });
         },
 
-        fetchPayments () {
+        async fetchPayments () {
             axios.get('/payment')
             .then(response => {
                 this.payment_methods = response.data.methods;
@@ -1013,35 +1013,30 @@ export default {
             this.isMobileMenuOpen = !this.isMobileMenuOpen;
         },
 
-        fetchCompanies() {
-            axios.get('/companies-invoice')
-            .then(response => {
-            this.companies = response.data.companies;
-            if (this.companies.length === 1) {
-                this.selectedCompany = this.companies[0];
-                this.companyId = this.selectedCompany.id;
-                return axios.get('/customers/' + this.selectedCompany.id);
-            } else {
+        async fetchCompanies() {
+            try {
+                const response = await axios.get('/companies-invoice');
+                this.companies = response.data.companies;
 
-                this.selectedCompany = this.companies[0];
-                this.loading = false;
-                return axios.get('/customers/' + this.selectedCompany.id);
-            }
-            })
-            .then(response => {
-            if (response) {
-                this.customers = response.data.customers;
+                if (this.companies.length === 1) {
+                    this.selectedCompany = this.companies[0];
+                    this.companyId = this.selectedCompany.id;
+                } else {
+                    this.selectedCompany = this.companies[0];
+                }
+
+                const customersResponse = await axios.get('/customers/' + this.selectedCompany.id);
+                this.customers = customersResponse.data.customers;
 
                 if (this.customers.length === 1) {
                     this.selectedCustomer = this.customers[0];
                 }
+
+                this.loading = false;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                this.loading = false;
             }
-            this.loading = false;
-            })
-            .catch(error => {
-            console.error('Error fetching data:', error);
-            this.loading = false;
-            });
         },
 
         hideDialog() {
@@ -1100,7 +1095,7 @@ export default {
                 });
         },
 
-        fetchDocuments() {
+        async fetchDocuments() {
             axios.get('/documents-type')
                 .then(response => {
                     this.types = response.data.types;     
