@@ -40,8 +40,8 @@
                             :disabled="slotProps.data.document_type_name !== 'Presupuesto'" 
                             @click="slotProps.data.document_type_name === 'Presupuesto' ? checkDocument(slotProps.data) : null" />
                     
-                        <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" 
-                            @click="handleInfoButtonClick(slotProps.data)" />
+                        <!--<Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" 
+                            @click="handleInfoButtonClick(slotProps.data)" /> -->
                     
                         <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" 
                             @click="confirmDeleteProduct(slotProps.data)" />

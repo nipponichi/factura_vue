@@ -329,7 +329,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         </tr>
                                         <tr>
                                             <td class="text-gray-600 pr-4">{{ $t('Bank account') }}:</td>
-                                            <td class="pl-4">{{ selectedBankAccount.complete_bank_account }}</td>
+                                            <!--<td class="pl-4">{{ selectedBankAccount.complete_bank_account }}</td>-->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -629,10 +629,10 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             <td>{{ subtotal.toFixed(2) }}€</td>
                         </tr>
                         
-                        <!-- <tr v-for="(entry, index) in taxMap" :key="index">
+                        <tr v-for="(entry, index) in taxMap" :key="index">
                             <td class="title">{{ $t('Total IVA') }} {{ Object.values(entry)[0] }} %</td>
                             <td> {{ Object.values(entry)[1].toFixed(2) }}€</td>
-                        </tr> -->
+                        </tr> --
                         
 
                         <tr>
@@ -654,11 +654,12 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             <span v-else-if="selectedPaymentMethod.id === 4">{{ $t('Email') }}:</span>
                             <span v-else>{{ $t('Bank account') }}:</span>
                         </td>
+                        
                         <td class="pl-4">
-                            <span v-if="selectedPaymentMethod.id === 2">{{ '' }}</span>
+                            <span v-if="selectedPaymentMethod.id === 1">{{ selectedBankAccount.complete_bank_account }}</span>
                             <span v-else-if="selectedPaymentMethod.id === 3">{{ selectedPhone.phone }}</span>
                             <span v-else-if="selectedPaymentMethod.id === 4">{{ selectedEmail.email }}</span>
-                            <span v-else>{{ selectedBankAccount.complete_bank_account }}</span>
+                            <span v-else>{{ '' }}</span>
                         </td>
                     </tr>
 
@@ -891,7 +892,7 @@ export default {
                     this.selectedSerie.number = numberWithoutSerie;
 
                     if (this.myDocument.paid === 0 ) {
-                        this.myDocument = false
+                        this.myDocument.paid = false
                     } else {
                         this.myDocument.paid = true
                     }
@@ -985,7 +986,7 @@ export default {
         },
 
         async fetchPayments () {
-            axios.get('/payment')
+            await axios.get('/payment')
             .then(response => {
                 this.payment_methods = response.data.methods;
                 this.selectedPaymentMethod = this.payment_methods[0]
@@ -1096,7 +1097,7 @@ export default {
         },
 
         async fetchDocuments() {
-            axios.get('/documents-type')
+            await axios.get('/documents-type')
                 .then(response => {
                     this.types = response.data.types;     
                     this.selectedType = this.types[0];
@@ -1259,10 +1260,13 @@ export default {
             })
             .catch(error => {
                 this.$toast(this.$t('Error saving document data.'), 'error');
+                console.log(error)
             });    
         },
 
         myDocumentSave() {
+            
+            
             this.myDocument.number = this.selectedSerie.serie + this.selectedSerie.number
             this.myDocument.document_counter = this.selectedSerie.number
             this.myDocument.expiration = this.expiration
@@ -1272,6 +1276,7 @@ export default {
             this.myDocument.documents_type_id = this.selectedType.id
             this.myDocument.documents_series_id = this.selectedSerie.id
             this.myDocument.date = this.fecha
+            
             this.myDocument.document_counter = 1
             this.myDocument.bank_account_id = this.selectedCompany.bank_account_id
             
@@ -1290,7 +1295,7 @@ export default {
                 this.myDocument.invoiced = true
             }
 
-        
+            this.myDocument.concept = []
             this.products.forEach(product => {
                 
                 try {
@@ -1302,8 +1307,10 @@ export default {
                         taxes: product.taxes,
                         discount: product.discount,
                         discount_reason: product.discount_reason,
-                        total: this.calculateTotal(product)
+                        total: this.calculateTotal(product),
+                        
                     };
+                
                     this.myDocument.concept.push(newProduct);
                 } catch (error) {
                     console.error("Error al crear el objeto newProduct:", error);
@@ -1323,7 +1330,10 @@ export default {
             })
             .catch(error => {
                 this.$toast(this.$t('Error saving invoice.'), 'error');
+                console.log(error)
                 this.myDocument.concept = []
+                
+
             });
         },
 
@@ -1342,14 +1352,14 @@ export default {
         },
 
         calculateTax(product) {
-            product.priceTax = parseFloat((product.taxes / 100) * product.subTotal);
+            product.priceTax = parseFloat((product.taxes / 100) * parseFloat(product.subTotal));
             return product.priceTax;
         },
 
 
         calculateTotal(product) {
             let taxAmount = this.calculateTax(product)
-            product.total =taxAmount + product.subTotal
+            product.total = taxAmount + parseFloat(product.subTotal)
             return product.total.toFixed(2)
         },
 
