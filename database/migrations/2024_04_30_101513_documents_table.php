@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreignId('documents_type_id')->constrained('documents_type');
             $table->foreignId('documents_series_id')->constrained('documents_series');
             $table->foreignId('payment_methods_id')->constrained('payment_method');
-            $table->foreignId('bank_account_id')->constrained('bank_account');
+            $table->foreignId('payment_system_id')->nullable();
             $table->date('date');
             $table->date('expiration')->nullable();
             $table->decimal('amount', 10, 2);

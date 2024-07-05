@@ -237,7 +237,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             <div class="flex justify-end mt-4 pr-4" v-if="showButton">
                                 <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="success-button" @click="addRow()" />
                             </div>
-                            <!-- Totals section for large screens -->
+                                                    <!-- Totals section for large screens -->
                             <div class="hidden md:flex justify-between mt-4 pr-4 mb-4">
                                 <!-- Columna izquierda -->
                                 <div class="totals-container w-1/3">
@@ -258,51 +258,49 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                 </tr>
                                                 <tr>
                                                     <td class="text-gray-600 pr-4">
-                                                        <span v-if="selectedPaymentMethod.id === 2">{{ '' }}</span>
+                                                        <span v-if="selectedPaymentMethod.id === 1 || selectedPaymentMethod.id === 7">{{ $t('Bank account') }}:</span>
                                                         <span v-else-if="selectedPaymentMethod.id === 3">{{ $t('Phone') }}:</span>
                                                         <span v-else-if="selectedPaymentMethod.id === 4">{{ $t('Email') }}:</span>
-                                                        <span v-else>{{ $t('Bank account') }}:</span>
+                                                        <span v-else>{{ '' }}</span>
                                                     </td>
                                                     <td class="pl-4">
-                                                        <span v-if="selectedPaymentMethod.id === 2">{{ '' }}</span>
+                                                        <span v-if="selectedPaymentMethod.id === 1||  selectedPaymentMethod.id === 7">{{ selectedBankAccount.complete_bank_account }}</span>
                                                         <span v-else-if="selectedPaymentMethod.id === 3">{{ selectedPhone.phone }}</span>
                                                         <span v-else-if="selectedPaymentMethod.id === 4">{{ selectedEmail.email }}</span>
-                                                        <span v-else>{{ selectedBankAccount.complete_bank_account }}</span>
+                                                        <span v-else>{{ '' }}</span>
                                                     </td>
                                                 </tr>
                                             </tbody>
                                         </table>
-                                    </div>    
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Espacio entre las tablas -->
-                            <div class="w-1/12"></div>
+                                <!-- Espacio entre las tablas -->
+                                <div class="w-1/12"></div>
 
-                            <!-- Columna central (Totales) -->
-                            <div class="totals-container w-1/3">
-                                <button class="ml-4 mb-5 rounded-md" @click="selectAPaymentMethod()">
-                                    
-                                </button>
-                                <div class="totals p-4 rounded-md">
-                                    <table class="w-full">
-                                        <tbody>
-                                            <tr>
-                                                <td class="text-gray-600 pr-4">{{ $t('Subtotal (excluding Tax)') }}:</td>
-                                                <td class="pl-4">{{ subtotal.toFixed(2) }}€</td>
-                                            </tr>
-                                            <hr class="my-2 border-gray-300">
-                                            <tr>
-                                                <td class="text-gray-600 pr-4">{{ $t('Total Tax') }}:</td>
-                                                <td class="pl-4">{{ totalIVA.toFixed(2) }}€</td>
-                                            </tr>
-                                            <hr class="my-2 border-gray-300">
-                                            <tr>
-                                                <td class="text-gray-600 pr-4">{{ $t('Total (with IVA)') }}:</td>
-                                                <td class="pl-4">{{ totalConIVA.toFixed(2) }}€</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                <!-- Columna central (Totales) -->
+                                <div class="totals-container w-1/3">
+                                    <button class="ml-4 mb-5 rounded-md" @click="selectAPaymentMethod()"></button>
+                                    <div class="totals p-4 rounded-md">
+                                        <table class="w-full">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="text-gray-600 pr-4">{{ $t('Subtotal (excluding Tax)') }}:</td>
+                                                    <td class="pl-4">{{ subtotal.toFixed(2) }}€</td>
+                                                </tr>
+                                                <hr class="my-2 border-gray-300">
+                                                <tr>
+                                                    <td class="text-gray-600 pr-4">{{ $t('Total Tax') }}:</td>
+                                                    <td class="pl-4">{{ totalIVA.toFixed(2) }}€</td>
+                                                </tr>
+                                                <hr class="my-2 border-gray-300">
+                                                <tr>
+                                                    <td class="text-gray-600 pr-4">{{ $t('Total (with IVA)') }}:</td>
+                                                    <td class="pl-4">{{ totalConIVA.toFixed(2) }}€</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -328,8 +326,18 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-gray-600 pr-4">{{ $t('Bank account') }}:</td>
-                                            <!--<td class="pl-4">{{ selectedBankAccount.complete_bank_account }}</td>-->
+                                            <td class="text-gray-600 pr-4">
+                                                <span v-if="selectedPaymentMethod.id === 1 || selectedPaymentMethod.id === 7">{{ $t('Bank account') }}:</span>
+                                                <span v-else-if="selectedPaymentMethod.id === 3">{{ $t('Phone') }}:</span>
+                                                <span v-else-if="selectedPaymentMethod.id === 4">{{ $t('Email') }}:</span>
+                                                <span v-else>{{ '' }}</span>
+                                            </td>
+                                            <td class="pl-4">
+                                                <span v-if="selectedPaymentMethod.id === 1||  selectedPaymentMethod.id === 7">{{ selectedBankAccount.complete_bank_account }}</span>
+                                                <span v-else-if="selectedPaymentMethod.id === 3">{{ selectedPhone.phone }}</span>
+                                                <span v-else-if="selectedPaymentMethod.id === 4">{{ selectedEmail.email }}</span>
+                                                <span v-else>{{ '' }}</span>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -338,8 +346,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 
                         <!-- Espacio entre las tablas en pantallas grandes -->
                         <div class="hidden md:block w-1/12"></div>
-
-                        
 
                         <!-- Columna central (Totales) -->
                         <div class="totals-container w-full md:w-1/3 flex flex-col">
@@ -486,12 +492,12 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                 <Dropdown v-if="!isDropdownHidden" v-model="selectedOption" :options="options" filter :optionLabel="dynamicOptionLabel" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class="flex items-center">
-                            <div>{{ slotProps.value[dynamicOptionLabel]  }}</div>
+                            <div>{{ slotProps.value[dynamicOptionLabel] }}</div>
                         </div>
                     </template>
                     <template #option="slotProps">
                         <div class="flex items-center">
-                            <div>{{ slotProps.option[dynamicOptionLabel]  }}</div>
+                            <div>{{ slotProps.option[dynamicOptionLabel] }}</div>
                         </div>
                     </template>
                 </Dropdown>
@@ -757,6 +763,7 @@ export default {
             phones:[],
             selectedProducts: [],
             selectedPaymentMethod: [],
+            selectedPaymentSystemId: '',
             filters: {},
             submitted: false,
             myDocument: { 
@@ -766,7 +773,7 @@ export default {
                 company_id_customer: '',
                 documents_type_id: '',
                 documents_series_id: '',
-                bank_account_id: '',
+                payment_system_id: '',
                 expiration: '',
                 date: '',
                 amount: '',
@@ -811,13 +818,14 @@ export default {
         dynamicOptionLabel() {
             switch (this.selectedPaymentMethod.id) {
                 case 1:
-                return 'complete_bank_account'; 
+                case 7:
+                    return 'complete_bank_account'; 
                 case 3:
-                return 'phone';
+                    return 'phone';
                 case 4:
-                return 'email';
+                    return 'email';
                 default:
-                return '';
+                    return '';
             }
         },
 
@@ -862,11 +870,83 @@ export default {
 
     watch: {
         selectedPaymentMethod(newMethod) {
+            console.log("PaymentId " + newMethod.id)
             this.handlePaymentMethodChange(newMethod);
+        },
+
+        selectedOption(newValue) {
+            if (newValue) {
+                switch (this.selectedPaymentMethod.id) {
+                case 1:
+                case 7:
+                    this.selectedBankAccount = newValue;
+                    this.selectedPaymentSystemId = newValue.id
+                    break;
+                case 3:
+                    this.selectedPhone = newValue;
+                    this.selectedPaymentSystemId = newValue.id
+                    break;
+                case 4:
+                    this.selectedEmail = newValue;
+                    this.selectedPaymentSystemId = newValue.id
+                    break;
+                default:
+                    this.selectedPaymentSystemId = '';
+                    break;
+                }
+            }
         }
+    
     },
     
     methods: {
+
+        async handlePaymentMethodChange(paymentMethod) {
+            switch (paymentMethod.id) {
+                case 1:
+                    // Pago bancario
+                    console.log("handlePaymentMethodChange 1")
+                    this.selectedPaymentMethod.name = "Transferencia"
+                    await this.fetchBanks();
+                    console.log("handlePayment " + this.selectedBankAccount.id)
+                    break;
+                case 2:
+                    //Efectivo
+                    console.log("handlePaymentMethodChange 2")
+                    this.selectedPaymentMethod.name = "Efectivo"
+                    break;
+                case 3:
+                    // Bizum
+                    console.log("handlePaymentMethodChange 3")
+                    this.selectedPaymentMethod.name = "Bizum"
+                    await this.fetchPhones();
+                    break;
+                case 4:
+                    /// Paypal
+                    console.log("handlePaymentMethodChange 4")
+                    this.selectedPaymentMethod.name = "Paypal"
+                    await this.fetchEmails();
+                    break;
+                case 5:
+                    /// Credit Card
+                    console.log("handlePaymentMethodChange 5")
+                    this.selectedPaymentMethod.name = "Tarjeta"
+                    break;
+                case 6:
+                    /// Cheque
+                    console.log("handlePaymentMethodChange 6")
+                    this.selectedPaymentMethod.name = "Cheque"
+                    break;
+                case 7:
+                    /// Domiciliación
+                    console.log("handlePaymentMethodChange 7")
+                    this.selectedPaymentMethod.name = "Domiciliación"
+                    await this.fetchBanks();
+                    break;    
+                default:
+                    break; 
+            }
+        },
 
         handleDocumentSelected(documentId) {
             if (documentId) {
@@ -880,13 +960,17 @@ export default {
 
                     // Document
                     this.myDocument = response.data.documents;
-                    console.log(this.myDocument.paid);
                     this.fecha = this.myDocument.date;
                     this.expiration = this.myDocument.expiration;
                     this.selectedType.name = this.myDocument.document_type_name;
                     this.selectedType.id = this.myDocument.documents_type_id;
                     this.selectedSerie.id = this.myDocument.documents_series_id;
                     this.selectedSerie.serie = this.myDocument.document_series_serie;
+                    console.log("carga")
+                    this.selectedPaymentSystemId = this.myDocument.payment_system_id
+                    this.selectedPaymentMethod.id = this.myDocument.payment_methods_id
+                    
+
                     let number = this.myDocument.number;
                     let numberWithoutSerie = number.replace(this.selectedSerie.serie, '');
                     this.selectedSerie.number = numberWithoutSerie;
@@ -922,71 +1006,65 @@ export default {
                 });   
         },
 
-        handlePaymentMethodChange(paymentMethod) {
-            switch (paymentMethod.id) {
-                case 1:
-                    // Pago bancario
-                    console.log("aqui")
-                    this.selectedPaymentMethod.name = "Transferencia"
-                    this.fetchBanks();
-                    break;
-                case 2:
-                    //Efectivo
-                    this.selectedPaymentMethod.name = "Efectivo"
-                    break;
-                case 3:
-                    // Bizum
-                    this.selectedPaymentMethod.name = "Bizum"
-                    this.fetchPhones();
-                    break;
-                case 4:
-                    /// Paypal
-                    this.selectedPaymentMethod.name = "Paypal"
-                    this.fetchEmails();
-                    break;
-                default:
+
+        async fetchBanks() {
+            try {
+                const response = await axios.get('/banks/' + this.selectedCompany.id);
+                this.banks = response.data.accounts;
+                this.selectedBankAccount = await this.changePaymentMethodSystemId(this.banks, this.selectedBankAccount);
+                this.options = this.banks;
+            } catch (error) {
+                this.$toast(this.$t('Error connecting to the server'), 'error');
+                console.log("banks error");
+                console.log(error);
             }
         },
 
-        fetchBanks() {
-
-            axios.get('/banks/' + this.selectedCompany.id)
-                .then(response => {
-                    this.banks = response.data.accounts;
-                    this.selectedBankAccount = this.banks[0]
-                    this.options = this.banks
-                })
-                .catch(error => {
-                    this.$toast(this.$t('Error connecting to the server'), 'error');
-                });
+        async fetchEmails() {
+            try {
+                const response = await axios.get('/emails/' + this.selectedCompany.id);
+                this.emails = response.data.emails;
+                this.selectedEmail = await this.changePaymentMethodSystemId(this.emails, this.selectedEmail);
+                this.options = this.emails;
+            } catch (error) {
+                this.$toast(this.$t('Error connecting to the server'), 'error');
+            }
         },
 
-        fetchEmails() {
-            axios.get('/emails/' + this.selectedCompany.id)
-                .then(response => {
-                    this.emails = response.data.emails;
-                    this.selectedEmail = this.emails[0]
-                    this.options = this.emails
-                })
-                .catch(error => {
-                    this.$toast(this.$t('Error connecting to the server'), 'error');
-                });
+        async fetchPhones() {
+            try {
+                const response = await axios.get('/phones/' + this.selectedCompany.id);
+                this.phones = response.data.phones;
+                this.selectedPhone = await this.changePaymentMethodSystemId(this.phones, this.selectedPhone);
+                this.options = this.phones;
+            } catch (error) {
+                this.$toast(this.$t('Error connecting to the server'), 'error');
+            }
         },
 
-        fetchPhones() {
-            axios.get('/phones/' + this.selectedCompany.id)
-                .then(response => {
-                    this.phones = response.data.phones;
-                    this.selectedPhone = this.phones[0]
-                    this.options = this.phones
-                })
-                .catch(error => {
-                    this.$toast(this.$t('Error connecting to the server'), 'error');
-                });
+        async changePaymentMethodSystemId(systemValues, selectedMethod) {
+            console.log("Entra al methodSystem");
+            if (this.selectedPaymentSystemId != null) {
+                console.log("Entra al methodSystem");
+                const value = systemValues.find(value => value.id === this.selectedPaymentSystemId);
+                if (value) {
+                    selectedMethod = value;
+                    console.log(selectedMethod);
+                } else {
+                    selectedMethod = systemValues.length > 0 ? systemValues[0] : null;
+                    console.log(selectedMethod);
+                }
+            } else {
+                selectedMethod = systemValues.length > 0 ? systemValues[0] : null;
+                console.log(selectedMethod);
+            }
+
+            return selectedMethod;
         },
+
 
         async fetchPayments () {
-            await axios.get('/payment')
+            await axios.get('/payment/' + this.selectedCompany.id)
             .then(response => {
                 this.payment_methods = response.data.methods;
                 this.selectedPaymentMethod = this.payment_methods[0]
@@ -1183,7 +1261,7 @@ export default {
             this.checkDocument(); 
         },
 
-        checkDocument() { 
+        checkDocument() {
             axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
             .then(response => {             
                 this.date = response.data.date.date
@@ -1271,6 +1349,7 @@ export default {
             this.myDocument.document_counter = this.selectedSerie.number
             this.myDocument.expiration = this.expiration
             this.myDocument.payment_methods_id = this.selectedPaymentMethod.id
+            this.myDocument.payment_system_id = this.selectedPaymentSystemId
             this.myDocument.company_id_company = this.selectedCompany.id 
             this.myDocument.company_id_customer = this.selectedCustomer.id
             this.myDocument.documents_type_id = this.selectedType.id
@@ -1278,7 +1357,7 @@ export default {
             this.myDocument.date = this.fecha
             
             this.myDocument.document_counter = 1
-            this.myDocument.bank_account_id = this.selectedCompany.bank_account_id
+            
             
             
             this.myDocument.subTotal = this.subtotal.toFixed(2)
@@ -1343,7 +1422,7 @@ export default {
             setTimeout(function() {
                 // Recargar la página
                 window.location.reload();
-            }, 3000);
+            }, 1000);
             
         },
 

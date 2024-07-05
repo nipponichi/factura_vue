@@ -178,7 +178,7 @@ class DocumentController extends Controller
                 'active' => true,
                 'tax' => $request->documentData['totalTax'],
                 'subtotal' => $request->documentData['subTotal'],
-                'bank_account_id' => $request->documentData['bank_account_id'],
+                'payment_system_id' => $request->documentData['payment_system_id'],
                 'user_who_modified' => $userId,
                 'dt_updated' => now(),
                 'dt_start' => now(),
@@ -260,22 +260,46 @@ class DocumentController extends Controller
             'documents_type.name as document_type_name',
             'documents_series.serie as document_series_serie',
             'companies_names.name as customer_name',
-            'documents.bank_account_id as bank_account_id',
-            'bank_account.complete_bank_account',
-            'bank_account.swift',
-            'bank_account.bank_name',
+            'documents.payment_system_id as payment_system_id',
             'payment_method.name'
         )
         ->leftJoin('documents_type', 'documents.documents_type_id', '=', 'documents_type.id')
         ->leftJoin('documents_series', 'documents.documents_series_id', '=', 'documents_series.id')
         ->leftJoin('companies_names', 'documents.company_id_customer', '=', 'companies_names.company_id')
-        ->leftJoin('bank_account', 'documents.bank_account_id', '=', 'bank_account.id')
         ->leftJoin('payment_method', 'documents.payment_methods_id', '=', 'payment_method.id')
         ->where('documents.company_id_company', $companyId)
         ->where('documents_series.company_id', $companyId)
         ->where('documents.id', $documentId)
         ->whereNull('documents.dt_end')
         ->first();
+
+        switch ($documents->payment_methods_id) {
+            case 1:
+            case 7:
+                $payment_system = DB::table('bank_account')
+                ->select('id','complete_bank_account', 'bank_name')
+                ->where('id',$documents->payment_system_id)
+                ->first();
+                break;
+            
+            case 3:
+                $payment_system = DB::table('phones')
+                ->select('id','phone')
+                ->where('id',$documents->payment_system_id)
+                ->first();
+                break;
+        
+            case 4:
+                $payment_system = DB::table('emails')
+                ->select('id','email')
+                ->where('id',$documents->payment_system_id)
+                ->first();
+                break;
+                        
+            default:
+                $payment_system = '';
+                break;
+        }
 
 
         if ($documents == null) {
@@ -359,7 +383,7 @@ class DocumentController extends Controller
         if ($customer == null) {
             return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
         }
-        return response()->json(['message' => 'Datos de las facturas cargadas correctamente', 'documents' => $documents, 'concepts' => $concepts, 'company'=>$company, 'customer'=>$customer]);
+        return response()->json(['message' => 'Datos de las facturas cargadas correctamente', 'documents' => $documents, 'concepts' => $concepts, 'company'=>$company, 'customer'=>$customer, 'payment_system'=>$payment_system]);
     }
     
 
@@ -477,7 +501,7 @@ class DocumentController extends Controller
                 'active' => true,
                 'tax' => $request->documentData['totalTax'],
                 'subtotal' => $request->documentData['subTotal'],
-                'bank_account_id' => $request->documentData['bank_account_id'],
+                'payment_system_id' => $request->documentData['payment_system_id'],
                 'user_who_modified' => $userId,
                 'dt_updated' => now(),
                 'dt_start' => now(),
