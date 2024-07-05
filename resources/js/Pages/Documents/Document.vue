@@ -66,7 +66,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                 :disabled="!selectedCompany.id">
                                                 <span>
                                                     <i class="pi pi-plus mr-2"></i>
-                                                    {{ $t('Document type') }}
                                                     {{ $t('Serie') }}
                                                 </span>
                                             </button>
