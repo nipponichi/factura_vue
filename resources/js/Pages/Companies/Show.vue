@@ -85,6 +85,12 @@
                                     </button>
                                 </li>
                                 <li class="me-2">
+                                    <button @click="changeTab('provider')" :class="{'border-b-2 border-blue-500': activeTab === 'provider'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-users w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                        {{ $t('Providers') }}
+                                    </button>
+                                </li>
+                                <li class="me-2">
                                     <button @click="changeTab('phone')" :class="{'border-b-2 border-blue-500': activeTab === 'phone'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-phone w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
                                         {{ $t('Phone') }}
@@ -116,7 +122,10 @@
                                 <TableDocument />
                             </div>
                             <div v-else-if="activeTab === 'customers'" class="w-full">
-                                <TableCustomers />
+                                <TableCustomer />
+                            </div>
+                            <div v-else-if="activeTab === 'provider'" class="w-full">
+                                <TableProvider />
                             </div>
                             <div v-else-if="activeTab === 'phone'" class="w-full">
                                 <TablePhone @updatePhone="handlePhoneUpdate" />
@@ -140,12 +149,13 @@
 
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import TableCustomers from '@/Pages/Companies/Partials/TableCustomer.vue';
+import TableCustomer from '@/Pages/Companies/Partials/TableCustomer.vue';
 import TableDocument from '@/Pages/Companies/Partials/TableDocument.vue';
 import TablePhone from '@/Pages/Companies/Partials/TablePhone.vue';
 import TableBank from '@/Pages/Companies/Partials/TableBank.vue';
 import TableEmail from '@/Pages/Companies/Partials/TableEmail.vue';
 import TableAddress from '@/Pages/Companies/Partials/TableAddress.vue';
+import TableProvider from '@/Pages/Companies/Partials/TableProvider.vue';
 import { ref } from 'vue';
 
 const activeTab = ref('documents');

@@ -63,12 +63,19 @@ const logout = () => {
                                     {{ $t('Invoice') }}
                                 </NavLink>
                             </div>  
+
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')" >
+                                <NavLink :href="route('accountings.index')" :active="route().current('accountings.*')">
+                                    {{ $t('Accounting') }}
+                                </NavLink>
+                            </div>
                             
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')" >
                                 <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
                                     {{ $t('My Company') }}
                                 </NavLink>
                             </div>
+
 
                             
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view consulting')">

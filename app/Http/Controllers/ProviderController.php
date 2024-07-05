@@ -3,17 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Http\Requests\CustomerRequest;
-use App\Http\Requests\CustomerHeadRequest;
-use App\Models\Company;
+use App\Http\Requests\ProviderRequest;
+use App\Http\Requests\ProviderHeadRequest;
 use Exception;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class CustomerController extends Controller
+class ProviderController extends Controller
 {
 
     public function __construct()
@@ -64,15 +62,15 @@ class CustomerController extends Controller
             ->whereNull('phones.dt_end')
             ->whereNull('emails.dt_end')
             ->whereIn('companies.id', function ($query) use ($companyId) {
-                $query->select('company_id_customer')
-                    ->from('companies_customers')
+                $query->select('company_id_provider')
+                    ->from('companies_providers')
                     ->where('company_id_company', $companyId)
                     ->where('dt_end', null);
             })
             ->get();
 
 
-            return response()->json(['customers' => $companies]);
+            return response()->json(['providers' => $companies]);
         } catch (Exception $e) {
             return response()->json(['message' => 'Error loading data' ,'type' => 'error']);
         }
@@ -81,7 +79,7 @@ class CustomerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CustomerRequest $request)
+    public function store(ProviderRequest $request)
     {
         DB::beginTransaction();
 
@@ -138,11 +136,10 @@ class CustomerController extends Controller
             ]);
 
 
-            DB::table('companies_customers')->insert([
+            DB::table('companies_providers')->insert([
                 'company_id_company' => $request->companyID,
-                'company_id_customer' => $companyId,
+                'company_id_provider' => $companyId,
                 'dt_start' => now(),
-                'isConsulting' => false,
             ]);
 
 
@@ -161,10 +158,9 @@ class CustomerController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($companyId, $customerId)
+    public function show($companyId, $providerId)
     {
         try {
-
             $userId = Auth::id();
             $user = Auth::user();
             
@@ -176,19 +172,19 @@ class CustomerController extends Controller
             ->where('company_id', $companyId)
             ->first();
 
-            $currentCustomerId = DB::table('companies_customers')
+            $currentProviderId = DB::table('companies_providers')
             ->select([
-                'company_id_customer'
+                'company_id_provider'
             ])
             ->where('company_id_company', $companyId)
-            ->where('company_id_customer', $customerId)
+            ->where('company_id_provider', $providerId)
             ->whereNull('dt_end')
             ->first();
             
-            if ($currentUserId === null || $currentCustomerId === null || $userId != $currentUserId->user_id && !$user->hasRole('admin')) {
+            if ($currentUserId === null || $currentProviderId === null || $userId != $currentUserId->user_id && !$user->hasRole('admin')) {
                 return Redirect::route('companies.index')->with('error', 'No se encontró la empresa o no tiene permisos suficientes');
             }
-        
+            
             $companies = DB::table('companies')
             ->select(
                 'companies.id',
@@ -203,6 +199,7 @@ class CustomerController extends Controller
                 'addresses.province',
                 'addresses.address'
             )
+            
             ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
             ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
             ->leftJoin('companies_tax_numbers', 'companies.id', '=', 'companies_tax_numbers.company_id')
@@ -210,13 +207,13 @@ class CustomerController extends Controller
             ->leftJoin('phones', 'companies.id', '=', 'phones.company_id')
             ->leftJoin('addresses', 'companies.id', '=', 'addresses.company_id')
 
-            ->where('companies.id', $customerId)
+            ->where('companies.id', $providerId)
             ->where('addresses.favourite', 1)
             ->where('phones.favourite', 1)
             ->where('emails.favourite', 1)
             ->whereIn('companies.id', function ($query) use ($companyId) {
-                $query->select('company_id_customer')
-                    ->from('companies_customers')
+                $query->select('company_id_provider')
+                    ->from('companies_providers')
                     ->where('company_id_company', $companyId)
                     ->where('dt_end', null);
             })
@@ -228,7 +225,6 @@ class CustomerController extends Controller
             ->whereNull('phones.dt_end')
             ->whereNull('emails.dt_end')
             ->first();
-
             
             return Inertia::render('Companies/Customers/Show', ['company' => $companies]);
             
@@ -251,7 +247,7 @@ class CustomerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(CustomerHeadRequest $request, $companyId)
+    public function update(ProviderHeadRequest $request, $companyId)
     {
         DB::beginTransaction();
         try {
@@ -320,8 +316,8 @@ class CustomerController extends Controller
     {
         try {
     
-            DB::table('companies_customers')
-                ->where('company_id_customer', $id)
+            DB::table('companies_providers')
+                ->where('company_id_provider', $id)
                 ->update([
                     'dt_end' => now(),
                 ]);

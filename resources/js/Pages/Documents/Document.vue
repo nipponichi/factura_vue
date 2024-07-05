@@ -67,6 +67,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                 <span>
                                                     <i class="pi pi-plus mr-2"></i>
                                                     {{ $t('Document type') }}
+                                                    {{ $t('Serie') }}
                                                 </span>
                                             </button>
                                             <button

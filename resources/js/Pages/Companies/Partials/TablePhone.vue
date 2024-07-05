@@ -32,7 +32,6 @@
                 <Column field="phone" :header="$t('Phone')" sortable class="dateTable"></Column>
                 
                 <Column :exportable="false" :header="$t('Favourite')" class="dateTable w-24 text-center">
-            
                     <template #body="slotProps">
                         <Button v-if="slotProps.data.favourite" icon="pi pi-star-fill"  class="mr-2 fav-button" @click="makeFavourite(slotProps.data)" />
                         <Button v-else icon="pi pi-star" class="mr-2 fav-button" @click="makeFavourite(slotProps.data)" />

@@ -6,8 +6,10 @@ use App\Http\Controllers\AdminInvoicesController;
 use App\Http\Controllers\AdminUsersController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PhoneController;
+use App\Http\Controllers\AccountingController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\AddressController;
@@ -36,11 +38,18 @@ Route::middleware([
     Route::get('/companies/{documentId}{date}', [DocumentController::class, 'fromBudgetToInvoice']);
     Route::get('/companies/{companyID}/document/{documentID}', [DocumentController::class, 'show']);
     Route::get('/companies/{companyID}/customer/{customerID}', [CustomerController::class, 'show']);
-    
+    Route::get('/companies/{companyID}/provider/{customerID}', [ProviderController::class, 'show']);
+
+    // Accounting
+    Route::resource('/accountings', AccountingController::class);
 
     //Customers
     Route::resource('/customer', CustomerController::class);
     Route::get('/customers/{id}', [CustomerController::class, 'index']);
+
+    //Providers
+    Route::resource('/provider', ProviderController::class);
+    Route::get('/providers/{id}', [ProviderController::class, 'index']);
     
     //Phones
     Route::put('/phones/{id}', [PhoneController::class, 'makeFavourite']);

@@ -32,8 +32,10 @@ return new class extends Migration
             $table->foreignId('user_who_modified')->nullable()->constrained('users');
             $table->decimal('tax', 10, 2)->nullable();
             $table->decimal('subtotal', 10, 2)->nullable();
+            $table->boolean('isReceived')->default (false);
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
+            
         });
     }
 
