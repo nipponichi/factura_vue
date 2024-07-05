@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 
+
 class RouteController extends Controller
 {
 
@@ -17,9 +18,11 @@ class RouteController extends Controller
         ]);
     }
 
-    public function documents(){
+    public function dashboard(){
 
-        return redirect()->route('documents.index');
+        
+        //return Inertia::render('Dashboard');
+        return Inertia::render('Documents/Document');
         
     }
     

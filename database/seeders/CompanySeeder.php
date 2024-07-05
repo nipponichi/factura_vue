@@ -40,19 +40,28 @@ class CompanySeeder extends Seeder
         'name' => 'Transferencia',
         'dt_start' => now(),
     ]);
-
     DB::table('payment_method')->insert([
-        'name' => 'Efectivo',
+        'name' => 'Contado',
         'dt_start' => now(),
     ]);
-
     DB::table('payment_method')->insert([
         'name' => 'Bizum',
         'dt_start' => now(),
     ]);
-
     DB::table('payment_method')->insert([
         'name' => 'Paypal',
+        'dt_start' => now(),
+    ]);
+    DB::table('payment_method')->insert([
+        'name' => 'Tarjeta',
+        'dt_start' => now(),
+    ]);
+    DB::table('payment_method')->insert([
+        'name' => 'Cheque',
+        'dt_start' => now(),
+    ]);
+    DB::table('payment_method')->insert([
+        'name' => 'Domiciliación',
         'dt_start' => now(),
     ]);
 
@@ -261,7 +270,107 @@ class CompanySeeder extends Seeder
         'dt_start' => now(),
     ]);
 
+    // DEMO COMPANY 
 
+    DB::table('companies')->insert([
+        'verified' => true,
+        'dt_start' => now(),
+    ]);
+
+    DB::table('companies_users')->insert([
+        'company_id' => 3,
+        'user_id' => 4,
+        'dt_start' => now(),
+    ]);
+
+    
+    DB::table('emails')->insert([
+        'email' => 'grovelec@grovelec.es',
+        'dt_start' => now(),
+        'favourite' =>true,
+        'company_id' => 3,
+    ]);
+    DB::table('phones')->insert([
+        'phone' => '+34604084935',
+        'favourite' =>true,
+        'isMobile' =>true,
+        'dt_start' => now(),
+        'company_id' => 3,
+    ]);
+
+    DB::table('bank_account')->insert([
+        'complete_bank_account' => 'ES40 2048 3506 36 9026752232',
+        'iban' => 'ES40',
+        'entity' => '2048',
+        'office' => '3506',
+        'control_digit' => '36',
+        'account_number' => '9026752232',
+        'bank_name' => 'EVO Banco',
+        'country' => 'España',
+        'swift' => 'EVOBESMM',
+        'currency' => 'eur',
+        'favourite' =>true,
+        'dt_start' => now(),
+        'company_id' => 3,
+    ]);
+
+
+    DB::table('addresses')->insert([
+        'company_id' => 3,
+        'town' => 'El Grove',
+        'address' => 'Rúa do Sol, 70, 5º A',
+        'post_code' => '36980',
+        'province' => 'Pontevedra',
+        'country' => 'España',
+        'favourite' => true,
+        'dt_start' => now(),
+    ]);
+
+    DB::table('companies_tax_numbers')->insert([
+        'tax_number' => '35449716T',
+        'company_id' => 3,
+        'dt_start' => now(),
+    ]);
+
+    DB::table('companies_names')->insert([
+        'name' => 'Antonio Castro Bea',
+        'company_id' => 3,
+        'dt_start' => now(),
+    ]);
+
+
+    DB::table('documents_series')->insert([
+        'serie' => 'R',
+        'number' => 0,
+        'company_id' => 3,
+        'documents_type_id' => 1,
+        'dt_start' => now(),
+    ]);
+
+    
+    DB::table('documents_series')->insert([
+        'serie' => 'R',
+        'number' => 0,
+        'company_id' => 3,
+        'documents_type_id' => 2,
+        'dt_start' => now(),
+    ]);
+
+    DB::table('documents_series')->insert([
+        'serie' => 'R',
+        'number' => 0,
+        'company_id' => 3,
+        'documents_type_id' => 3,
+        'dt_start' => now(),
+    ]);
+
+    DB::table('documents_series')->insert([
+        'serie' => 'R',
+        'number' => 0,
+        'company_id' => 3,
+        'documents_type_id' => 4,
+        'dt_start' => now(),
+    ]);
 
 
 

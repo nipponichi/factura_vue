@@ -94,16 +94,18 @@ class CompanyController extends Controller
         ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
         ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
         ->leftJoin('companies_tax_numbers', 'companies.id', '=', 'companies_tax_numbers.company_id')
-        ->leftJoin('bank_account', 'companies.id', '=', 'bank_account.company_id')
+        //->leftJoin('bank_account', 'companies.id', '=', 'bank_account.company_id')
         ->leftJoin('emails', 'companies.id', '=', 'emails.company_id')
         ->leftJoin('phones', 'companies.id', '=', 'phones.company_id')
         ->leftJoin('addresses', 'companies.id', '=', 'addresses.company_id')
+
+        ->leftJoin(DB::raw('(SELECT * FROM bank_account WHERE favourite = 1) as bank_account'), 'companies.id', '=', 'bank_account.company_id')
         
         ->where('companies_users.user_id', $userId)
         ->where('addresses.favourite', 1)
         ->where('phones.favourite', 1)
         ->where('emails.favourite', 1)
-        ->where('bank_account.favourite', 1)
+        //->where('bank_account.favourite', 1)
         ->whereNull('companies_users.dt_end')
         ->whereNull('companies_names.dt_end')
         ->whereNull('companies_tax_numbers.dt_end')
@@ -136,6 +138,7 @@ class CompanyController extends Controller
     /**
      * Display the specified resource.
      */
+
     public function show(string $id)
     {
         try {
@@ -164,35 +167,22 @@ class CompanyController extends Controller
                 'companies_names.name',
                 'emails.email',
                 'phones.phone',
-                'addresses.address',
+                'addresses.country',
+                'addresses.town',
                 'addresses.post_code',
                 'addresses.province',
-                'addresses.town',
-                'addresses.country',
-                'bank_account.complete_bank_account',
-                'bank_account.swift',
-                'bank_account.bank_name',
-                'bank_account.id as bank_account_id'
+                'addresses.address'
             )
+
             ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
             ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
             ->leftJoin('companies_tax_numbers', 'companies.id', '=', 'companies_tax_numbers.company_id')
-            ->leftJoin('bank_account', 'companies.id', '=', 'bank_account.company_id')
             ->leftJoin('emails', 'companies.id', '=', 'emails.company_id')
             ->leftJoin('phones', 'companies.id', '=', 'phones.company_id')
             ->leftJoin('addresses', 'companies.id', '=', 'addresses.company_id')
-            
+
+            ->where('companies.id', $id)
             ->where('companies_users.user_id', $userId)
-            ->where('addresses.favourite', 1)
-            ->where('phones.favourite', 1)
-            ->where('emails.favourite', 1)
-            ->where('bank_account.favourite', 1)
-            ->whereNull('companies_users.dt_end')
-            ->whereNull('companies_names.dt_end')
-            ->whereNull('companies_tax_numbers.dt_end')
-            ->whereNull('addresses.dt_end')
-            ->whereNull('phones.dt_end')
-            ->whereNull('emails.dt_end')
             ->first();
 
             
@@ -203,6 +193,7 @@ class CompanyController extends Controller
             return response()->json(['message' => 'Compañía no encontrada ahora ', $e->getMessage()], 500);
         }
     }
+    
 
     /**
      * Show the form for editing the specified resource.

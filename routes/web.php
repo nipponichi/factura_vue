@@ -27,7 +27,7 @@ Route::middleware([
 ])->group(function () {
 
 
-    Route::get('/', [RouteController::class, 'documents'])->name('dashboard');
+    Route::get('/dashboard', [RouteController::class, 'dashboard'])->name('dashboard');
 
     //Companies
     Route::resource('/companies', CompanyController::class);
@@ -68,6 +68,7 @@ Route::middleware([
     //Documents
     Route::resource('/documents', DocumentController::class);
     Route::get('/documents-type', [DocumentController::class, 'documentType']);
+    Route::get('/documents-show/{companyId}/{documentId}', [DocumentController::class, 'show']);
     Route::get('/documents-serie/{typeID}/{companyID}', [DocumentController::class, 'documentSerie']);
     Route::get('/documents-serie/{typeID}/{companyID}/{serie}', [DocumentController::class, 'documentSerieCheck']);
     Route::get('/documents-series/{companyID}/{typeID}', [DocumentController::class, 'documentDateCheck']);

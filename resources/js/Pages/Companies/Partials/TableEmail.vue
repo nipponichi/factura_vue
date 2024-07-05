@@ -125,6 +125,7 @@ export default {
                 favourite: '',
                 companyID: window.location.pathname.split('/').pop(),
             },
+            originalEmail: {},
             selectedEmails: [], 
             filters: {}, 
             submitted: false,
@@ -173,8 +174,6 @@ export default {
             if (this.myEmail.favourite == null) {
                 this.myEmail.favourite = false;
             }
-            this.myEmail.isMobile = 0;
-
             try {
                 
                 if (!this.myEmail.id) {
@@ -197,6 +196,7 @@ export default {
 
         editMyEmail(slotProps) {
 
+            this.originalEmail = { ...slotProps };
             this.myEmail.email = slotProps.email;
             this.myEmail.id = slotProps.id;
             this.myEmail.favourite = slotProps.favourite;
@@ -204,6 +204,16 @@ export default {
         },
 
         updateMyEmail() {
+
+
+            this.originalEmail.companyID = this.myEmail.companyID;
+
+            
+            if (JSON.stringify(this.originalEmail) === JSON.stringify(this.myEmail)) {
+                this.$toast(this.$t('Successfully updated.'), 'success');
+                this.emailDialog = false;
+                return;
+            }
 
             axios.put('/email/' + this.myEmail.id, this.myEmail)
             .then(async response => {
