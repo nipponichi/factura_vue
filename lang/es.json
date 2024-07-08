@@ -366,5 +366,8 @@
     "Providers": "Proveedores",
     "No results found.":"No se han encontrado resultados",
     "Accounting": "Contabilidad",
-    "Document list": "Facturas"
+    "Document list": "Facturas",
+    "Duty": "Debe",
+    "Have" : "Haber",
+    "Tax" : "IVA"
 }

@@ -9,7 +9,7 @@
             </h2>
         </template>
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="max-w-9xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                     <div>
                         <div class="card">
@@ -50,37 +50,96 @@
                                 </template>
                                 <Column field="date" :header="$t('Date')" sortable class="dateTable"></Column>
                                 <Column field="number" :header="$t('Concept')" sortable class="dateTable"></Column>
-                                <Column sortable class="dateTable">
+                                <Column class="dateTable">
                                     <template #header>
                                         <div class="text-center">
                                             <div>{{ $t('Duty') }}</div>
                                             <div class="flex gap-2 justify-center text-sm text-gray-500">
-                                                <div class="w-1/3 text-center px-2">{{ $t('Subtotal') }}</div>
-                                                <div class="w-1/3 text-center px-2">{{ $t('Tax') }}</div>
-                                                <div class="w-1/3 text-center px-2">{{ $t('Total') }}</div>
+                                                <div class="w-1/3 text-center px-3">{{ $t('Subtotal') }}</div>
+                                                <div class="w-1/3 text-center px-12">{{ $t('Tax') }}</div>
+                                                <div class="w-1/3 text-center pl-16">{{ $t('Total') }}</div>
                                             </div>
                                         </div>
                                     </template>
                                     <template #body="slotProps">
-                                        <div v-if="!slotProps.data.isReceived" class="flex gap-2 justify-center">
-                                            <div class="w-1/3 border-r border-gray-400 px-2 text-center">{{ slotProps.data.subtotal }}</div>
-                                            <div class="w-1/3 border-r border-gray-400 px-2 text-center">{{ slotProps.data.tax }}</div>
-                                            <div class="w-1/3 px-2 text-center">{{ slotProps.data.amount }}</div>
+                                        <div class="flex gap-2 justify-center">
+                                            <div class="w-1/3 border-r border-gray-400 px-2 text-center">
+                                                {{ !slotProps.data.isReceived ? slotProps.data.subtotal : '-' }}
+                                            </div>
+                                            <div class="w-1/3 border-r border-gray-400 px-2 text-center">
+                                                {{ !slotProps.data.isReceived ? slotProps.data.tax : '-' }}
+                                            </div>
+                                            <div class="w-1/3 px-2 text-center">
+                                                {{ !slotProps.data.isReceived ? slotProps.data.amount : '-' }}
+                                            </div>
                                         </div>
                                     </template>
                                 </Column>
                                 
-                                <Column field="have" :header="$t('Have')" sortable class="dateTable">
+                                
+                                <Column class="dateTable">
+                                    <template #header>
+                                        <div class="text-center">
+                                            <div>{{ $t('Have') }}</div>
+                                            <div class="flex gap-2 justify-center text-sm text-gray-500">
+                                                <div class="w-1/3 text-center px-3">{{ $t('Subtotal') }}</div>
+                                                <div class="w-1/3 text-center px-12">{{ $t('Tax') }}</div>
+                                                <div class="w-1/3 text-center pl-16">{{ $t('Total') }}</div>
+                                            </div>
+                                        </div>
+                                    </template>
                                     <template #body="slotProps">
-                                        <div v-if="slotProps.data.isReceived" class="flex gap-2">
-                                            <div class="flex-1 border-r border-gray-400 pr-2">{{ slotProps.data.subtotal }}</div>
-                                            <div class="flex-1 border-r border-gray-400 pr-2">{{ slotProps.data.tax }}</div>
-                                            <div class="flex-1">{{ slotProps.data.amount }}</div>
+                                        <div class="flex gap-2 justify-center">
+                                            <div class="w-1/3 border-r border-gray-400 px-2 text-center">
+                                                {{ slotProps.data.isReceived ? slotProps.data.subtotal : '-' }}
+                                            </div>
+                                            <div class="w-1/3 border-r border-gray-400 px-2 text-center">
+                                                {{ slotProps.data.isReceived ? slotProps.data.tax : '-' }}
+                                            </div>
+                                            <div class="w-1/3 px-2 text-center">
+                                                {{ slotProps.data.isReceived ? slotProps.data.amount : '-' }}
+                                            </div>
                                         </div>
                                     </template>
                                 </Column>
-                                <Column field="balance" :header="$t('Balance')" sortable class="dateTable"></Column>
                             </DataTable>
+                            
+
+                            <!-- Totals section for large screens -->
+                            <div class="hidden md:flex justify-between mt-4 pr-4 mb-4">
+                                <!-- Columna izquierda -->
+                                <div class="totals-container w-1/3">
+                                    <div class="ml-4 totals p-4 rounded-md">
+                                    </div>
+                                </div>
+
+                                <!-- Espacio entre las tablas -->
+                                <div class="w-1/12"></div>
+
+                                <!-- Columna central (Totales) -->
+                                <div class="totals-container w-1/3">
+                                    <div class="totals p-4 rounded-md">
+                                        <table class="w-full">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="text-gray-600 pr-4">{{ $t('Subtotal (excluding Tax)') }}:</td>
+                                                    <td class="pl-4">{{ balance.subtotal }}€</td>
+                                                </tr>
+                                                <hr class="my-2 border-gray-300">
+                                                <tr>
+                                                    <td class="text-gray-600 pr-4">{{ $t('Total Tax') }}:</td>
+                                                    <td class="pl-4">{{ balance.tax }}€</td>
+                                                </tr>
+                                                <hr class="my-2 border-gray-300">
+                                                <tr>
+                                                    <td class="text-gray-600 pr-4">{{ $t('Total (with IVA)') }}:</td>
+                                                    <td class="pl-4">{{ balance.amount }}€</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>       
                         </div>
                     </div>
                 </div>
@@ -114,6 +173,11 @@ export default {
         return {
             documents: [],
             companies: [],
+            balance: {
+                subtotal: 0,
+                amount: 0,
+                tax: 0
+            },
             selectedCompany: '',
             accountingDialog: false,
 
@@ -128,31 +192,89 @@ export default {
         this.filters = {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
         }
+
     },
-    mounted() {
+    async mounted() {
         this.companies = this.$page.props.companies;
         this.selectedCompany = this.companies[0]
-        this.fetchDocuments()
+        await this.fetchDocuments()
+        this.calculateBalance(this.documents)
     },
 
     watch: {
-        selectedCompany(newCompany, oldCompany) {
+        async selectedCompany(newCompany, oldCompany) {
             if (newCompany !== oldCompany) {
-                this.fetchDocuments();
+                await this.fetchDocuments();
+                await this.calculateBalance(this.documents)
             }
         }
     },
 
     methods: {
         
-        fetchDocuments() {
-            axios.get(`/accountings/${this.selectedCompany.id}`)
-                .then(response => {
+        async fetchDocuments() {
+            await axios.get(`/accountings/${this.selectedCompany.id}`)
+                .then(response => {   
+                    let date
+                    let dateFormatted
+                    for(let i = 0; i < response.data.documents.length; i++ ) {
+                        date = response.data.documents[i].date
+                        dateFormatted = this.dateFormat(date)
+                        response.data.documents[i].date = dateFormatted
+                    }
                     this.documents = response.data.documents;
+                    
                 })
                 .catch(error => {
                     console.error('Error fetching documents data:', error);
                 });
+        },
+
+        async calculateBalance(data) {
+            let total = 0;
+            let subtotal = 0;
+            let tax = 0;       
+            for (let i = 0; i < this.documents.length; i++) {   
+                if (!this.documents[i].isReceived) {
+                    total += parseFloat(this.documents[i].amount);
+                    subtotal += parseFloat(this.documents[i].subtotal);
+                    tax += parseFloat(this.documents[i].tax);
+                } else {
+                    total -= parseFloat(this.documents[i].amount);
+                    subtotal -= parseFloat(this.documents[i].subtotal);
+                    tax -= parseFloat(this.documents[i].tax);
+                }
+
+            }
+
+            this.balance = {
+                subtotal: subtotal.toFixed(2),
+                amount: total.toFixed(2),
+                tax: tax.toFixed(2)
+            };
+        },
+
+        dateFormat(fecha) {
+            // Convierte la fecha seleccionada a un objeto Date
+            let date = new Date(fecha);
+
+            // Obtén el día, mes y año de la fecha
+            let dia = date.getDate();
+            let mes = date.getMonth() + 1; // Los meses en JavaScript son de 0 a 11, por lo que se suma 1
+            let año = date.getFullYear();
+
+            // Añade un cero inicial si el día o mes son menores de 10
+            if (dia < 10) {
+            dia = '0' + dia;
+            }
+            if (mes < 10) {
+            mes = '0' + mes;
+            }
+
+            // Construye la cadena con el formato español
+            let fechaFormateada = `${dia}/${mes}/${año}`;
+
+            return fechaFormateada;
         },
         
         hideDialog() {
