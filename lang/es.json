@@ -369,5 +369,7 @@
     "Document list": "Facturas",
     "Duty": "Debe",
     "Have" : "Haber",
-    "Tax" : "IVA"
+    "Tax" : "IVA",
+    "End date" : "Fecha fin",
+    "Initial date" : "Fecha inicio"
 }

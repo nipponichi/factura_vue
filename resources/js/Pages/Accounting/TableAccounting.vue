@@ -31,9 +31,23 @@
                                 :rowsPerPageOptions="[5,10,25]" :currentPageReportTemplate="`${$t('Showing')} {first} ${$t('of')} {last} ${$t('of')} {totalRecords} ${$t('documents')}`"
                                 selectionMode="single" @rowClick="handleRowClick">
                                 <template #header>
-                                    <div class="flex justify-between items-center mt-2">
-                                        <h4>{{ $t('') }}</h4>
-                                        <div class="relative rounded-md shadow-sm w-1/4">
+                                    
+                                    <div class="flex flex-col sm:flex-row justify-between items-center mt-2 space-y-2 sm:space-y-0">
+                                        <!-- Campo de Fecha Inicial -->
+                                        <div class="flex items-center space-x-2 sm:space-x-0">
+                                            <div class="font-semibold mr-3">{{ $t('Initial date') }}: </div>
+                                            <input type="date" v-model="initialDate" @change="itemsFiltrados" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                        </div>
+                                        
+                                        <!-- Campo de Fecha de Expiración -->
+                                        <div class="flex items-center space-x-2 sm:space-x-0">
+                                            <div class="font-semibold ml-3">{{ $t('End date') }}: 
+                                            </div>
+                                            <input type="date" v-model="endDate" @change="itemsFiltrados" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                        </div>
+                                        
+                                        <!-- Campo de Búsqueda -->
+                                        <div class="relative rounded-md shadow-sm ml-auto">
                                             <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
                                                 v-model="filters['global'].value" :placeholder="$t('Search...')">
                                             <div class="absolute inset-y-0 left-0 flex items-center pl-3">
@@ -46,7 +60,9 @@
                                             </div>
                                         </div>
                                     </div>
-                
+                                    
+                                    
+
                                 </template>
                                 <Column field="date" :header="$t('Date')" sortable class="dateTable"></Column>
                                 <Column field="number" :header="$t('Concept')" sortable class="dateTable"></Column>
@@ -104,20 +120,9 @@
                                 </Column>
                             </DataTable>
                             
-
-                            <!-- Totals section for large screens -->
-                            <div class="hidden md:flex justify-between mt-4 pr-4 mb-4">
-                                <!-- Columna izquierda -->
-                                <div class="totals-container w-1/3">
-                                    <div class="ml-4 totals p-4 rounded-md">
-                                    </div>
-                                </div>
-
-                                <!-- Espacio entre las tablas -->
-                                <div class="w-1/12"></div>
-
-                                <!-- Columna central (Totales) -->
-                                <div class="totals-container w-1/3">
+                            <!-- Columna central (Totales) -->
+                            <div class="flex flex-col items-center justify-center sm:flex-row sm:justify-end">
+                                <div class="totals-container w-full sm:w-1/3 mb-4 sm:mb-0 sm:ml-4">
                                     <div class="totals p-4 rounded-md">
                                         <table class="w-full">
                                             <tbody>
@@ -139,7 +144,9 @@
                                         </table>
                                     </div>
                                 </div>
-                            </div>       
+                            </div>
+                            
+                            
                         </div>
                     </div>
                 </div>
@@ -173,11 +180,15 @@ export default {
         return {
             documents: [],
             companies: [],
+            totalDocuments: [],
             balance: {
                 subtotal: 0,
                 amount: 0,
                 tax: 0
             },
+            initialDate: '',
+            endDate: '',
+            startDate: '',
             selectedCompany: '',
             accountingDialog: false,
 
@@ -193,12 +204,21 @@ export default {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
         }
 
+        // Inicializa la fecha con la fecha de hoy
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const day = today.getDate().toString().padStart(2, '0');
+        this.initialDate = `${year}-01-01`;
+        this.endDate = `${year}-${month}-${day}`;
+
     },
     async mounted() {
         this.companies = this.$page.props.companies;
         this.selectedCompany = this.companies[0]
         await this.fetchDocuments()
-        this.calculateBalance(this.documents)
+        await this.calculateBalance(this.documents)
+        await this.itemsFiltrados()
     },
 
     watch: {
@@ -206,6 +226,7 @@ export default {
             if (newCompany !== oldCompany) {
                 await this.fetchDocuments();
                 await this.calculateBalance(this.documents)
+                await this.itemsFiltrados()
             }
         }
     },
@@ -213,16 +234,11 @@ export default {
     methods: {
         
         async fetchDocuments() {
+        
             await axios.get(`/accountings/${this.selectedCompany.id}`)
                 .then(response => {   
-                    let date
-                    let dateFormatted
-                    for(let i = 0; i < response.data.documents.length; i++ ) {
-                        date = response.data.documents[i].date
-                        dateFormatted = this.dateFormat(date)
-                        response.data.documents[i].date = dateFormatted
-                    }
-                    this.documents = response.data.documents;
+
+                    this.totalDocuments = response.data.documents;
                     
                 })
                 .catch(error => {
@@ -230,10 +246,42 @@ export default {
                 });
         },
 
+        async itemsFiltrados() {
+            this.documents = []
+            console.log("itemsFiltrados")
+            console.log(this.documents)
+            // Si no se han seleccionado ambas fechas, retornar todos los items
+            if (!this.initialDate || !this.endDate) {
+                return this.totalDocuments;
+            }
+
+
+            // Convertir las fechas de los input a objetos Date
+            const inicio = new Date(this.initialDate);
+            const fin = new Date(this.endDate);
+
+
+            console.log(inicio)
+            console.log(fin)
+
+            // Filtrar los items basado en el rango de fechas
+            this.documents = this.totalDocuments.filter(document => {
+                const fechaItem = new Date(document.date);
+                return fechaItem >= inicio && fechaItem <= fin;
+            });
+            let date
+            let dateFormatted
+            for(let i = 0; i < this.documents.length; i++ ) {
+                date = this.documents[i].date
+                dateFormatted = this.dateFormat(date)
+                this.documents[i].date = dateFormatted
+            }
+        },
+
         async calculateBalance(data) {
             let total = 0;
             let subtotal = 0;
-            let tax = 0;       
+            let tax = 0;     
             for (let i = 0; i < this.documents.length; i++) {   
                 if (!this.documents[i].isReceived) {
                     total += parseFloat(this.documents[i].amount);

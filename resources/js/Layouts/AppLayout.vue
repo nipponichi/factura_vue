@@ -250,6 +250,13 @@ const logout = () => {
                             {{ $t('Invoices') }}
                         </ResponsiveNavLink>
                     </div>
+
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view company')">
+                        <ResponsiveNavLink :href="route('accountings.index')" :active="route().current('accountings.*')">
+                            {{ $t('Accounting') }}
+                        </ResponsiveNavLink>
+                    </div>
+
                     <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view company')">
                         <ResponsiveNavLink :href="route('companies.index')" :active="route().current('companies.*')">
                             {{ $t('My Company') }}
