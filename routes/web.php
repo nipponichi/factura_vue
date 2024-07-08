@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminCompaniesController;
 use App\Http\Controllers\AdminProductsController;
 use App\Http\Controllers\AdminInvoicesController;
 use App\Http\Controllers\AdminUsersController;
+use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProviderController;
@@ -42,6 +43,9 @@ Route::middleware([
 
     // Accounting
     Route::resource('/accountings', AccountingController::class);
+
+    // Warehouse
+    Route::resource('/warehouses', WarehouseController::class);
 
     //Customers
     Route::resource('/customer', CustomerController::class);

@@ -371,5 +371,6 @@
     "Have" : "Haber",
     "Tax" : "IVA",
     "End date" : "Fecha fin",
-    "Initial date" : "Fecha inicio"
+    "Initial date" : "Fecha inicio",
+    "Warehouse":"Almacén"
 }
