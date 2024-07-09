@@ -14,17 +14,26 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">   
 
                         <div class="card">
-                            <div class="relative inline-block flex mb-5">
+                            <div class="relative flex justify-between mb-5">
                                 <button
                                     v-if="!loading && (companies.length > 0)"
                                     type="button"
-                                    class="px-4 py-2 bg-black text-white border border-gray-200 rounded-md flex items-center justify-between"
+                                    class="px-4 py-2 bg-black text-white border border-gray-200 rounded-md flex items-center"
                                     @click="selectCompany">
                                     <span class="font-bold text-lg">
                                         <i class="pi pi-plus mr-2"></i>
                                         {{ selectedCompany.name }}
                                     </span>
                                 </button>
+                            
+                                <label class="flex items-center cursor-pointer">
+                                    <span class="text-lg font-medium text-gray-900 dark:text-gray-300" v-if="!isChecked">{{ $t('Emitted invoice') }}</span>
+                                    <span class="text-lg font-medium text-gray-900 dark:text-gray-300" v-else>{{ $t('Received invoice') }}</span>
+                                    <input type="checkbox" class="sr-only peer" v-model="isChecked">
+                                    <div
+                                        class="relative w-11 h-6 ml-3 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+                                    ></div>
+                                </label>
                             </div>
                             
                             <!-- Botones normales para pantallas grandes -->
@@ -32,8 +41,11 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <div class="flex flex-col md:flex-row justify-start items-center">
                                     <div class="flex flex-wrap justify-start items-center">
                                         <div class="relative inline-block w-50">
-                                            <Button :label="$t('Customer')" icon="pi pi-plus" class="success-button text-white p-2" @click="selectACustomer()" />
+                                            <Button v-if="isChecked" :label="$t('Provider')" icon="pi pi-plus" class="success-button text-white p-2" @click="selectAProvider" />
+                                            <Button v-else :label="$t('Customer')" icon="pi pi-plus" class="success-button text-white p-2" @click="selectACustomer" />
                                         </div>
+
+                                        
 
                                         <div class="flex items-center ml-2">
                                             <label for="link-checkbox" class="ms-2 mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark as paid') }}</label>
@@ -72,7 +84,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                 type="button"
                                                 class="px-4 py-2 bg-purple-600 text-white rounded-md flex items-center justify-between"
                                                 @click="toggleDropdownExport"
-                                                :disabled="totalConIVA <= 0 || isSaving"
+                                                :disabled="totalConIVA <= 0 || isSaving || isSaving || !selectedCustomer.id"
                                                 :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id}">
                                                 <i class="pi pi-upload mr-2"></i>
                                                 {{ $t('Export') }}
@@ -87,7 +99,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                     {{ $t('PDF') }}
                                                 </span>
                                             </button>
-                                            <button type="button" class="px-4 py-2 rounded-r flex items-center" @click="exportToXML()">
+                                            <button v-if="!isChecked" type="button" class="px-4 py-2 rounded-r flex items-center" @click="exportToXML()">
                                                 <span>
                                                     <i class="pi pi-file-export mr-2"></i>
                                                     {{ $t('XML') }}
@@ -101,8 +113,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                             class="blue-button"
                                             :label="$t('Save')"
                                             @click="checkDocument"
-                                            :model="items"
-                                            :disabled="totalConIVA <= 0 || isSaving"
+                                            :model="itemsSave"
+                                            :disabled="totalConIVA <= 0 || isSaving || isSaving || !selectedCustomer.id"
                                             :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id}">
                                             <template v-slot:icon>
                                                 <i class="pi pi-save mr-2" :class="{ 'opacity-50': totalConIVA <= 0 }"></i>
@@ -120,7 +132,9 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <div class="showCustomer"> 
                                     <div class="grid md:grid-cols-1 text-m gap-y-1">
                                         <div class="flex items-center justify-between w-full">
-                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Customer') }}:</div>
+                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">
+                                                {{ isChecked ? $t('Provider') : $t('Customer') }}:
+                                            </div>
                                             <div class="text-gray-700 w-full font-bold text-lg">{{ selectedCustomer.name }}</div>
                                         </div>
                                         <div class="flex items-center justify-between w-full">
@@ -688,7 +702,19 @@ export default {
     },
     data() {
         return {
-            items: [
+            itemsSave: [
+                {
+                    label: this.$t('Guardar y crear nueva'),
+                    icon: 'pi pi-refresh',
+                    command: () => this.saveAndReset()
+                },
+                {
+                    label: this.$t('Cancelar'),
+                    command: () => this.cancelInvoice()
+                },
+            ],
+
+            itemsExport: [
                 {
                     label: this.$t('Guardar y crear nueva'),
                     icon: 'pi pi-refresh',
@@ -705,6 +731,7 @@ export default {
             fechaFormateada: '',
             loading: true,
             isSaving: false,
+            isChecked: false,
             isMobileMenuOpen: false,
             showTable: false,
             isDropdownOpen: false,
@@ -896,6 +923,12 @@ export default {
     },
     
     methods: {
+
+        async switchToReceivedInvoice() {
+            this.selectedCustomer = this.selectedCompany
+            this.fetchProviders()
+            
+        },
 
         async handlePaymentMethodChange(paymentMethod) {
             switch (paymentMethod.id) {
@@ -1255,6 +1288,9 @@ export default {
         saveAndReset() {
             this.saveRestart = true;
             this.checkDocument(); 
+        },
+        checkExport() {
+            this.itemsExport
         },
 
         checkDocument() {

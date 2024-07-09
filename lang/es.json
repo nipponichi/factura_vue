@@ -372,5 +372,8 @@
     "Tax" : "IVA",
     "End date" : "Fecha fin",
     "Initial date" : "Fecha inicio",
-    "Warehouse":"Almacén"
+    "Warehouse":"Almacén",
+    "Emitted invoice" : "Factura emitida",
+    "Received invoice" : "Factura recibida",
+    "Provider" : "Proveedor"
 }
