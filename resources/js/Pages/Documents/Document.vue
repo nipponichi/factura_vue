@@ -1153,22 +1153,22 @@ export default {
 
         },
 
-        handleCompanySelection() {
+        async handleCompanySelection() {
             this.selectedCustomer = [];
-            axios.get('/customers/'+this.selectedCompany.id)
-                .then(response => {
-            
-                    this.customers = response.data.customers;   
-                    
-                    if (this.customers.length === 1) {
-                        this.selectedCustomer = this.customers[0];
-                    }
-
-                })
-                .catch(error => {
-                    console.error('Error fetching phone data:', error);
-                });
+            try {
+                const response = await axios.get('/customers/' + this.selectedCompany.id);
+                await this.fetchDocuments();
+                await this.fetchPayments();
+                this.customers = response.data.customers;   
+                
+                if (this.customers.length === 1) {
+                    this.selectedCustomer = this.customers[0];
+                }
+            } catch (error) {
+                console.error('Error fetching phone data:', error);
+            }
         },
+
 
         async fetchDocuments() {
             await axios.get('/documents-type')
