@@ -9,7 +9,7 @@
             </h2>
         </template>
         <div class="py-12">
-            <div class="max-w-9xl mx-auto sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                     <div>
                         <div class="card">
@@ -64,13 +64,13 @@
                                     
 
                                 </template>
-                                <Column field="date" :header="$t('Date')" sortable class="dateTable"></Column>
+                                <Column field="dateFormatted" :header="$t('Date')" sortable class="dateTable"></Column>
                                 <Column field="number" :header="$t('Concept')" sortable class="dateTable"></Column>
                                 <Column class="dateTable">
                                     <template #header>
                                         <div class="text-center">
                                             <div>{{ $t('Duty') }}</div>
-                                            <div class="flex gap-2 justify-center text-sm text-gray-500">
+                                            <div class="flex justify-center gap-2 text-sm text-gray-500">
                                                 <div class="w-1/3 text-center px-3">{{ $t('Subtotal') }}</div>
                                                 <div class="w-1/3 text-center px-12">{{ $t('Tax') }}</div>
                                                 <div class="w-1/3 text-center pl-16">{{ $t('Total') }}</div>
@@ -118,7 +118,12 @@
                                         </div>
                                     </template>
                                 </Column>
+
+                        
+                                
                             </DataTable>
+
+                            
                             
                             <!-- Columna central (Totales) -->
                             <div class="flex flex-col items-center justify-center sm:flex-row sm:justify-end">
@@ -199,6 +204,7 @@ export default {
         };
 
     },
+    
     created() {
         this.filters = {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -212,12 +218,16 @@ export default {
         this.initialDate = `${year}-01-01`;
         this.endDate = `${year}-${month}-${day}`;
 
+        
+        console.log(this.initialDate)
+        console.log(this.endDate)
+
     },
     async mounted() {
         this.companies = this.$page.props.companies;
         this.selectedCompany = this.companies[0]
         await this.fetchDocuments()
-        await this.calculateBalance(this.documents)
+        await this.calculateBalance()
         await this.itemsFiltrados()
     },
 
@@ -225,7 +235,7 @@ export default {
         async selectedCompany(newCompany, oldCompany) {
             if (newCompany !== oldCompany) {
                 await this.fetchDocuments();
-                await this.calculateBalance(this.documents)
+                await this.calculateBalance()
                 await this.itemsFiltrados()
             }
         }
@@ -238,7 +248,17 @@ export default {
             await axios.get(`/accountings/${this.selectedCompany.id}`)
                 .then(response => {   
 
+                    let date
+                    let dateFormatted
+                    
+                    for(let i = 0; i < response.data.documents.length; i++ ) {
+                        date = response.data.documents[i].date
+                        dateFormatted = this.dateFormat(date)
+                        response.data.documents[i].dateFormatted = dateFormatted
+                        console.log("fetch: " + dateFormatted)
+                    }
                     this.totalDocuments = response.data.documents;
+                    
                     
                 })
                 .catch(error => {
@@ -248,37 +268,26 @@ export default {
 
         async itemsFiltrados() {
             this.documents = []
-            console.log("itemsFiltrados")
-            console.log(this.documents)
+
+    
             // Si no se han seleccionado ambas fechas, retornar todos los items
             if (!this.initialDate || !this.endDate) {
                 return this.totalDocuments;
             }
 
-
             // Convertir las fechas de los input a objetos Date
             const inicio = new Date(this.initialDate);
             const fin = new Date(this.endDate);
-
-
-            console.log(inicio)
-            console.log(fin)
-
+            
             // Filtrar los items basado en el rango de fechas
             this.documents = this.totalDocuments.filter(document => {
                 const fechaItem = new Date(document.date);
                 return fechaItem >= inicio && fechaItem <= fin;
             });
-            let date
-            let dateFormatted
-            for(let i = 0; i < this.documents.length; i++ ) {
-                date = this.documents[i].date
-                dateFormatted = this.dateFormat(date)
-                this.documents[i].date = dateFormatted
-            }
+            
         },
 
-        async calculateBalance(data) {
+        async calculateBalance() {
             let total = 0;
             let subtotal = 0;
             let tax = 0;     
@@ -324,7 +333,7 @@ export default {
 
             return fechaFormateada;
         },
-        
+
         hideDialog() {
             this.accountingDialog = false
         },
@@ -332,6 +341,7 @@ export default {
         openNew() {
             this.accountingDialog = true
         },
+        
 
     },
 

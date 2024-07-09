@@ -27,7 +27,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 </button>
                             </div>
                             
-                            
                             <!-- Botones normales para pantallas grandes -->
                             <div class="md:flex justify-between items-center">
                                 <div class="flex flex-col md:flex-row justify-start items-center">
@@ -713,7 +712,6 @@ export default {
             saveRestart: false,
             taxTypes: [],
             taxValues: [],
-            documents1: [],
             taxOptions: [
                 { label: '0', value: 0 },
                 { label: '4', value: 4 },
