@@ -71,7 +71,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                             </button>
                                             <button
                                                 type="button"
-                                                class="px-4 py-2 mr-2 success-button text-white rounded flex items-center justify-between"
+                                                class="px-4 py-2 success-button text-white rounded flex items-center justify-between"
                                                 @click="selectDocument()"
                                                 :class="{ 'opacity-50': !selectedCompany.id }"
                                                 :disabled="!selectedCompany.id">
@@ -80,34 +80,24 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                     {{ $t('Serie') }}
                                                 </span>
                                             </button>
-                                            <button
-                                                type="button"
-                                                class="px-4 py-2 bg-purple-600 text-white rounded-md flex items-center justify-between"
-                                                @click="toggleDropdownExport"
-                                                :disabled="totalConIVA <= 0 || isSaving || isSaving || !selectedCustomer.id"
-                                                :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id}">
-                                                <i class="pi pi-upload mr-2"></i>
-                                                {{ $t('Export') }}
-                                            </button>
-                                        </div>
-
-                                        <!-- Desplegable Export -->
-                                        <div v-show="isDropdownOpenExport" class="absolute right-0 w-48 bg-white border border-gray-300 rounded shadow-lg">
-                                            <button type="button" class="px-4 py-2 rounded-l flex items-center justify-between" @click="exportToPDF()">
-                                                <span>
-                                                    <i class="pi pi-file-pdf mr-2"></i>
-                                                    {{ $t('PDF') }}
-                                                </span>
-                                            </button>
-                                            <button v-if="!isChecked" type="button" class="px-4 py-2 rounded-r flex items-center" @click="exportToXML()">
-                                                <span>
-                                                    <i class="pi pi-file-export mr-2"></i>
-                                                    {{ $t('XML') }}
-                                                </span>
-                                            </button>
                                         </div>
                                     </div>
 
+                                    <div class="split-button-container ml-2">
+                                        <SplitButton
+                                            ref="splitButton"
+                                            class="purple-button"
+                                            :label="$t('Export')"
+                                            @click="handleClick"
+                                            :model="itemsExport"
+                                            :disabled="totalConIVA <= 0 || isSaving || isSaving || !selectedCustomer.id"
+                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id}">
+                                            <template v-slot:icon>
+                                                <i class="pi pi-upload mr-2" :class="{ 'opacity-50': totalConIVA <= 0 }"></i>
+                                            </template>
+                                        </SplitButton>
+                                    </div>
+                                    
                                     <div class="split-button-container ml-2">
                                         <SplitButton
                                             class="blue-button"
@@ -121,6 +111,9 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                             </template>
                                         </SplitButton>
                                     </div>
+
+                                    
+
                                 </div>
                             </div>
 
@@ -713,15 +706,15 @@ export default {
                     command: () => this.cancelInvoice()
                 },
             ],
-
             itemsExport: [
                 {
-                    label: this.$t('Guardar y crear nueva'),
-                    icon: 'pi pi-refresh',
+                    label: this.$t('Exportar a PDF'),
+                    icon: 'pi pi-file-pdf',
                     command: () => this.saveAndReset()
                 },
                 {
-                    label: this.$t('Cancelar'),
+                    label: this.$t('Exportar a XML'),
+                    icon: 'pi pi-file-o',
                     command: () => this.cancelInvoice()
                 },
             ],
@@ -735,7 +728,6 @@ export default {
             isMobileMenuOpen: false,
             showTable: false,
             isDropdownOpen: false,
-            isDropdownOpenExport: false,
             saveRestart: false,
             taxTypes: [],
             taxValues: [],
@@ -929,7 +921,6 @@ export default {
             this.fetchProviders()
             
         },
-
         async handlePaymentMethodChange(paymentMethod) {
             switch (paymentMethod.id) {
                 case 1:
@@ -1100,27 +1091,6 @@ export default {
             })
         },
 
-        handleScroll() {
-            let scrollPosition = window.scrollY;
-            if (scrollPosition > 200) {
-                this.showButton = true;
-            } else {
-                this.showButton = false;
-            }
-        },
-        
-        toggleDropdown() {
-            this.isDropdownOpen = !this.isDropdownOpen;
-        },
-
-        toggleDropdownExport() {
-            this.isDropdownOpenExport = !this.isDropdownOpenExport;
-        },
-
-        toggleMobileMenu() {
-            this.isMobileMenuOpen = !this.isMobileMenuOpen;
-        },
-
         async fetchCompanies() {
             try {
                 const response = await axios.get('/companies-invoice');
@@ -1289,10 +1259,17 @@ export default {
             this.saveRestart = true;
             this.checkDocument(); 
         },
-        checkExport() {
-            this.itemsExport
-        },
 
+        handleClick() {
+            // Simula un clic en el ícono del desplegable para abrirlo
+            this.$nextTick(() => {
+            const splitButton = this.$refs.splitButton.$el;
+            const dropdownIcon = splitButton.querySelector('.p-splitbutton-menubutton');
+            if (dropdownIcon) {
+                dropdownIcon.click();
+            }
+            });
+        },
         checkDocument() {
             axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
             .then(response => {             

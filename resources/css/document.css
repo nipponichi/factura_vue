@@ -11,8 +11,17 @@ background-color: #0056b3; /* Cambio de color de fondo en hover */
 border-color: #0056b3; /* Cambio de color de borde en hover */
 }
 
-.p-splitbutton .p-button:hover {
-    background-color: #0056b3; /* Cambio de color de fondo en hover de los items del menú */
+.purple-button {
+background-color: #804BF7; /* Azul según el esquema de colores de Tailwind CSS */
+color: white; /* Texto en blanco */
+border-color: #804BF7; /* Color del borde igual que el fondo */
+padding: 0.5rem 1rem; /* Ajusta el relleno según sea necesario */
+transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.purple-button:hover {
+background-color: #7042da; /* Cambio de color de fondo en hover */
+border-color: #7042da; /* Cambio de color de borde en hover */
 }
 
 .dateTable {

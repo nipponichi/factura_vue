@@ -238,6 +238,10 @@ export default {
                 await this.calculateBalance()
                 await this.itemsFiltrados()
             }
+        },
+
+        async hadleCalculateBalance() {
+            await this.calculateBalance()
         }
     },
 
@@ -284,10 +288,17 @@ export default {
                 const fechaItem = new Date(document.date);
                 return fechaItem >= inicio && fechaItem <= fin;
             });
-            
+            await this.calculateBalance()
         },
 
         async calculateBalance() {
+            console.log("calculateTotal1")
+            console.log(this.balance)
+            this.balance = {
+                subtotal: 0,
+                amount: 0,
+                tax: 0
+            }
             let total = 0;
             let subtotal = 0;
             let tax = 0;     
@@ -309,6 +320,9 @@ export default {
                 amount: total.toFixed(2),
                 tax: tax.toFixed(2)
             };
+
+            console.log("calculateTotal2")
+            console.log(this.balance)
         },
 
         dateFormat(fecha) {
