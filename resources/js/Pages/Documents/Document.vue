@@ -11,29 +11,41 @@ import AppLayout from '@/Layouts/AppLayout.vue';
             </template>
             <div class="py-12">
                 <div class="max-w-10xl mx-auto sm:px-6 lg:px-24">
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">   
-
+                    <div :class="{'border-blue-500 border-2': isChecked, 'bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg': true}">
                         <div class="card">
+
+                            <label class="flex items-center cursor-pointer justify-end max-w-xs ml-auto">
+                                <span class="text-lg font-medium text-gray-900 dark:text-gray-300 flex-shrink-0" v-if="!myDocument.paid">{{ $t('Not paid') }}</span>
+                                <span class="text-lg font-medium text-gray-900 dark:text-gray-300 flex-shrink-0" v-else>{{ $t('Paid') }}</span>
+                                <input type="checkbox" class="sr-only peer" v-model="myDocument.paid">
+                                <div class="relative w-11 h-6 ml-3 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                            </label>
+
+                            
+                        
+
                             <div class="relative flex justify-between mb-5">
                                 <button
                                     v-if="!loading && (companies.length > 0)"
                                     type="button"
-                                    class="px-4 py-2 bg-black text-white border border-gray-200 rounded-md flex items-center"
+                                    class="px-4 py-2 bg-gray-800 hover:bg-gray-900 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-white flex items-center"
                                     @click="selectCompany">
                                     <span class="font-bold text-lg">
                                         <i class="pi pi-plus mr-2"></i>
                                         {{ selectedCompany.name }}
                                     </span>
                                 </button>
+
+                                
                             
                                 <label class="flex items-center cursor-pointer">
-                                    <span class="text-lg font-medium text-gray-900 dark:text-gray-300" v-if="!isChecked">{{ $t('Emitted invoice') }}</span>
-                                    <span class="text-lg font-medium text-gray-900 dark:text-gray-300" v-else>{{ $t('Received invoice') }}</span>
-                                    <input type="checkbox" class="sr-only peer" v-model="isChecked">
-                                    <div
-                                        class="relative w-11 h-6 ml-3 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-                                    ></div>
+                                    <span class="text-lg font-medium text-gray-900 dark:text-gray-300" v-if="!isChecked">{{ $t('Emit') }}</span>
+                                    <span class="text-lg font-medium text-gray-900 dark:text-gray-300" v-else>{{ $t('Receive') }}</span>
+                                    <input type="checkbox" class="sr-only peer" v-model="isChecked" @change="switchToReceivedInvoice">
+                                    <div class="relative w-11 h-6 ml-3 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                                 </label>
+
+                                
                             </div>
                             
                             <!-- Botones normales para pantallas grandes -->
@@ -41,15 +53,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <div class="flex flex-col md:flex-row justify-start items-center">
                                     <div class="flex flex-wrap justify-start items-center">
                                         <div class="relative inline-block w-50">
-                                            <Button v-if="isChecked" :label="$t('Provider')" icon="pi pi-plus" class="success-button text-white p-2" @click="selectAProvider" />
-                                            <Button v-else :label="$t('Customer')" icon="pi pi-plus" class="success-button text-white p-2" @click="selectACustomer" />
-                                        </div>
-
-                                        
-
-                                        <div class="flex items-center ml-2">
-                                            <label for="link-checkbox" class="ms-2 mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark as paid') }}</label>
-                                            <input id="link-checkbox" type="checkbox" v-model="myDocument.paid" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                            <Button v-if="isChecked" :label="$t('Provider')" icon="pi pi-plus" class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white p-2" @click="selectAProvider" />
+                                            <Button v-else :label="$t('Customer')" icon="pi pi-plus" class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white p-2" @click="selectACustomer" />
                                         </div>
                                     </div>
                                 </div>
@@ -60,7 +65,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         <div class="flex">
                                             <button
                                                 type="button"
-                                                class="px-4 py-2 mr-2 danger-button text-white rounded flex items-center justify-between"
+                                                class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-white rounded flex items-center justify-between"
                                                 @click="handleListDocument()"
                                                 :class="{ 'opacity-50': !selectedCompany.id }"
                                                 :disabled="!selectedCompany.id">
@@ -69,9 +74,9 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                     {{ $t('Document list') }}
                                                 </span>
                                             </button>
-                                            <button
+                                            <Button v-if="!isChecked"
                                                 type="button"
-                                                class="px-4 py-2 success-button text-white rounded flex items-center justify-between"
+                                                class="px-4 ml-2 py-2 bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white rounded flex items-center justify-between"
                                                 @click="selectDocument()"
                                                 :class="{ 'opacity-50': !selectedCompany.id }"
                                                 :disabled="!selectedCompany.id">
@@ -83,15 +88,15 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         </div>
                                     </div>
 
-                                    <div class="split-button-container ml-2">
+                                    <div v-if="!isChecked" class="split-button-container ml-2">
                                         <SplitButton
                                             ref="splitButton"
-                                            class="purple-button"
+                                            class="bg-purple-400 hover:bg-purple-500 focus:ring-4 focus:ring-pur-300 font-medium rounded-lg text-white text-white p-2"
                                             :label="$t('Export')"
                                             @click="handleClick"
                                             :model="itemsExport"
-                                            :disabled="totalConIVA <= 0 || isSaving || isSaving || !selectedCustomer.id"
-                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id}">
+                                            :disabled="totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.id"
+                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.id}">
                                             <template v-slot:icon>
                                                 <i class="pi pi-upload mr-2" :class="{ 'opacity-50': totalConIVA <= 0 }"></i>
                                             </template>
@@ -104,8 +109,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                             :label="$t('Save')"
                                             @click="checkDocument"
                                             :model="itemsSave"
-                                            :disabled="totalConIVA <= 0 || isSaving || isSaving || !selectedCustomer.id"
-                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id}">
+                                            :disabled="totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.id"
+                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.id}">
                                             <template v-slot:icon>
                                                 <i class="pi pi-save mr-2" :class="{ 'opacity-50': totalConIVA <= 0 }"></i>
                                             </template>
@@ -172,8 +177,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <template #start>
                                     <div class="flex items-center justify-between ">
                                         <div class="flex items-center">
-                                            <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="addRow" />
-                                            <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
+                                            <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="mr-2 bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white rounded-md p-2" @click="addRow" />
+                                            <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="bg-red-400 hover:bg-red-500 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-white rounded-md p-2" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
                                         </div>
                                         <div class="flex-grow"></div>
                                     </div>
@@ -241,15 +246,13 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             </DataTable>
 
                             <div class="flex justify-end mt-4 pr-4" v-if="showButton">
-                                <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="success-button" @click="addRow()" />
+                                <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white" @click="addRow()" />
                             </div>
                                                     <!-- Totals section for large screens -->
                             <div class="hidden md:flex justify-between mt-4 pr-4 mb-4">
                                 <!-- Columna izquierda -->
                                 <div class="totals-container w-1/3">
-                                    <button class="ml-4 mb-2 success-button text-white rounded-md p-2" @click="selectAPaymentMethod()">
-                                        <i class="pi pi-plus"></i> {{ $t('Payment method') }}
-                                    </button>
+                                    <Button :label="$t('Payment method')" icon="pi pi-plus" class="ml-4 mb-2 bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white rounded-md p-2" @click="selectAPaymentMethod()" />
                                     <div class="ml-4 totals p-4 rounded-md">
                                         <table class="w-full">
                                             <tbody>
@@ -471,7 +474,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                 </Dropdown>
                 <div class="grid gap-3 md:grid-cols-1 justify-items">
                     <div class="flex justify-between">
-                        <button class="success-button mr-1 mr-1 rounded-md" @click="openNew">
+                        <button class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white p-2 mr-1 mr-1 rounded-md" @click="openNew">
                             <i class="pi pi-plus"></i> {{ $t('Create customer') }}
                         </button>
                         <button class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog()">{{ $t('Close') }}</button>
@@ -878,12 +881,14 @@ export default {
 
     async mounted() {
         await this.fetchCompanies();
+        await this.fetchCustomers();
         await this.fetchDocuments();
         await this.fetchPayments();
 
     },
 
     watch: {
+
         selectedPaymentMethod(newMethod) {
             console.log("PaymentId " + newMethod.id)
             this.handlePaymentMethodChange(newMethod);
@@ -917,10 +922,13 @@ export default {
     methods: {
 
         async switchToReceivedInvoice() {
-            this.selectedCustomer = this.selectedCompany
-            this.fetchProviders()
-            
+            this.customers = []
+            this.selectedCustomer = []
+
+            await this.fetchCustomers()  
+            await this.fetchPayments()
         },
+        
         async handlePaymentMethodChange(paymentMethod) {
             switch (paymentMethod.id) {
                 case 1:
@@ -1042,8 +1050,18 @@ export default {
 
         async fetchEmails() {
             try {
-                const response = await axios.get('/emails/' + this.selectedCompany.id);
-                this.emails = response.data.emails;
+                const url = this.isChecked 
+                        ? `/emails/${this.selectedCustomer.id}` 
+                        : `/emails/${this.selectedCompany.id}`;
+                    
+                const emailResponse = await axios.get(url);
+
+                if (this.isChecked) {
+                    this.emails = emailResponse.data.emails;
+                } else {
+                    this.emails = emailResponse.data.emails;
+                }
+            
                 this.selectedEmail = await this.changePaymentMethodSystemId(this.emails, this.selectedEmail);
                 this.options = this.emails;
             } catch (error) {
@@ -1052,9 +1070,20 @@ export default {
         },
 
         async fetchPhones() {
+            
             try {
-                const response = await axios.get('/phones/' + this.selectedCompany.id);
-                this.phones = response.data.phones;
+                const url = this.isChecked 
+                        ? `/phones/${this.selectedCustomer.id}` 
+                        : `/phones/${this.selectedCompany.id}`;
+                    
+                const phonesResponse = await axios.get(url);
+
+                if (this.isChecked) {
+                    this.phones = phonesResponse.data.phones;
+                } else {
+                    this.phones = phonesResponse.data.phones;
+                }
+            
                 this.selectedPhone = await this.changePaymentMethodSystemId(this.phones, this.selectedPhone);
                 this.options = this.phones;
             } catch (error) {
@@ -1084,11 +1113,21 @@ export default {
 
 
         async fetchPayments () {
-            await axios.get('/payment/' + this.selectedCompany.id)
-            .then(response => {
-                this.payment_methods = response.data.methods;
+
+            const url = this.isChecked 
+                    ? `/payment/${this.selectedCustomer.id}` 
+                    : `/payment/${this.selectedCompany.id}`;
+                
+            const paymentResponse = await axios.get(url);
+
+            if (this.isChecked) {
+                this.payment_methods = paymentResponse.data.methods;
+            } else {
+                this.payment_methods = paymentResponse.data.methods;
+            }
+
                 this.selectedPaymentMethod = this.payment_methods[0]
-            })
+        
         },
 
         async fetchCompanies() {
@@ -1103,8 +1142,30 @@ export default {
                     this.selectedCompany = this.companies[0];
                 }
 
-                const customersResponse = await axios.get('/customers/' + this.selectedCompany.id);
-                this.customers = customersResponse.data.customers;
+                this.loading = false;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                this.loading = false;
+            }
+        },
+
+        async fetchCustomers() {
+
+            console.log("Pruevbaaa")
+            try {
+                
+                const url = this.isChecked 
+                    ? `/providers/${this.selectedCompany.id}` 
+                    : `/customers/${this.selectedCompany.id}`;
+                
+                
+                const customersResponse = await axios.get(url);
+
+                if (this.isChecked) {
+                    this.customers = customersResponse.data.providers;
+                } else {
+                    this.customers = customersResponse.data.customers;
+                }
 
                 if (this.customers.length === 1) {
                     this.selectedCustomer = this.customers[0];
@@ -1134,6 +1195,10 @@ export default {
         },
 
         selectACustomer() {
+            this.selectACustomerDialog = true;
+        },
+
+        selectAProvider() {
             this.selectACustomerDialog = true;
         },
 

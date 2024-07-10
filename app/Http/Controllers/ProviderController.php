@@ -68,8 +68,7 @@ class ProviderController extends Controller
                     ->where('dt_end', null);
             })
             ->get();
-
-
+            
             return response()->json(['providers' => $companies]);
         } catch (Exception $e) {
             return response()->json(['message' => 'Error loading data' ,'type' => 'error']);

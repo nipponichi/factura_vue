@@ -374,6 +374,12 @@
     "Initial date" : "Fecha inicio",
     "Warehouse":"Almacén",
     "Emitted invoice" : "Factura emitida",
+    "Emit invoice" : "Emitir factura",
+    "Emit" : "Emitir",
+    "Receive" : "Recibir",
     "Received invoice" : "Factura recibida",
-    "Provider" : "Proveedor"
+    "Provider" : "Proveedor",
+    "Paid" : "Pagada",
+    "Not paid" : "No pagada"
+
 }
