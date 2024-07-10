@@ -49,7 +49,7 @@ class AccountingController extends Controller
     public function show($companyId)
     {
 
-        $documents = DB::table('documents')
+        $emittedDocuments = DB::table('documents')
             ->select(
                 'documents.id',
                 'documents.number',
@@ -78,7 +78,41 @@ class AccountingController extends Controller
             ->whereNull('documents.dt_end')
             ->whereNull('companies_names.dt_end')
             ->get();
+
+
+            $receivedDocuments = DB::table('documents')
+            ->select(
+                'documents.id',
+                'documents.number',
+                'documents.company_id_company',
+                'documents.documents_type_id',
+                'documents.payment_methods_id',
+                'documents.date',
+                'documents.amount',
+                'documents.subtotal',
+                'documents.tax',
+                'documents.paid',
+                'documents.expiration',
+                'documents.invoiced',
+                'documents.active',
+                'documents.isReceived',
+                'documents_type.name as document_type_name',
+                'companies_names.name as customer_name'
+            )
+            ->leftJoin('documents_type', 'documents.documents_type_id', '=', 'documents_type.id')
+            ->leftJoin('companies_names', 'documents.company_id_company', '=', 'companies_names.company_id')
+            ->where('documents.company_id_customer', $companyId)
+            ->whereNull('documents.dt_end')
+            ->whereNull('companies_names.dt_end')
+            ->get();
             
+            // Convert collections to arrays
+            $emittedDocumentsArray = $emittedDocuments->toArray();
+            $receivedDocumentsArray = $receivedDocuments->toArray();
+
+            // Merge arrays
+            $documents = array_merge($emittedDocumentsArray, $receivedDocumentsArray);
+                    
         return response()->json(['message' => 'Documents uploaded', 'documents' => $documents]);
     }
 

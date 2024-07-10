@@ -431,8 +431,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
             </Dialog>
 
             <!-- MODAL DOCUMENT LIST -->
-            <Dialog v-model:visible="documentListDialog" class="w-3/4" :header="$t('Select document')" :modal="true">
-                <TableDocumentSelector :companyId="selectedCompany.id" @document-selected="handleDocumentSelected" />
+            <Dialog v-model:visible="documentListDialog" class="w-3/4" :header="isChecked ? $t('Received invoices') : $t('Emitted invoices')" :modal="true">
+                <TableDocumentSelector :companyId="selectedCompany.id" :isChecked="isChecked" @document-selected="handleDocumentSelected"  />
             </Dialog>
 
             <!-- MODAL DELETE SIMPLE -->

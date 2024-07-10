@@ -26,9 +26,8 @@
                                 </button>
                             </div>
                             <DataTable ref="dt" :value="documents" v-model:selection="selectedDocuments" dataKey="id"
-                                :paginator="true" :rows="10" :filters="filters"
-                                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                                :rowsPerPageOptions="[5,10,25]" :currentPageReportTemplate="`${$t('Showing')} {first} ${$t('of')} {last} ${$t('of')} {totalRecords} ${$t('documents')}`"
+                                
+    
                                 selectionMode="single" @rowClick="handleRowClick">
                                 <template #header>
                                     
@@ -252,6 +251,7 @@ export default {
             await axios.get(`/accountings/${this.selectedCompany.id}`)
                 .then(response => {   
 
+                    console.log(response.data.documents);
                     let date
                     let dateFormatted
                     

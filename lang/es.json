@@ -382,6 +382,11 @@
     "Received invoice" : "Factura recibida",
     "Provider" : "Proveedor",
     "Paid" : "Pagada",
-    "Not paid" : "No pagada"
+    "Not paid" : "No pagada",
+    "Emitted" : "Emitidas",
+    "Received" : "Recibidas",
+    "Received invoices" : "Facturas recibidas",
+    "Emitted invoices" : "Facturas emitidas",
+    "Emitter" : "Emisor"
 
 }

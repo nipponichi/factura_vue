@@ -242,6 +242,7 @@ class DocumentController extends Controller
             return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
         }
 
+
         $documents = DB::table('documents')
         ->select(
             'documents.id',
@@ -256,6 +257,7 @@ class DocumentController extends Controller
             'documents.amount',
             'documents.paid',
             'documents.invoiced',
+            'documents.isReceived',
             'documents.active',
             'documents.payment_methods_id',
             'documents_type.name as document_type_name',
@@ -274,6 +276,41 @@ class DocumentController extends Controller
         ->whereNull('documents.dt_end')
         ->first();
 
+        if ($documents == null) {
+            $documents = DB::table('documents')
+            ->select(
+                'documents.id',
+                'documents.number',
+                'documents.document_counter',
+                'documents.company_id_company',
+                'documents.company_id_customer',
+                'documents.documents_type_id',
+                'documents.payment_methods_id',
+                'documents.documents_series_id',
+                'documents.isReceived',
+                'documents.date',
+                'documents.expiration',
+                'documents.amount',
+                'documents.paid',
+                'documents.invoiced',
+                'documents.active',
+                'documents.payment_methods_id',
+                'documents_type.name as document_type_name',
+                'documents_series.serie as document_series_serie',
+                'companies_names.name as customer_name',
+                'documents.payment_system_id as payment_system_id',
+                'payment_method.name'
+            )
+            ->leftJoin('documents_type', 'documents.documents_type_id', '=', 'documents_type.id')
+            ->leftJoin('documents_series', 'documents.documents_series_id', '=', 'documents_series.id')
+            ->leftJoin('companies_names', 'documents.company_id_company', '=', 'companies_names.company_id')
+            ->leftJoin('payment_method', 'documents.payment_methods_id', '=', 'payment_method.id')
+            ->where('documents.id', $documentId)
+            ->whereNull('documents.dt_end')
+            ->first();
+        }
+
+        
         switch ($documents->payment_methods_id) {
             case 1:
             case 7:
@@ -358,6 +395,10 @@ class DocumentController extends Controller
             return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
         }
 
+        if ($documents->isReceived) {
+            $documents->company_id_customer = $documents->company_id_company;
+        }
+        
         $customer = DB::table('companies')
         ->select(
             'companies.id',
@@ -391,7 +432,7 @@ class DocumentController extends Controller
     public function indexDocuments($id)
     {
 
-        $documents = DB::table('documents')
+        $emittedDocuments = DB::table('documents')
         ->select(
             'documents.id',
             'documents.number',
@@ -405,6 +446,7 @@ class DocumentController extends Controller
             'documents.expiration',
             'documents.invoiced',
             'documents.active',
+            'documents.isReceived',
             'documents_type.name as document_type_name',
             'documents_series.serie as document_series_serie',
             'companies_names.name as customer_name'
@@ -417,6 +459,39 @@ class DocumentController extends Controller
         ->whereNull('documents.dt_end')
         ->whereNull('companies_names.dt_end')
         ->get();
+
+        $receivedDocuments = DB::table('documents')
+        ->select(
+            'documents.id',
+            'documents.number',
+            'documents.company_id_company',
+            'documents.documents_type_id',
+            'documents.payment_methods_id',
+            'documents.date',
+            'documents.amount',
+            'documents.subtotal',
+            'documents.tax',
+            'documents.paid',
+            'documents.expiration',
+            'documents.invoiced',
+            'documents.active',
+            'documents.isReceived',
+            'documents_type.name as document_type_name',
+            'companies_names.name as customer_name'
+        )
+        ->leftJoin('documents_type', 'documents.documents_type_id', '=', 'documents_type.id')
+        ->leftJoin('companies_names', 'documents.company_id_company', '=', 'companies_names.company_id')
+        ->where('documents.company_id_customer', $id)
+        ->whereNull('documents.dt_end')
+        ->whereNull('companies_names.dt_end')
+        ->get();
+
+        // Convert collections to arrays
+        $emittedDocumentsArray = $emittedDocuments->toArray();
+        $receivedDocumentsArray = $receivedDocuments->toArray();
+
+        // Merge arrays
+        $documents = array_merge($emittedDocumentsArray, $receivedDocumentsArray);
 
 
         return response()->json(['message' => 'Datos de las facturas cargadas correctamente', 'documents'=>$documents]);

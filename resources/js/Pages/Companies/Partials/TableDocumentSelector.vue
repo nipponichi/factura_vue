@@ -1,14 +1,13 @@
 <template>
     <div>
         <div class="card">
-            <DataTable ref="dt" :value="documents" v-model:selection="selectedDocuments" dataKey="id"
+            <DataTable ref="dt" :value="valueToUse" v-model:selection="selectedDocuments" dataKey="id"
                 :paginator="true" :rows="10" :filters="filters"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 :rowsPerPageOptions="[5,10,25]" :currentPageReportTemplate="`${$t('Showing')} {first} ${$t('of')} {last} ${$t('of')} {totalRecords} ${$t('documents')}`"
                 selectionMode="single" @rowClick="handleRowClick">
                 <template #header>
                     <div class="flex justify-between items-center mt-2">
-                        <h4>{{ $t('') }}</h4>
                         <div class="relative rounded-md shadow-sm w-1/4">
                             <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
                                 v-model="filters['global'].value" :placeholder="$t('Search...')">
@@ -26,7 +25,7 @@
                 </template>
                 <Column field="number" :header="$t('Number')" sortable class="dateTable"></Column>
                 <Column field="document_type_name" :header="$t('Type')" sortable class="dateTable"></Column>
-                <Column field="customer_name" :header="$t('Receiver')" sortable class="dateTable"></Column>
+                <Column field="customer_name" :header="isChecked ? $t('Emitter') : $t('Receiver')" sortable class="dateTable"></Column>
                 <Column field="date" :header="$t('Date')" sortable class="dateTable"></Column>
                 <Column field="amount" :header="$t('Amount')" sortable class="dateTable"></Column>
             </DataTable>
@@ -43,12 +42,18 @@ export default {
         companyId: {
             type: String,
             required: true
-        }
+        },
+        isChecked: {
+            type: Boolean,
+            required: true
+        },
     },
     data() {
         return {
             documents: null,
             selectedDocuments: [],
+            receivedDocuments: [],
+            emitedDocuments: [],
             filters: {
                 'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
             },
@@ -64,11 +69,25 @@ export default {
         this.fetchDocuments();
     },
 
+    computed: {
+        valueToUse() {
+            return this.isChecked ? this.receivedDocuments : this.emitedDocuments;
+        },
+    },
+
     methods: {
         fetchDocuments() {
             axios.get(`/documents-serie/${this.companyId}`)
                 .then(response => {
                     this.documents = response.data.documents;
+                    this.documents.forEach(document => {
+                        if (document.isReceived === 0) {
+                            this.emitedDocuments.push(document);
+                        } else if (document.isReceived === 1) {
+                            this.receivedDocuments.push(document);
+                        }
+                    });
+
                 })
                 .catch(error => {
                     console.error('Error fetching documents data:', error);
