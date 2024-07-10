@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('company_id_company')->constrained();
             $table->foreignId('company_id_customer')->constrained();
             $table->foreignId('documents_type_id')->constrained('documents_type');
-            $table->foreignId('documents_series_id')->constrained('documents_series');
+            $table->foreignId('documents_series_id')->nullable();
             $table->foreignId('payment_methods_id')->constrained('payment_method');
             $table->foreignId('payment_system_id')->nullable();
             $table->date('date');

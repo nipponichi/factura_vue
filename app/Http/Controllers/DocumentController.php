@@ -171,6 +171,7 @@ class DocumentController extends Controller
                 'payment_methods_id' => $request->documentData['payment_methods_id'],
                 'documents_type_id' => $request->documentData['documents_type_id'],
                 'date' => $request->documentData['date'],
+                'isReceived' => $request->documentData['isReceived'],
                 'expiration' => $request->documentData['expiration'],
                 'amount' => $request->documentData['amount'],
                 'paid' => $request->documentData['paid'],

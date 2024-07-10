@@ -95,8 +95,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                             :label="$t('Export')"
                                             @click="handleClick"
                                             :model="itemsExport"
-                                            :disabled="totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.id"
-                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.id}">
+                                            :disabled="totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.number"
+                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.number}">
                                             <template v-slot:icon>
                                                 <i class="pi pi-upload mr-2" :class="{ 'opacity-50': totalConIVA <= 0 }"></i>
                                             </template>
@@ -109,8 +109,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                             :label="$t('Save')"
                                             @click="checkDocument"
                                             :model="itemsSave"
-                                            :disabled="totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.id"
-                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.id}">
+                                            :disabled="totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.number"
+                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.number}">
                                             <template v-slot:icon>
                                                 <i class="pi pi-save mr-2" :class="{ 'opacity-50': totalConIVA <= 0 }"></i>
                                             </template>
@@ -159,7 +159,9 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <div class="grid md:grid-cols-1 text-sm gap-y-1 mr-28">
                                     <div class="flex items-center justify-between w-full">
                                         <div class="font-semibold mr-3 min-w-20 flex-shrink-0">Nº {{ selectedType.name }}:</div>
-                                        <div class="text-gray-700 ml-3 flex-shrink-0 font-bold text-lg">{{ selectedSerie.serie }}&nbsp;&nbsp;/&nbsp;</div>
+                                        <div class="text-gray-700 ml-3 flex-shrink-0 font-bold text-lg">
+                                            {{ selectedSerie.serie }}<span v-if="!isChecked">&nbsp;&nbsp;/&nbsp;</span>
+                                        </div>
                                         <input type="text" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400" v-model="selectedSerie.number">
                                     </div>
                                     <div class="flex items-center justify-between w-full">
@@ -459,7 +461,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
         
 
             <!-- SELECT A CUSTOMER -->
-            <Dialog v-model:visible="selectACustomerDialog" :header="$t('Select a customer')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
+            <Dialog v-model:visible="selectACustomerDialog" :header="isChecked ? $t('Select a provider') : $t('Select a customer')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
                 <Dropdown v-model="selectedCustomer" :options="customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class=" flex align-items-center ">
@@ -475,7 +477,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                 <div class="grid gap-3 md:grid-cols-1 justify-items">
                     <div class="flex justify-between">
                         <button class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white p-2 mr-1 mr-1 rounded-md" @click="openNew">
-                            <i class="pi pi-plus"></i> {{ $t('Create customer') }}
+                            <i class="pi pi-plus"></i> {{ isChecked ? $t('Create provider') : $t('Create customer') }}
                         </button>
                         <button class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog()">{{ $t('Close') }}</button>
                     </div>   
@@ -713,12 +715,12 @@ export default {
                 {
                     label: this.$t('Exportar a PDF'),
                     icon: 'pi pi-file-pdf',
-                    command: () => this.saveAndReset()
+                    command: () => this.exportToPDF()
                 },
                 {
                     label: this.$t('Exportar a XML'),
                     icon: 'pi pi-file-o',
-                    command: () => this.cancelInvoice()
+                    command: () => this.exportToXML()
                 },
             ],
             taxMap: new Map(),
@@ -801,7 +803,8 @@ export default {
                 totalTax: '',
                 subTotal: '',
                 paid: false, 
-                invoiced: false,               
+                invoiced: false,  
+                isReceived: false,             
                 concept: [],
             },
             
@@ -924,6 +927,14 @@ export default {
         async switchToReceivedInvoice() {
             this.customers = []
             this.selectedCustomer = []
+            this.selectedType.id = 1
+            this.selectedType.name = "Factura"
+            if (!this.isChecked) {
+                await this.fetchDocuments()
+            } else {
+                this.selectedSerie = []
+            }
+            
 
             await this.fetchCustomers()  
             await this.fetchPayments()
@@ -1039,7 +1050,12 @@ export default {
             try {
                 const response = await axios.get('/banks/' + this.selectedCompany.id);
                 this.banks = response.data.accounts;
+                console.log("this.banks")
+                console.log(this.banks)
                 this.selectedBankAccount = await this.changePaymentMethodSystemId(this.banks, this.selectedBankAccount);
+                this.selectedPaymentSystemId = this.selectedBankAccount.id
+                console.log("selectedBankaccount")
+                console.log(this.selectedBankAccount)
                 this.options = this.banks;
             } catch (error) {
                 this.$toast(this.$t('Error connecting to the server'), 'error');
@@ -1056,12 +1072,7 @@ export default {
                     
                 const emailResponse = await axios.get(url);
 
-                if (this.isChecked) {
-                    this.emails = emailResponse.data.emails;
-                } else {
-                    this.emails = emailResponse.data.emails;
-                }
-            
+                this.emails = emailResponse.data.emails;
                 this.selectedEmail = await this.changePaymentMethodSystemId(this.emails, this.selectedEmail);
                 this.options = this.emails;
             } catch (error) {
@@ -1078,12 +1089,8 @@ export default {
                     
                 const phonesResponse = await axios.get(url);
 
-                if (this.isChecked) {
-                    this.phones = phonesResponse.data.phones;
-                } else {
-                    this.phones = phonesResponse.data.phones;
-                }
-            
+                this.phones = phonesResponse.data.phones;
+
                 this.selectedPhone = await this.changePaymentMethodSystemId(this.phones, this.selectedPhone);
                 this.options = this.phones;
             } catch (error) {
@@ -1120,13 +1127,10 @@ export default {
                 
             const paymentResponse = await axios.get(url);
 
-            if (this.isChecked) {
-                this.payment_methods = paymentResponse.data.methods;
-            } else {
-                this.payment_methods = paymentResponse.data.methods;
-            }
+            this.payment_methods = paymentResponse.data.methods;
 
-                this.selectedPaymentMethod = this.payment_methods[0]
+            this.selectedPaymentMethod = this.payment_methods[0]
+            console.log(this.selectedPaymentMethod)
         
         },
 
@@ -1151,7 +1155,6 @@ export default {
 
         async fetchCustomers() {
 
-            console.log("Pruevbaaa")
             try {
                 
                 const url = this.isChecked 
@@ -1208,17 +1211,22 @@ export default {
 
         saveCustomer() {
 
-            axios.post('/customer', this.customer)
-            .then(response => {
-                this.customer.id = response.data.companyId;
+            let customersResponse
+            if (this.isChecked) {
+                customersResponse = axios.post('/provider', this.customer)
+            } else {
+                customersResponse = axios.post('/customer', this.customer)
+            }
+    
+            customersResponse.then(result => {
+                this.customer.id = result.data.companyId;
                 this.selectedCustomer = this.customer;
-                this.customerDialog = false;      
-            })
-            .catch(error => {
-                this.$toast(this.$t('Error connecting to the server'), 'error');
+            }).catch(error => {
+                console.error("Error:", error);
                 this.customerDialog = false;
-            });   
-
+            });
+  
+            this.customerDialog = false;
         },
 
         async handleCompanySelection() {
@@ -1322,7 +1330,7 @@ export default {
         //Identifica que boton de guardado le ha dado
         saveAndReset() {
             this.saveRestart = true;
-            this.checkDocument(); 
+            this.checkDocument();
         },
 
         handleClick() {
@@ -1336,103 +1344,117 @@ export default {
             });
         },
         checkDocument() {
-            axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
-            .then(response => {             
-                this.date = response.data.date.date
-                this.serie = response.data.serie.number;
+            if (!this.isChecked) {
+                axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
+                .then(response => {             
+                    this.date = response.data.date.date
+                    this.serie = response.data.serie.number;
 
-                if (this.selectedSerie.number <= this.serie) {
-                
-                    let respuesta = prompt(`El número de documento ya existe. ¿Qué deseas hacer?\n1. Conservar el número ingresado: ${(this.selectedSerie.serie)}${this.selectedSerie.number} \n2. Asignar el siguiente valor disponible: ${(this.selectedSerie.serie)}${++this.serie}`);
-
-                    switch (respuesta) {
-                        case null:
-                            // Cancelar la operación en el prompt
-                            this.$toast(this.$t('Operation cancelled.'), 'error');
-                            break;
-                        case '1':
-                            // Conservar el número ingresado por el cliente
-                            this.$toast(this.$t('The number entered will be retained: ') + this.selectedSerie.serie +this.selectedSerie.number, 'success');
-                            this.serie = '';
-                            this.saveDocument();
-                            break;
-                        case '2':
-                            // Asignar el siguiente valor disponible
-                            this.selectedSerie.number = this.serie;
-                            this.$toast(this.$t('The following available number has been assigned: ') + this.selectedSerie.serie + this.selectedSerie.number, 'success');
-                            this.serie = '';
-                            this.saveDocument();
-                            break;
-                        default:
-                            // Entrada no válida
-                            this.$toast(this.$t('Invalid input.'), 'error');
-                    }
-
-
-                } else if (this.date > this.fecha) {
-
-                    let dateFormateado = this.dateFormat(this.date)
-                    let fechaFormateada = this.dateFormat(this.fecha)
-
-                    let respuesta = prompt(`La fecha seleccionada es anterior a la de la última factura, ¿deseas asignarle la fecha actual?\n1. Conservar la fecha seleccionada: ${fechaFormateada} \n2. Asignar la fecha actual: ${dateFormateado}`);
-
-                    switch (respuesta) {
-                        case null:
-                            // Cancelar la operación en el prompt
-                            this.$toast(this.$t('Operation cancelled.'), 'error');
-                            break;
-                        case '1':
-                            // Conservar la fecha ingresada por el cliente
-                            this.$toast(this.$t('The date will be retained: ') + this.fecha, 'success');
-                            this.saveDocument();
-                            break;
-                        case '2':
-                            // Asignar la fecha actual
-                            const today = new Date();
-                            const year = today.getFullYear();
-                            const month = (today.getMonth() + 1).toString().padStart(2, '0');
-                            const day = today.getDate().toString().padStart(2, '0');
-                            this.fecha = `${year}-${month}-${day}`;
-                            
-                            this.$toast(this.$t('The current date has been assigned.'), 'success');
-
-                            this.saveDocument();
-                            break;
-
-                        default:
-                            // Entrada no válida
-                            this.$toast(this.$t('Invalid input.'), 'error');
-                    }
+                    if (this.selectedSerie.number <= this.serie) {
                     
-                
-                
-                }else{
-                    this.saveDocument();
-                }
-            })
-            .catch(error => {
-                this.$toast(this.$t('Error saving document data.'), 'error');
-                console.log(error)
-            });    
+                        let respuesta = prompt(`El número de documento ya existe. ¿Qué deseas hacer?\n1. Conservar el número ingresado: ${(this.selectedSerie.serie)}${this.selectedSerie.number} \n2. Asignar el siguiente valor disponible: ${(this.selectedSerie.serie)}${++this.serie}`);
+
+                        switch (respuesta) {
+                            case null:
+                                // Cancelar la operación en el prompt
+                                this.$toast(this.$t('Operation cancelled.'), 'error');
+                                break;
+                            case '1':
+                                // Conservar el número ingresado por el cliente
+                                this.$toast(this.$t('The number entered will be retained: ') + this.selectedSerie.serie +this.selectedSerie.number, 'success');
+                                this.serie = '';
+                                this.saveDocument();
+                                break;
+                            case '2':
+                                // Asignar el siguiente valor disponible
+                                this.selectedSerie.number = this.serie;
+                                this.$toast(this.$t('The following available number has been assigned: ') + this.selectedSerie.serie + this.selectedSerie.number, 'success');
+                                this.serie = '';
+                                this.saveDocument();
+                                break;
+                            default:
+                                // Entrada no válida
+                                this.$toast(this.$t('Invalid input.'), 'error');
+                        }
+
+
+                    } else if (this.date > this.fecha) {
+
+                        let dateFormateado = this.dateFormat(this.date)
+                        let fechaFormateada = this.dateFormat(this.fecha)
+
+                        let respuesta = prompt(`La fecha seleccionada es anterior a la de la última factura, ¿deseas asignarle la fecha actual?\n1. Conservar la fecha seleccionada: ${fechaFormateada} \n2. Asignar la fecha actual: ${dateFormateado}`);
+
+                        switch (respuesta) {
+                            case null:
+                                // Cancelar la operación en el prompt
+                                this.$toast(this.$t('Operation cancelled.'), 'error');
+                                break;
+                            case '1':
+                                // Conservar la fecha ingresada por el cliente
+                                this.$toast(this.$t('The date will be retained: ') + this.fecha, 'success');
+                                this.saveDocument();
+                                break;
+                            case '2':
+                                // Asignar la fecha actual
+                                const today = new Date();
+                                const year = today.getFullYear();
+                                const month = (today.getMonth() + 1).toString().padStart(2, '0');
+                                const day = today.getDate().toString().padStart(2, '0');
+                                this.fecha = `${year}-${month}-${day}`;
+                                
+                                this.$toast(this.$t('The current date has been assigned.'), 'success');
+
+                                this.saveDocument();
+                                break;
+
+                            default:
+                                // Entrada no válida
+                                this.$toast(this.$t('Invalid input.'), 'error');
+                        }
+                        
+                    
+                    
+                    }else{
+                        this.saveDocument();
+                    }
+                })
+                .catch(error => {
+                    this.$toast(this.$t('Error saving document data.'), 'error');
+                    console.log(error)
+                });
+            }else{
+                this.saveDocument();
+            } 
         },
 
         myDocumentSave() {
+
             
-            
-            this.myDocument.number = this.selectedSerie.serie + this.selectedSerie.number
-            this.myDocument.document_counter = this.selectedSerie.number
-            this.myDocument.expiration = this.expiration
-            this.myDocument.payment_methods_id = this.selectedPaymentMethod.id
-            this.myDocument.payment_system_id = this.selectedPaymentSystemId
-            this.myDocument.company_id_company = this.selectedCompany.id 
-            this.myDocument.company_id_customer = this.selectedCustomer.id
+            if (!this.isChecked) {
+                this.myDocument.number = this.selectedSerie.serie + this.selectedSerie.number
+                this.myDocument.document_counter = this.selectedSerie.number
+                this.myDocument.company_id_company = this.selectedCompany.id 
+                this.myDocument.company_id_customer = this.selectedCustomer.id
+                this.myDocument.documents_series_id = this.selectedSerie.id
+            } else {
+                this.myDocument.number = this.selectedSerie.number
+                this.myDocument.company_id_company = this.selectedCustomer.id 
+                this.myDocument.company_id_customer = this.selectedCompany.id
+                this.myDocument.documents_series_id = ''
+                
+            }
+
+            this.myDocument.isReceived = this.isChecked
             this.myDocument.documents_type_id = this.selectedType.id
-            this.myDocument.documents_series_id = this.selectedSerie.id
+            this.myDocument.expiration = this.expiration
             this.myDocument.date = this.fecha
-            
+            this.myDocument.payment_methods_id = this.selectedPaymentMethod.id
+            console.log("selectedPaymentSystemId")
+            console.log(this.selectedPaymentSystemId)
+            this.myDocument.payment_system_id = this.selectedPaymentSystemId
+ 
             this.myDocument.document_counter = 1
-            
-            
             
             this.myDocument.subTotal = this.subtotal.toFixed(2)
             this.myDocument.totalTax = this.totalIVA.toFixed(2)
