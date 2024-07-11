@@ -1,13 +1,14 @@
 <template>
     <div>
         <div class="card">
+
             <DataTable ref="dt" :value="valueToUse" v-model:selection="selectedDocuments" dataKey="id"
                 :paginator="true" :rows="10" :filters="filters"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 :rowsPerPageOptions="[5,10,25]" :currentPageReportTemplate="`${$t('Showing')} {first} ${$t('of')} {last} ${$t('of')} {totalRecords} ${$t('documents')}`"
                 selectionMode="single" @rowClick="handleRowClick">
                 <template #header>
-                    <div class="flex justify-between items-center mt-2">
+                    <div class="flex justify-between items-center">
                         <div class="relative rounded-md shadow-sm w-1/4">
                             <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
                                 v-model="filters['global'].value" :placeholder="$t('Search...')">
@@ -23,9 +24,14 @@
                     </div>
 
                 </template>
+                <Column :exportable="false" :header="$t('View')"  class="dateTable">
+                    <template #body="slotProps">
+                        <Button icon="pi pi-eye" outlined rounded class="mr-2 view-button" @click="handleRowClick(slotProps)" />
+                    </template>
+                </Column>
                 <Column field="number" :header="$t('Number')" sortable class="dateTable"></Column>
                 <Column field="document_type_name" :header="$t('Type')" sortable class="dateTable"></Column>
-                <Column field="customer_name" :header="isChecked ? $t('Emitter') : $t('Receiver')" sortable class="dateTable"></Column>
+                <Column field="customer_name" :header="isChecked ? $t('Provider') : $t('Customer')" sortable class="dateTable"></Column>
                 <Column field="date" :header="$t('Date')" sortable class="dateTable"></Column>
                 <Column field="amount" :header="$t('Amount')" sortable class="dateTable"></Column>
             </DataTable>

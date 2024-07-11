@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 use App\Http\Requests\DocumentRequest;
 use Inertia\Inertia;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Exception;
@@ -25,7 +24,18 @@ class DocumentController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Documents/Document');
+        //El isChecked es para diferenciar que va a cargar si Facturas Recibidas o Emitidas
+        return Inertia::render('Documents/Document', [
+            'isChecked' => false,
+        ]);
+    }
+
+    public function indexExpense()
+    {
+        //El isChecked es para diferenciar que va a cargar si Facturas Recibidas o Emitidas
+        return Inertia::render('Documents/Document', [
+            'isChecked' => true,
+        ]);
     }
 
     //Saca los tipos de documentos para empresa
@@ -171,6 +181,7 @@ class DocumentController extends Controller
                 'payment_methods_id' => $request->documentData['payment_methods_id'],
                 'documents_type_id' => $request->documentData['documents_type_id'],
                 'date' => $request->documentData['date'],
+                'date_paid' => $request->documentData['date_paid'],
                 'isReceived' => $request->documentData['isReceived'],
                 'expiration' => $request->documentData['expiration'],
                 'amount' => $request->documentData['amount'],
@@ -253,6 +264,7 @@ class DocumentController extends Controller
             'documents.payment_methods_id',
             'documents.documents_series_id',
             'documents.date',
+            'documents.date_paid',
             'documents.expiration',
             'documents.amount',
             'documents.paid',
@@ -289,6 +301,7 @@ class DocumentController extends Controller
                 'documents.documents_series_id',
                 'documents.isReceived',
                 'documents.date',
+                'documents.date_paid',
                 'documents.expiration',
                 'documents.amount',
                 'documents.paid',

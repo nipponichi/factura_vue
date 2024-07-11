@@ -20,31 +20,24 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <input type="checkbox" class="sr-only peer" v-model="myDocument.paid">
                                 <div class="relative w-11 h-6 ml-3 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                             </label>
-
                             
-                        
-
+                            <div v-if="myDocument.paid" class="flex items-center justify-end w-full mt-4">
+                                <div class="font-semibold mr-3 flex-shrink-0">{{ $t('Payment date') }}:</div>
+                                <input type="date" v-model="fechaPaid" @change="cambiarFormatoFecha" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                            </div>
+                            
                             <div class="relative flex justify-between mb-5">
                                 <button
                                     v-if="!loading && (companies.length > 0)"
                                     type="button"
                                     class="px-4 py-2 bg-gray-800 hover:bg-gray-900 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-white flex items-center"
-                                    @click="selectCompany">
+                                    @click="companies.length > 1 ? selectCompany() : null"
+                                    :disabled="companies.length === 1">
                                     <span class="font-bold text-lg">
-                                        <i class="pi pi-plus mr-2"></i>
+                                        <i v-if="companies.length > 1" class="pi pi-plus mr-2"></i>
                                         {{ selectedCompany.name }}
                                     </span>
                                 </button>
-
-                                
-                            
-                                <label class="flex items-center cursor-pointer">
-                                    <span class="text-lg font-medium text-gray-900 dark:text-gray-300" v-if="!isChecked">{{ $t('Emit') }}</span>
-                                    <span class="text-lg font-medium text-gray-900 dark:text-gray-300" v-else>{{ $t('Receive') }}</span>
-                                    <input type="checkbox" class="sr-only peer" v-model="isChecked" @change="switchToReceivedInvoice">
-                                    <div class="relative w-11 h-6 ml-3 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                </label>
-
                                 
                             </div>
                             
@@ -52,9 +45,20 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             <div class="md:flex justify-between items-center">
                                 <div class="flex flex-col md:flex-row justify-start items-center">
                                     <div class="flex flex-wrap justify-start items-center">
-                                        <div class="relative inline-block w-50">
+                                        <div class="relative inline-block w-50 flex justify-between">
                                             <Button v-if="isChecked" :label="$t('Provider')" icon="pi pi-plus" class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white p-2" @click="selectAProvider" />
-                                            <Button v-else :label="$t('Customer')" icon="pi pi-plus" class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white p-2" @click="selectACustomer" />
+                                            <Button v-else :label="$t('Customer')" icon="pi pi-search" class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white p-2" @click="selectACustomer" />
+                                            <button
+                                                type="button"
+                                                class="ml-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-white rounded flex items-center justify-between"
+                                                @click="handleListDocument()"
+                                                :class="{ 'opacity-50': !selectedCompany.id }"
+                                                :disabled="!selectedCompany.id">
+                                                <span>
+                                                    <i class="pi pi-search mr-2"></i>
+                                                    {{ $t('Document check') }}
+                                                </span>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -63,17 +67,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <div class="flex items-center">
                                     <div id="app" class="relative inline-block w-50 ml-2">
                                         <div class="flex">
-                                            <button
-                                                type="button"
-                                                class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-white rounded flex items-center justify-between"
-                                                @click="handleListDocument()"
-                                                :class="{ 'opacity-50': !selectedCompany.id }"
-                                                :disabled="!selectedCompany.id">
-                                                <span>
-                                                    <i class="pi pi-plus mr-2"></i>
-                                                    {{ $t('Document list') }}
-                                                </span>
-                                            </button>
                                             <Button v-if="!isChecked"
                                                 type="button"
                                                 class="px-4 ml-2 py-2 bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white rounded flex items-center justify-between"
@@ -82,6 +75,18 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                 :disabled="!selectedCompany.id">
                                                 <span>
                                                     <i class="pi pi-plus mr-2"></i>
+                                                    {{ $t('New invoice') }}
+                                                </span>
+                                            </button>
+
+                                            <Button v-if="!isChecked"
+                                                type="button"
+                                                class="px-4 ml-2 py-2 bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white rounded flex items-center justify-between"
+                                                @click="selectDocument()"
+                                                :class="{ 'opacity-50': !selectedCompany.id }"
+                                                :disabled="!selectedCompany.id">
+                                                <span>
+                                                    <i class="pi pi-search mr-2"></i>
                                                     {{ $t('Serie') }}
                                                 </span>
                                             </button>
@@ -205,9 +210,14 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         <InputText class="input w-full" :placeholder="$t('Reference')" v-model="slotProps.data.reference" />
                                     </template>
                                 </Column>
-                                <Column field="product" :header="$t('Description')" sortable class="dateTable w-full">
+                                <Column field="product" :header="$t('Concept')" sortable class="dateTable w-full">
                                     <template #body="slotProps">
-                                        <InputText class="input w-full" :placeholder="$t('Description')" v-model="slotProps.data.description" />
+                                        <InputText 
+                                            class="input w-full" 
+                                            :placeholder="$t('Concept')" 
+                                            v-model="slotProps.data.description" 
+                                            @click="openDescriptionDialog(slotProps.data)"
+                                        />
                                     </template>
                                 </Column>
                                 <Column field="quantity" :header="$t('Quantity')" sortable class="dateTable w-1/8">
@@ -254,7 +264,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                             <div class="hidden md:flex justify-between mt-4 pr-4 mb-4">
                                 <!-- Columna izquierda -->
                                 <div class="totals-container w-1/3">
-                                    <Button :label="$t('Payment method')" icon="pi pi-plus" class="ml-4 mb-2 bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white rounded-md p-2" @click="selectAPaymentMethod()" />
+                                    <Button :label="$t('Payment method')" icon="pi pi-search" class="ml-4 mb-2 bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white rounded-md p-2" @click="selectAPaymentMethod()" />
                                     <div class="ml-4 totals p-4 rounded-md">
                                         <table class="w-full">
                                             <tbody>
@@ -382,6 +392,26 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                     </div>
                 </div>
             </div>
+
+            <!-- MODAL DESCRIPTION -->
+            <Dialog v-model:visible="descriptionDialog" :style="{ width: '450px' }" :header="$t('Concept')" modal>
+                <template v-slot:footer>
+                    <Button :label="$t('Save')" icon="pi pi-check" @click="saveDescription"/>
+                </template>
+            
+                <div style="display: flex; flex-direction: column;">
+                    <textarea v-model="selectedDescription" rows="7"
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        :placeholder="$t('Insert the description here')"></textarea>
+                        <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+                            <div :class="{'char-counter': true, 'text-red-500': charCount > 255}">
+                                {{ charCount }}/255
+                            </div>
+                        </div>
+                </div>
+            </Dialog>
+
+            
 
             <!-- MODAL COMPANY -->
             <Dialog v-model:visible="productDialog" :header="$t('Select companies')" :modal="true" @change="handleCompanySelection" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
@@ -649,9 +679,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         <tr v-for="(entry, index) in taxMap" :key="index">
                             <td class="title">{{ $t('Total IVA') }} {{ Object.values(entry)[0] }} %</td>
                             <td> {{ Object.values(entry)[1].toFixed(2) }}€</td>
-                        </tr> --
+                        </tr>
                         
-
                         <tr>
                             <td class="title"><strong>{{ $t('Total (with IVA)') }}</strong></td>
                             <td><strong>{{ totalConIVA.toFixed(2) }}€</strong></td>
@@ -725,6 +754,7 @@ export default {
             ],
             taxMap: new Map(),
             fecha: '',
+            fechaPaid: '',
             expiration: '',
             fechaFormateada: '',
             loading: true,
@@ -770,7 +800,9 @@ export default {
             selectACustomerDialog: false,
             selectAPaymentMethodDialog: false,
             documentListDialog: false,
-            selectedOption: [],
+            descriptionDialog: false,
+            selectedDescription: '',
+            productDescription: '',
             options: [],
             concepts: [],
             selectedBankAccount: [],
@@ -798,6 +830,7 @@ export default {
                 payment_system_id: '',
                 expiration: '',
                 date: '',
+                date_paid: '',
                 amount: '',
                 payment_methods_id: '',
                 totalTax: '',
@@ -838,6 +871,14 @@ export default {
 
     computed: {
 
+        charCount() {
+            if (this.selectedDescription === null) {
+                return "";
+            } else {
+                return this.selectedDescription.length;
+            }
+        },
+
         dynamicOptionLabel() {
             switch (this.selectedPaymentMethod.id) {
                 case 1:
@@ -873,12 +914,15 @@ export default {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
         };
 
+        this.isChecked = this.$page.props.isChecked;
+
         // Inicializa la fecha con la fecha de hoy
         const today = new Date();
         const year = today.getFullYear();
         const month = (today.getMonth() + 1).toString().padStart(2, '0');
         const day = today.getDate().toString().padStart(2, '0');
         this.fecha = `${year}-${month}-${day}`;
+        this.fechaPaid = `${year}-${month}-${day}`;
         this.expiration = `${year}-${month}-${day}`;
     },
 
@@ -923,6 +967,27 @@ export default {
     },
     
     methods: {
+
+        openDescriptionDialog(data) {
+            this.productDescription = data
+            this.selectedDescription = data.description;
+            this.descriptionDialog = true;
+        },
+        
+        saveDescription() {
+            if ((this.selectedDescription === null) || (this.selectedDescription.length <= 255)) {
+                this.products.forEach(product => {
+                    if (this.productDescription.id === product.id) {
+                        product.description = this.selectedDescription;
+                    }
+                });
+                this.descriptionDialog = false;
+                this.selectedDescription = '';
+                
+            } else {
+                this.$toast(this.$t('Too many characters, need to be 255 at maximum'), 'error');
+            }
+        },
 
         async switchToReceivedInvoice() {
             this.customers = []
@@ -1000,12 +1065,12 @@ export default {
                     // Document
                     this.myDocument = response.data.documents;
                     this.fecha = this.myDocument.date;
+                    this.fechaPaid = this.myDocument.date_paid;
                     this.expiration = this.myDocument.expiration;
                     this.selectedType.name = this.myDocument.document_type_name;
                     this.selectedType.id = this.myDocument.documents_type_id;
                     this.selectedSerie.id = this.myDocument.documents_series_id;
                     this.selectedSerie.serie = this.myDocument.document_series_serie;
-                    console.log("carga")
                     this.selectedPaymentSystemId = this.myDocument.payment_system_id
                     this.selectedPaymentMethod.id = this.myDocument.payment_methods_id
                     
@@ -1449,6 +1514,7 @@ export default {
                 
             }
 
+            this.myDocument.date_paid = this.fechaPaid
             this.myDocument.isReceived = this.isChecked
             this.myDocument.documents_type_id = this.selectedType.id
             this.myDocument.expiration = this.expiration

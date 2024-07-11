@@ -80,6 +80,7 @@ Route::middleware([
 
     //Documents
     Route::resource('/documents', DocumentController::class);
+    Route::get('/expense', [DocumentController::class, 'indexExpense'])->name('indexExpense');
     Route::get('/documents-type', [DocumentController::class, 'documentType']);
     Route::get('/documents-show/{companyId}/{documentId}', [DocumentController::class, 'show']);
     Route::get('/documents-serie/{typeID}/{companyID}', [DocumentController::class, 'documentSerie']);

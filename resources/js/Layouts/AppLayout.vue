@@ -59,11 +59,11 @@ const logout = () => {
                             -->
                             
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')">
-                                <NavLink :href="route('documents.index')" :active="route().current('documents.*')">
-                                    {{ $t('Invoice') }}
+                                <NavLink :href="route('documents.index')" :active="route().current('documents.index')">
+                                    {{ $t('Invoice-Income') }}
                                 </NavLink>
-                            </div>  
-
+                            </div>
+                            
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')" >
                                 <NavLink :href="route('accountings.index')" :active="route().current('accountings.*')">
                                     {{ $t('Accounting') }}
@@ -76,13 +76,17 @@ const logout = () => {
                                 </NavLink>
                             </div>
                             
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')">
+                                <NavLink :href="route('indexExpense')" :active="route().current('indexExpense')">
+                                    {{ $t('Invoice-Expense') }}
+                                </NavLink>
+                            </div>
+
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')" >
                                 <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
                                     {{ $t('My Company') }}
                                 </NavLink>
                             </div>
-
-
                             
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view consulting')">
                                 <NavLink :href="route('companies.index')">
@@ -266,6 +270,12 @@ const logout = () => {
                     <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view company')">
                         <ResponsiveNavLink :href="route('warehouses.index')" :active="route().current('warehouses.*')">
                             {{ $t('Warehouse') }}
+                        </ResponsiveNavLink>
+                    </div>
+
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view company')">
+                        <ResponsiveNavLink :href="route('indexExpense')" :active="route().current('indexExpense')" >
+                            {{ $t('Invoice-Expense') }}
                         </ResponsiveNavLink>
                     </div>
 

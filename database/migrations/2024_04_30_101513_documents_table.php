@@ -26,6 +26,7 @@ return new class extends Migration
             $table->date('expiration')->nullable();
             $table->decimal('amount', 10, 2);
             $table->boolean('paid');
+            $table->date('date_paid')->nullable();
             $table->boolean('active');
             $table->boolean('invoiced');
             $table->dateTime('dt_updated')->nullable();

@@ -387,6 +387,12 @@
     "Received" : "Recibidas",
     "Received invoices" : "Facturas recibidas",
     "Emitted invoices" : "Facturas emitidas",
-    "Emitter" : "Emisor"
-
+    "Emitter" : "Emisor",
+    "Invoice-Income":"Facturas ingresos",
+    "Invoice-Expense":"Facturas gastos",
+    "Insert the description here" : "Inserta el concepto aquí",
+    "To much characters, need to be 255 at maximun" : "Demasiados caracteres, el máximo permitido es de 255",
+    "Payment date":"Fecha de pago",
+    "Document check" : "Ver facturas",
+    "View":"Ver"
 }

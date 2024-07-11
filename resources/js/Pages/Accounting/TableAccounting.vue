@@ -261,8 +261,8 @@ export default {
                         response.data.documents[i].dateFormatted = dateFormatted
                         console.log("fetch: " + dateFormatted)
                     }
-                    this.totalDocuments = response.data.documents;
-                    
+
+                    this.totalDocuments = response.data.documents.filter(doc => doc.documents_type_id === 1);
                     
                 })
                 .catch(error => {
