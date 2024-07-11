@@ -1311,11 +1311,11 @@ export default {
         addRow() {
 
             let newProduct = {
-                reference: '5.01.02.003',
-                description: 'Collar',
-                price: 8,
-                quantity: 1,
-                discount: 15,
+                reference: '',
+                description: '',
+                price: 0,
+                quantity: 0,
+                discount: 0,
                 discount_reason: 'Descuento profesional',
                 subtotal: 0,
                 taxes: 21,
@@ -1336,13 +1336,17 @@ export default {
         handleClick() {
             // Simula un clic en el ícono del desplegable para abrirlo
             this.$nextTick(() => {
-            const splitButton = this.$refs.splitButton.$el;
-            const dropdownIcon = splitButton.querySelector('.p-splitbutton-menubutton');
-            if (dropdownIcon) {
-                dropdownIcon.click();
-            }
+                const splitButton = this.$refs.splitButton.$el;
+                const dropdownIcon = splitButton.querySelector('.p-splitbutton-menubutton');
+                if (dropdownIcon) {
+                    dropdownIcon.classList.add('no-print');
+                    dropdownIcon.click();
+
+                }
             });
         },
+
+
         checkDocument() {
             if (!this.isChecked) {
                 axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
@@ -1881,3 +1885,11 @@ export default {
             },
 }
 </script>
+
+<style scoped>
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}
+</style>
