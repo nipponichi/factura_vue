@@ -78,18 +78,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                     {{ $t('New invoice') }}
                                                 </span>
                                             </button>
-
-                                            <Button v-if="!isChecked"
-                                                type="button"
-                                                class="px-4 ml-2 py-2 bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white rounded flex items-center justify-between"
-                                                @click="selectDocument()"
-                                                :class="{ 'opacity-50': !selectedCompany.id }"
-                                                :disabled="!selectedCompany.id">
-                                                <span>
-                                                    <i class="pi pi-search mr-2"></i>
-                                                    {{ $t('Serie') }}
-                                                </span>
-                                            </button>
                                         </div>
                                     </div>
 
@@ -160,25 +148,33 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         </div>
                                     </div>
                                 </div>
-
+                                
+                            
                                 <div class="grid md:grid-cols-1 text-sm gap-y-1 mr-28">
-                                    <div class="flex items-center justify-between w-full">
+                                    <form class="flex items-center">   
                                         <div class="font-semibold mr-3 min-w-20 flex-shrink-0">Nº {{ selectedType.name }}:</div>
-                                        <div class="text-gray-700 ml-3 flex-shrink-0 font-bold text-lg">
-                                            {{ selectedSerie.serie }}<span v-if="!isChecked">&nbsp;&nbsp;/&nbsp;</span>
+                                        <div class="relative w-full">
+                                            <div class="text-gray-800 flex-shrink-0 font-bold flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                                                {{ selectedSerie.serie }} /
+                                            </div>
+                                            <input type="text" id="voice-search" class="bg-gray-50 border border-gray-300 rounded-md text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="selectedSerie.number" required="">
+                                            <Button type="button" icon="pi pi-search" @click="selectDocument()" class="bg-blue-500 text-white hover:bg-blue-600 font-bold flex absolute inset-y-0 right-0 items-center rounded rounded-l-none">   
+                                            </Button>
                                         </div>
-                                        <input type="text" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400" v-model="selectedSerie.number">
-                                    </div>
+                                    </form>
+                                    
                                     <div class="flex items-center justify-between w-full">
                                         <div class="font-semibold mr-3 flex-shrink-0">{{ $t('Date') }}:</div>
-                                        <input type="date" v-model="fecha" @change="cambiarFormatoFecha" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                        <input type="date" v-model="fecha" @change="cambiarFormatoFecha" class="bg-gray-50 border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
                                     </div>
                                     <div class="flex items-center justify-between w-full">
                                         <div class="font-semibold mr-3 flex-shrink-0">{{ $t('Expiration') }}:</div>
-                                        <input type="date" v-model="expiration" @change="cambiarFormatoFecha" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                        <input type="date" v-model="expiration" @change="cambiarFormatoFecha" class="bg-gray-50 border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
                                     </div>
-                                </div>            
+                                    
+                                </div>       
                             </div>  
+
 
                             <Toolbar class="mb-4 mt-8 border border-slate-200 ...">
                                 <template #start>
@@ -212,16 +208,15 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 </Column>
                                 <Column field="product" :header="$t('Concept')" sortable class="dateTable w-full">
                                     <template #body="slotProps">
-                                        <InputText 
-                                            class="input w-full" 
-                                            :placeholder="$t('Concept')" 
-                                            v-model="slotProps.data.description" 
-                                            @click="openDescriptionDialog(slotProps.data)"
-                                        />
+                                        <div class="relative text-gray-600">
+                                            <input type="search" name="serch" :placeholder="$t('Concept')"  class="bg-white mt-3 rounded-md border border-gray-100 text-m focus:outline-none">
+                                            <Button type="submit" icon="pi pi-search" @click="openDescriptionDialog(slotProps.data)" class="absolute right-0 top-0 mt-5 mr-4"/>
+                                        </div>
                                     </template>
                                 </Column>
                                 <Column field="quantity" :header="$t('Quantity')" sortable class="dateTable w-1/8">
                                     <template #body="slotProps">
+                                        
                                         <InputText class="input input-short w-full" v-model="slotProps.data.quantity" />
                                     </template>
                                 </Column>
