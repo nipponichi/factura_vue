@@ -212,7 +212,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                     </div>
                                 </template>
                             </Toolbar>
-                            <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id" class="w-full lg:w-4/4 mx-auto">
+                            <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id" class="w-full lg:w-4/4 mx-auto" :filters="filters">
                 
                                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox"></Column>
                                 <Column field="reference" :header="$t('Reference')" sortable class="dateTable w-1/4">
@@ -220,7 +220,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         <InputText class="input w-full" :placeholder="$t('Reference')" v-model="slotProps.data.reference" />
                                     </template>
                                 </Column>
-                                <Column field="product" :header="$t('Concept')" sortable class="dateTable w-full">
+                                <Column field="description" :header="$t('Concept')" sortable class="dateTable w-full">
                                     <template #body="slotProps">
                                         <div class="relative text-gray-600">
                                             <InputText v-model="slotProps.data.description" :placeholder="$t('Concept')"  class="input bg-white mt-3 rounded-md border border-gray-100 text-m"/>
