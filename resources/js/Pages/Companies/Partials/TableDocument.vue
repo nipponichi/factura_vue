@@ -15,8 +15,8 @@
                     <div class="flex justify-between items-center mt-2">
                         <h4>{{ $t('Manage documents') }}</h4>
                         <label class="flex items-center cursor-pointer">
-                            <span class="text-lg font-medium text-gray-900 dark:text-gray-300" v-if="!isChecked">{{ $t('Emitted') }}</span>
-                            <span class="text-lg font-medium text-gray-900 dark:text-gray-300" v-else>{{ $t('Received') }}</span>
+                            <span class="text-lg font-medium text-gray-900 dark:text-gray-300" v-if="!isChecked">{{ $t('Invoice-Income') }}</span>
+                            <span class="text-lg font-medium text-gray-900 dark:text-gray-300" v-else>{{ $t('Invoice-Expense') }}</span>
                             <input type="checkbox" class="sr-only peer" v-model="isChecked">
                             <div class="relative w-11 h-6 ml-3 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                         </label>
@@ -161,9 +161,14 @@ export default {
         deleteProduct() {
             axios.delete('/documents/' + this.myDocument.id)
                 .then(response => {
-                    if (response.data.type === 'success') {
-                        this.documents = this.documents.filter(p => p.id !== this.myDocument.id);
+                    
+
+                    if(this.isChecked){
+                        this.receivedDocuments = this.receivedDocuments.filter(p => p.id !== this.myDocument.id);
+                    }else{
+                        this.emitedDocuments = this.emitedDocuments.filter(p => p.id !== this.myDocument.id);
                     }
+                
                     this.$toast(this.$t(response.data.message), response.data.type);
                 })
                 .catch(error => {
@@ -180,10 +185,16 @@ export default {
             this.selectedDocuments.forEach(myDocument => {
                 axios.delete('/documents/' + myDocument.id)
                     .then(response => {
-                        if (response.data.type === 'success') {
-                            this.documents = this.documents.filter(p => p.id !== myDocument.id);
+                        
+                        if(this.isChecked){
+                            this.receivedDocuments = this.receivedDocuments.filter(p => p.id !== myDocument.id);
+                        }else{
+                            this.emitedDocuments = this.emitedDocuments.filter(p => p.id !== myDocument.id);
                         }
-                        this.$toast(this.$t(response.data.message), response.data.type);
+                            
+                        this.$toast(this.$t(response.data.message), response.data.type); 
+                        
+                        
                     })
                     .catch(error => {
                         if (error.response || error.response.status === 400) {

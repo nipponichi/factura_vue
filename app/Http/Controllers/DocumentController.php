@@ -457,6 +457,7 @@ class DocumentController extends Controller
             'documents.amount',
             'documents.paid',
             'documents.expiration',
+            'documents.dt_updated',
             'documents.invoiced',
             'documents.active',
             'documents.isReceived',
@@ -471,6 +472,7 @@ class DocumentController extends Controller
         ->where('documents_series.company_id', $id)
         ->whereNull('documents.dt_end')
         ->whereNull('companies_names.dt_end')
+        ->orderBy('documents.dt_updated', 'desc')
         ->get();
 
         $receivedDocuments = DB::table('documents')
@@ -482,6 +484,7 @@ class DocumentController extends Controller
             'documents.payment_methods_id',
             'documents.date',
             'documents.amount',
+            'documents.dt_updated',
             'documents.subtotal',
             'documents.tax',
             'documents.paid',
@@ -497,6 +500,7 @@ class DocumentController extends Controller
         ->where('documents.company_id_customer', $id)
         ->whereNull('documents.dt_end')
         ->whereNull('companies_names.dt_end')
+        ->orderBy('documents.dt_updated', 'desc')
         ->get();
 
         // Convert collections to arrays

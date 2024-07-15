@@ -12,44 +12,24 @@ import AppLayout from '@/Layouts/AppLayout.vue';
             <div class="py-12">
                 <div class="max-w-10xl mx-auto sm:px-6 lg:px-24">
                     <div :class="{'border-blue-500 border-2': isChecked, 'bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg': true}">
-                        <div class="card">
-
-                            <label class="flex items-center cursor-pointer justify-end max-w-xs ml-auto">
-                                <span class="text-lg font-medium text-gray-900 dark:text-gray-300 flex-shrink-0" v-if="!myDocument.paid">{{ $t('Not paid') }}</span>
-                                <span class="text-lg font-medium text-gray-900 dark:text-gray-300 flex-shrink-0" v-else>{{ $t('Paid') }}</span>
-                                <input type="checkbox" class="sr-only peer" v-model="myDocument.paid">
-                                <div class="relative w-11 h-6 ml-3 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                            </label>
-                            
-                            <div v-if="myDocument.paid" class="flex items-center justify-end w-full mt-4">
-                                <div class="font-semibold mr-3 flex-shrink-0">{{ $t('Payment date') }}:</div>
-
-                                <input type="date" v-model="fechaPaid" @change="cambiarFormatoFecha" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
-
-                            </div>
-                            
-                            <div class="relative flex justify-between mb-5">
-                                <button
-                                    v-if="!loading && (companies.length > 0)"
-                                    type="button"
-                                    class="px-4 py-2 bg-gray-800 hover:bg-gray-900 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-white flex items-center"
-                                    @click="companies.length > 1 ? selectCompany() : null"
-                                    :disabled="companies.length === 1">
-                                    <span class="font-bold text-lg">
-                                        <i v-if="companies.length > 1" class="pi pi-plus mr-2"></i>
-                                        {{ selectedCompany.name }}
-                                    </span>
-                                </button>
-                                
-                            </div>
-                            
-                            <!-- Botones normales para pantallas grandes -->
+                        <div class="card"> 
                             <div class="md:flex justify-between items-center">
+                                
                                 <div class="flex flex-col md:flex-row justify-start items-center">
                                     <div class="flex flex-wrap justify-start items-center">
                                         <div class="relative inline-block w-50 flex justify-between">
-                                            <Button v-if="isChecked" :label="$t('Provider')" icon="pi pi-plus" class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white p-2" @click="selectAProvider" />
-                                            <Button v-else :label="$t('Customer')" icon="pi pi-search" class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white p-2" @click="selectACustomer" />
+                                            <button
+                                                v-if="!loading && (companies.length > 0)"
+                                                type="button"
+                                                class="px-4 py-2 bg-gray-800 hover:bg-gray-900 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-white flex items-center"
+                                                @click="companies.length > 1 ? selectCompany() : null"
+                                                :disabled="companies.length === 1">
+                                                <span class="font-bold text-lg">
+                                                    <i v-if="companies.length > 1" class="pi pi-plus mr-2"></i>
+                                                    {{ selectedCompany.name }}
+                                                </span>
+                                            </button>
+                
                                             <button
                                                 type="button"
                                                 class="ml-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-white rounded flex items-center justify-between"
@@ -57,15 +37,15 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                 :class="{ 'opacity-50': !selectedCompany.id }"
                                                 :disabled="!selectedCompany.id">
                                                 <span>
-                                                    <i class="pi pi-search mr-2"></i>
+                                                    <i class="pi pi-eye mr-2"></i>
                                                     {{ $t('Document check') }}
                                                 </span>
                                             </button>
+
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Mantén estos divs a la derecha -->
                                 <div class="flex items-center">
                                     <div id="app" class="relative inline-block w-50 ml-2">
                                         <div class="flex">
@@ -112,8 +92,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         </SplitButton>
                                     </div>
 
-                                    
-
                                 </div>
                             </div>
 
@@ -122,30 +100,40 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         
                             <div class="selector flex flex-col md:flex-row justify-between mt-5 ml-12">
                                 
-                                <div class="showCustomer"> 
+                                <div class="showCustomer mt-12"> 
                                     <div class="grid md:grid-cols-1 text-m gap-y-1">
                                         <div class="flex items-center justify-between w-full">
-                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">
-                                                {{ isChecked ? $t('Provider') : $t('Customer') }}:
+                                            <div>
+                                                <div v-if="!selectedCustomer.name" class="font-semibold whitespace-nowrap mr-3">
+                                                    {{ isChecked ? $t('Select a provider') : $t('Select a customer') }}
+                                                </div>
+                                                <div v-else class="font-semibold mr-3 flex-shrink-0 w-32">
+                                                    {{ isChecked ? $t('Provider') : $t('Customer') }}:
+                                                </div>
                                             </div>
                                             <div class="text-gray-700 w-full font-bold text-lg">{{ selectedCustomer.name }}</div>
+                                            <div class="relative w-full mr-20">
+                                                <Button type="button" icon="pi pi-search" id="voice-search" @click="selectACustomer" class="bg-gray-100 p-2 rounded-md text-gray-900 text-sm hover:bg-gray-300"/>
+                                            </div>
                                         </div>
-                                        <div class="flex items-center justify-between w-full">
-                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Tax number') }}:</div>
-                                            <div class="text-gray-700 w-full uppercase">{{ selectedCustomer.tax_number }}</div>
-                                        </div>
-                                        <div class="flex items-center justify-between w-full">
-                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Phone') }}:</div>
-                                            <div class="text-gray-700 w-full">{{ selectedCustomer.phone }}</div>
-                                        </div>
-                                        <div class="flex items-center justify-between w-full">
-                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Email') }}:</div>
-                                            <div class="text-gray-700 w-full">{{ selectedCustomer.email }}</div>
-                                        </div>
-                                        <div class="flex items-center justify-between w-full">
-                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Address') }}:</div>
-                                            <div class="text-gray-700 w-full">
-                                                {{ selectedCustomer.address }}, {{ selectedCustomer.post_code }}, {{ selectedCustomer.town }}, {{ selectedCustomer.province }} ( {{ selectedCustomer.country }} )
+                                        <div> 
+                                            <div class="flex items-center justify-between w-full">
+                                                <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Tax number') }}:</div>
+                                                <div class="text-gray-700 w-full uppercase">{{ selectedCustomer.tax_number }}</div>
+                                            </div>
+                                            <div class="flex items-center justify-between w-full">
+                                                <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Phone') }}:</div>
+                                                <div class="text-gray-700 w-full">{{ selectedCustomer.phone }}</div>
+                                            </div>
+                                            <div class="flex items-center justify-between w-full">
+                                                <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Email') }}:</div>
+                                                <div class="text-gray-700 w-full">{{ selectedCustomer.email }}</div>
+                                            </div>
+                                            <div class="flex items-center justify-between w-full">
+                                                <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Address') }}:</div>
+                                                <div class="text-gray-700 w-full" v-if="selectedCustomer.name">
+                                                    {{ selectedCustomer.address }}, {{ selectedCustomer.post_code }}, {{ selectedCustomer.town }}, {{ selectedCustomer.province }} ( {{ selectedCustomer.country }} )
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -153,21 +141,42 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 
                             
                                 <div class="grid md:grid-cols-1 text-sm gap-y-1 mr-28">
+
+                                    <label class="flex items-center cursor-pointer justify-end max-w-xs ml-auto">
+                                        <span class="text-m font-medium text-gray-900 dark:text-gray-300 flex-shrink-0">{{ $t('Mark as paid') }}</span>
+
+                                        <input type="checkbox" class="sr-only peer" v-model="myDocument.paid">
+                                        <div class="relative w-11 h-6 ml-3 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                    </label>
+                                    
+                                    <div class="flex items-center justify-end w-full mt-4">
+                                        <div class="font-semibold mr-4 flex-shrink-0">{{ $t('Payment date') }}:</div>
+
+                                        <div class="input-wrapper">
+                                        <input type="date" :min="fecha"  v-model="fechaPaid" @change="cambiarFormatoFecha" 
+                                            :disabled="false"
+                                            :class="{
+                                                'bg-gray-100 text-gray-300 cursor-not-allowed': !myDocument.paid, 
+                                                'bg-white text-black': myDocument.paid,
+                                                'pointer-events-none': !myDocument.paid
+                                            }" 
+                                            class="styled-input bg-gray-50 border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                        </div>
+                                    </div>
                                     
         
-                                    
-                                    
                                     <form class="flex items-center">   
-                                        <div class="font-semibold mr-4 min-w-20 flex-shrink-0">Nº {{ selectedType.name }}:</div>
+                                        <div class="font-semibold mr-8 min-w-20 flex-shrink-0">Nº {{ selectedType.name }}:</div>
                                         <div class="relative w-full">
-                                            <div class="input-wrapper">
+                                            
+                                            <div v-if="!isChecked" class="input-wrapper">
                                                 <div class=" font-bold flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                                                     {{ selectedSerie.serie }} /
-                                                </div>
-                                                <input type="text" id="voice-search" class=" border-gray-300 rounded-md text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="selectedSerie.number" required="">
-                                                <Button type="button" icon="pi pi-search" @click="selectDocument()" class=" button-search font-bold flex absolute inset-y-0 right-0 items-center border-gray-300 pr-1"/>  
+                                                </div>    
+                                                <input type="text" id="voice-search" class="border-gray-300 rounded-md text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="selectedSerie.number" required="">
+                                                <Button type="button" icon="pi pi-search" @click="selectDocument()" class=" button-search font-bold flex absolute inset-y-0 right-0 items-center border-gray-300 pr-1"/>
                                             </div>
-
+                                            <input v-else type="text" id="voice-search" class="border-gray-300 rounded-md text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-[161px] pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="selectedSerie.number" required="">
                                         </div>
                                     </form>
                                     
@@ -177,13 +186,12 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                             <input type="date" v-model="fecha" @change="cambiarFormatoFecha" class="styled-input bg-gray-50 border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
                                         </div>
                                     </div>
-
+                                    
                                     <div class="flex items-center justify-between w-full">
                                         <div class="font-semibold mr-3 flex-shrink-0">{{ $t('Expiration') }}:</div>
                                         <div class="input-wrapper">
-                                            <input type="date" v-model="expiration" @change="cambiarFormatoFecha" class="styled-input bg-gray-50 border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                            <input type="date" v-model="expiration" :min="fecha" @change="cambiarFormatoFecha" class="styled-input bg-gray-50 border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
                                         </div>
-                                        
                                     </div>
                                     
                                 </div>       
@@ -271,14 +279,23 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                                     <!-- Totals section for large screens -->
                             <div class="hidden md:flex justify-between mt-4 pr-4 mb-4">
                                 <!-- Columna izquierda -->
-                                <div class="totals-container w-1/3">
-                                    <Button :label="$t('Payment method')" icon="pi pi-search" class="ml-4 mb-2 bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white rounded-md p-2" @click="selectAPaymentMethod()" />
-                                    <div class="ml-4 totals p-4 rounded-md">
+                                <div class="totals-container w-1/3"> <div class="ml-4 totals p-4 rounded-md">
                                         <table class="w-full">
                                             <tbody>
                                                 <tr>
                                                     <td class="text-gray-600 pr-4">{{ $t('Payment method') }}:</td>
-                                                    <td class="pl-4">{{ selectedPaymentMethod.name }}</td>
+                                                    <td class="text-gray-600 pr-4">
+                                                        <div class="relative w-full ml-4">
+                                                            <div class="flex items-center pointer-events-none">
+                                                                {{ selectedPaymentMethod.name }}
+                                                            </div>
+                                                            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                                                <Button type="button" icon="pi pi-search" id="voice-search" @click="selectAPaymentMethod()" class="bg-gray-100 p-2 rounded-md text-gray-900 text-sm hover:bg-gray-300"/>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    
+                                                    
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2">
@@ -346,7 +363,9 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <table class="w-full">
                                     <tbody>
                                         <tr>
-                                            <td class="text-gray-600 pr-4">{{ $t('Payment method') }}:</td>
+                                            <td class="text-gray-600 pr-4">
+                                                {{ $t('Payment method') }}:
+                                            </td>
                                             <td class="pl-4">{{ selectedPaymentMethod.name }}</td>
                                         </tr>
                                         <tr>
@@ -761,6 +780,7 @@ export default {
                 },
             ],
             taxMap: new Map(),
+            today: new Date(),
             fecha: '',
             fechaPaid: '',
             expiration: '',
@@ -799,6 +819,7 @@ export default {
             series: [],
             serie: '',
             counter: '',
+            updateDate: false,
             showButton: false,
             productDialog: false,
             documentDialog: false,
@@ -917,32 +938,41 @@ export default {
 
     },
 
-    created() {
+    async created() {
         this.filters = {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
         };
 
         this.isChecked = this.$page.props.isChecked;
 
-        // Inicializa la fecha con la fecha de hoy
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = (today.getMonth() + 1).toString().padStart(2, '0');
-        const day = today.getDate().toString().padStart(2, '0');
-        this.fecha = `${year}-${month}-${day}`;
-        this.fechaPaid = `${year}-${month}-${day}`;
-        this.expiration = `${year}-${month}-${day}`;
+        this.fecha = await this.getDate()
+        this.fechaPaid = await this.getDate()
+        this.expiration = await this.getExpirationDate()
     },
 
     async mounted() {
         await this.fetchCompanies();
         await this.fetchCustomers();
-        await this.fetchDocuments();
+
         await this.fetchPayments();
+
+
+
+        if (!this.isChecked) {
+                await this.fetchDocuments()
+            } else {
+                this.selectedType.id = 1
+                this.selectedType.name = "Factura"
+                this.selectedSerie = []
+        }
 
     },
 
     watch: {
+
+        fecha(date) {
+            this.validateDate()
+        },
 
         selectedPaymentMethod(newMethod) {
             console.log("PaymentId " + newMethod.id)
@@ -976,6 +1006,14 @@ export default {
     
     methods: {
 
+        validateDate() {
+            if (new Date(this.fecha) > new Date(this.expiration)) {
+                alert('La fecha seleccionada no puede ser mayor que la fecha de vencimiento.');
+                this.fecha = this.getDate();
+                this.expiration = this.getExpirationDate();
+                this.fechaPaid = this.fecha;            }
+        },
+
         openDescriptionDialog(data) {
             this.productDescription = data
             this.selectedDescription = data.description;
@@ -995,22 +1033,6 @@ export default {
             } else {
                 this.$toast(this.$t('Too many characters, need to be 255 at maximum'), 'error');
             }
-        },
-
-        async switchToReceivedInvoice() {
-            this.customers = []
-            this.selectedCustomer = []
-            this.selectedType.id = 1
-            this.selectedType.name = "Factura"
-            if (!this.isChecked) {
-                await this.fetchDocuments()
-            } else {
-                this.selectedSerie = []
-            }
-            
-
-            await this.fetchCustomers()  
-            await this.fetchPayments()
         },
         
         async handlePaymentMethodChange(paymentMethod) {
@@ -1060,20 +1082,20 @@ export default {
             }
         },
 
-        handleDocumentSelected(documentId) {
+        async handleDocumentSelected(documentId) {
             if (documentId) {
                 this.documentListDialog = false
             }
             this.company = this.selectedCompany;
             this.company.documentId = documentId
 
-            axios.get('/documents-show/' + this.company.id + '/' + this.company.documentId)
-                .then(response => {
+            const response = await axios.get('/documents-show/' + this.company.id + '/' + this.company.documentId)
+                if(response) {
 
                     // Document
                     this.myDocument = response.data.documents;
                     this.fecha = this.myDocument.date;
-                    this.fechaPaid = this.myDocument.date_paid;
+                    
                     this.expiration = this.myDocument.expiration;
                     this.selectedType.name = this.myDocument.document_type_name;
                     this.selectedType.id = this.myDocument.documents_type_id;
@@ -1085,11 +1107,14 @@ export default {
 
                     let number = this.myDocument.number;
                     let numberWithoutSerie = number.replace(this.selectedSerie.serie, '');
+
                     this.selectedSerie.number = numberWithoutSerie;
 
                     if (this.myDocument.paid === 0 ) {
+                        this.fechaPaid = await this.getDate();
                         this.myDocument.paid = false
                     } else {
+                        this.fechaPaid = this.myDocument.date_paid;
                         this.myDocument.paid = true
                     }
 
@@ -1112,10 +1137,9 @@ export default {
                     this.selectedPaymentMethod.id = this.myDocument.payment_methods_id;
                     //this.handlePaymentMethodChange(this.selectedPaymentMethod)
 
-                })
-                .catch(error => {
+                } else { 
                     this.$toast(this.$t('Error connecting to the server'), 'error');
-                });   
+                };   
         },
 
 
@@ -1444,6 +1468,7 @@ export default {
                                 break;
                             case '2':
                                 // Asignar el siguiente valor disponible
+                                this.updateDate = true;
                                 this.selectedSerie.number = this.serie;
                                 this.$toast(this.$t('The following available number has been assigned: ') + this.selectedSerie.serie + this.selectedSerie.number, 'success');
                                 this.serie = '';
@@ -1507,7 +1532,6 @@ export default {
 
         myDocumentSave() {
 
-            
             if (!this.isChecked) {
                 this.myDocument.number = this.selectedSerie.serie + this.selectedSerie.number
                 this.myDocument.document_counter = this.selectedSerie.number
@@ -1522,11 +1546,24 @@ export default {
                 
             }
 
-            this.myDocument.date_paid = this.fechaPaid
+            if (this.myDocument.paid) {
+                this.myDocument.date_paid = this.fechaPaid
+            } else {
+                this.myDocument.date_paid = '';
+            }
+
             this.myDocument.isReceived = this.isChecked
             this.myDocument.documents_type_id = this.selectedType.id
+            
+            if (this.updateDate) {
+                this.fecha =  this.getDate();
+                this.expiration =  this.getExpirationDate();
+            } 
+
             this.myDocument.expiration = this.expiration
             this.myDocument.date = this.fecha
+
+            this.updateDate = false;
             this.myDocument.payment_methods_id = this.selectedPaymentMethod.id
             console.log("selectedPaymentSystemId")
             console.log(this.selectedPaymentSystemId)
@@ -1534,9 +1571,9 @@ export default {
  
             this.myDocument.document_counter = 1
             
-            this.myDocument.subTotal = this.subtotal.toFixed(2)
-            this.myDocument.totalTax = this.totalIVA.toFixed(2)
-            this.myDocument.amount = this.totalConIVA.toFixed(2)
+            this.myDocument.subTotal =  this.subtotal.toFixed(2)
+            this.myDocument.totalTax =  this.totalIVA.toFixed(2)
+            this.myDocument.amount =  this.totalConIVA.toFixed(2)
             
         },
 
@@ -1547,7 +1584,8 @@ export default {
             if(this.selectedType.id == 1 ) {
                 this.myDocument.invoiced = true
             }
-
+            console.log(this.fecha);
+            console.log(this.expiration);
             this.myDocument.concept = []
             this.products.forEach(product => {
                 
@@ -1590,7 +1628,24 @@ export default {
             });
         },
 
+        getDate() {    
+            const year = this.today.getFullYear();
+            const month = (this.today.getMonth() + 1).toString().padStart(2, '0');
+            const day = this.today.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        },
 
+        getExpirationDate() {
+            const expirationDate = new Date();
+            expirationDate.setDate(this.today.getDate() + 15);
+            const expYear = expirationDate.getFullYear();
+            const expMonth = (expirationDate.getMonth() + 1).toString().padStart(2, '0');
+            const expDay = expirationDate.getDate().toString().padStart(2, '0');
+            return `${expYear}-${expMonth}-${expDay}`;
+        },
+
+
+        
         resetData() {
             this.isSaving = true;
             setTimeout(function() {
