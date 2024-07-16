@@ -32,7 +32,7 @@
                 <Column field="number" :header="$t('Number')" sortable class="dateTable"></Column>
                 <Column field="document_type_name" :header="$t('Type')" sortable class="dateTable"></Column>
                 <Column field="customer_name" :header="isChecked ? $t('Provider') : $t('Customer')" sortable class="dateTable"></Column>
-                <Column field="date" :header="$t('Date')" sortable class="dateTable"></Column>
+                <Column field="dateFormatted" :header="$t('Date')" sortable class="dateTable"></Column>
                 <Column field="amount" :header="$t('Amount')" sortable class="dateTable"></Column>
             </DataTable>
         </div>
@@ -85,6 +85,17 @@ export default {
         fetchDocuments() {
             axios.get(`/documents-serie/${this.companyId}`)
                 .then(response => {
+
+                    let date
+                    let dateFormatted
+                    
+                    for(let i = 0; i < response.data.documents.length; i++ ) {
+                        date = response.data.documents[i].date
+                        dateFormatted = this.dateFormat(date)
+                        response.data.documents[i].dateFormatted = dateFormatted
+                        
+                    }
+                    
                     this.documents = response.data.documents;
                     this.documents.forEach(document => {
                         if (document.isReceived === 0) {
@@ -106,7 +117,31 @@ export default {
         },
         sendDocumentId(documentId) {
             this.$emit('document-selected', documentId);
-        }
+        },
+        
+        dateFormat(fecha) {
+            // Convierte la fecha seleccionada a un objeto Date
+            let date = new Date(fecha);
+
+            // Obtén el día, mes y año de la fecha
+            let dia = date.getDate();
+            let mes = date.getMonth() + 1; // Los meses en JavaScript son de 0 a 11, por lo que se suma 1
+            let año = date.getFullYear();
+
+            // Añade un cero inicial si el día o mes son menores de 10
+            if (dia < 10) {
+            dia = '0' + dia;
+            }
+            if (mes < 10) {
+            mes = '0' + mes;
+            }
+
+            // Construye la cadena con el formato español
+            let fechaFormateada = `${dia}/${mes}/${año}`;
+
+            return fechaFormateada;
+        },
+
     },
 
 }

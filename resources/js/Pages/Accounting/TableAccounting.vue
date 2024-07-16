@@ -17,10 +17,11 @@
                                 <button
                                     v-if="!loading && (companies.length > 0)"
                                     type="button"
-                                    class="px-4 py-2 bg-black text-white border border-gray-200 rounded-md flex items-center justify-between"
-                                    @click="openNew">
+                                    class="px-4 py-2 bg-gray-800 hover:bg-gray-900 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-white flex items-center"
+                                    @click="companies.length > 1 ? selectCompany() : null"
+                                    :disabled="companies.length === 1">
                                     <span class="font-bold text-lg">
-                                        <i class="pi pi-plus mr-2"></i>
+                                        <i v-if="companies.length > 1" class="pi pi-plus mr-2"></i>
                                         {{ selectedCompany.name }}
                                     </span>
                                 </button>
@@ -356,6 +357,9 @@ export default {
             this.accountingDialog = true
         },
         
+        selectCompany() {
+            this.accountingDialog = true
+        },
 
     },
 

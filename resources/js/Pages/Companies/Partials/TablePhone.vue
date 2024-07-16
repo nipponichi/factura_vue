@@ -61,7 +61,7 @@
                     <div class="grid gap-3 mb-6 md:grid-cols-1">
                     <div>
                         <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Phone') }}</label>
-                        <input type="tel" id="phone" v-model="myPhone.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Update phone')" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
+                        <input type="tel" id="phone" v-model="myPhone.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Update phone')" pattern="(\+34\s?)?(\d{9})" required />
                     </div>
                     <div v-if="!myPhone.id" class="flex items-center">
                         <input id="link-checkbox" type="checkbox" v-model="myPhone.favourite" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
@@ -170,6 +170,8 @@ export default {
         },
 
         async saveMyPhone() {
+            
+
             if (this.myPhone.favourite == null) {
                 this.myPhone.favourite = false;
             }
@@ -302,6 +304,8 @@ export default {
             });
             this.deletePhonesDialog = false;
         },
+
+
 
         updateFields() {
 

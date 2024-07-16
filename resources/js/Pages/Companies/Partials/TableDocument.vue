@@ -35,7 +35,7 @@
                 <Column field="number" :header="$t('Number')" sortable class="dateTable"></Column>
                 <Column field="document_type_name" :header="$t('Type')" sortable class="dateTable"></Column>
                 <Column field="customer_name" :header="$t('Receiver')" sortable class="dateTable"></Column>
-                <Column field="date" :header="$t('Date')" sortable class="dateTable"></Column>
+                <Column field="dateFormatted" :header="$t('Date')" sortable class="dateTable"></Column>
                 <Column field="amount" :header="$t('Amount')" sortable class="dateTable"></Column>
 
                 <Column :exportable="false" class="dateTable">
@@ -98,6 +98,7 @@ export default {
                 documents_type_id: '',
                 documents_series_id: '',
                 date: '',
+                dateFormatted: '',
                 subTotal: '',
                 totalTax: '',
                 amount: '',
@@ -138,8 +139,18 @@ export default {
             console.log("ID company " + myCompanyId);
             axios.get('/documents-serie/' + myCompanyId)
                 .then(response => {
-                    this.documents = response.data.documents;
                     
+                    let date
+                    let dateFormatted
+                    
+                    for(let i = 0; i < response.data.documents.length; i++ ) {
+                        date = response.data.documents[i].date
+                        dateFormatted = this.dateFormat(date)
+                        response.data.documents[i].dateFormatted = dateFormatted
+                        
+                    }
+                    this.documents = response.data.documents;
+
                     console.log(this.documents);
                     
                     this.documents.forEach(document => {
@@ -238,6 +249,30 @@ export default {
                     console.error('Error al guardar los datos del documento:', error.response);
                 });
         },
+
+        dateFormat(fecha) {
+            // Convierte la fecha seleccionada a un objeto Date
+            let date = new Date(fecha);
+
+            // Obtén el día, mes y año de la fecha
+            let dia = date.getDate();
+            let mes = date.getMonth() + 1; // Los meses en JavaScript son de 0 a 11, por lo que se suma 1
+            let año = date.getFullYear();
+
+            // Añade un cero inicial si el día o mes son menores de 10
+            if (dia < 10) {
+            dia = '0' + dia;
+            }
+            if (mes < 10) {
+            mes = '0' + mes;
+            }
+
+            // Construye la cadena con el formato español
+            let fechaFormateada = `${dia}/${mes}/${año}`;
+
+            return fechaFormateada;
+        },
+
         makeInvoice() {
             console.log("Make invoice");
             let companyID = window.location.pathname.split('/').pop();

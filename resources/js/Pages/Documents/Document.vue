@@ -49,10 +49,10 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <div class="flex items-center">
                                     <div id="app" class="relative inline-block w-50 ml-2">
                                         <div class="flex">
-                                            <Button v-if="!isChecked"
+                                            <Button
                                                 type="button"
                                                 class="px-4 ml-2 py-2 bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white rounded flex items-center justify-between"
-                                                @click="selectDocument()"
+                                                @click="resetData()"
                                                 :class="{ 'opacity-50': !selectedCompany.id }"
                                                 :disabled="!selectedCompany.id">
                                                 <span>
@@ -582,43 +582,43 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                     <div class="grid gap-3 mb-6 md:grid-cols-2">
                         <div>
                         <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Company name') }}</label>
-                        <input type="text" id="name" v-model="customer.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Company name')" :required="!selectedCustomer" />
+                        <input type="text" id="name" v-model="customer.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Company name')" required />
                         </div>
                         <div>
                         <label for="tax_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Tax number') }}</label>
-                        <input type="text" id="tax_number" v-model="customer.tax_number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Tax number')"  :required="!selectedCustomer" />
+                        <input type="text" id="tax_number" v-model="customer.tax_number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Tax number')" required />
                         </div>
                     </div>
                 
                     <div class="mb-6">
                         <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Address') }}</label>
-                        <input type="text" id="address1" v-model="customer.address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Address')" :required="!selectedCustomer" />
+                        <input type="text" id="address1" v-model="customer.address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Address')" required/>
                     </div>
                 
                     <div class="grid gap-3 mb-6 md:grid-cols-2"> 
                         <div>
                             <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Town') }}</label>
-                            <input type="text" id="town" v-model="customer.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Town')" :required="!selectedCustomer" />
+                            <input type="text" id="town" v-model="customer.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Town')" required />
                         </div>  
                         <div>
                             <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Province') }}</label>
-                            <input type="text" id="province" v-model="customer.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Province')" :required="!selectedCustomer" />
+                            <input type="text" id="province" v-model="customer.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Province')" required />
                         </div>  
                         <div>
                             <label for="post_code" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Post code') }}</label>
-                            <input type="text" id="post_code" v-model="customer.post_code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Post code')" pattern="^\d+$" :required="!selectedCustomer" />
+                            <input type="text" id="post_code" v-model="customer.post_code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Post code')" pattern="^\d+$" required />
                         </div>
                         <div>
                             <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Country') }}</label>
-                            <input type="text" id="country" v-model="customer.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Country')" :required="!selectedCustomer" />
+                            <input type="text" id="country" v-model="customer.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Country')" required />
                         </div>
                         <div>
                             <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Email') }}</label>
-                            <input type="email" id="email" v-model="customer.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('info@mycompany.com')" :required="!selectedCustomer" />
+                            <input type="email" id="email" v-model="customer.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('info@mycompany.com')" required/>
                         </div>    
                         <div>
                             <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Phone') }}</label>
-                            <input type="tel" id="phone" v-model="customer.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Phone')" pattern="^\+\d{1,3}\s?\d{1,14}$" :required="!selectedCustomer" />
+                            <input type="tel" id="phone" v-model="customer.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Phone')" pattern="(?:\+?(\d{1,3}))?\s?(?:\(?\d{1,4}\)?)?\s?\d{6,10}$" required />
                         </div>
                     </div>
                 
@@ -791,6 +791,7 @@ export default {
             isMobileMenuOpen: false,
             showTable: false,
             isDropdownOpen: false,
+            selectedOption: null,
             saveRestart: false,
             taxTypes: [],
             taxValues: [],
@@ -847,6 +848,7 @@ export default {
             selectedProducts: [],
             selectedPaymentMethod: [],
             selectedPaymentSystemId: '',
+            payment_methods: null,
             filters: {},
             submitted: false,
             myDocument: { 
@@ -980,8 +982,12 @@ export default {
         },
 
         selectedOption(newValue) {
+            console.log("NewValue")
+            console.log(newValue)
+            
             if (newValue) {
                 switch (this.selectedPaymentMethod.id) {
+                    
                 case 1:
                 case 7:
                     this.selectedBankAccount = newValue;
@@ -1149,7 +1155,7 @@ export default {
                 this.banks = response.data.accounts;
                 console.log("this.banks")
                 console.log(this.banks)
-                this.selectedBankAccount = await this.changePaymentMethodSystemId(this.banks, this.selectedBankAccount);
+                this.selectedBankAccount = await this.changePaymentMethodSystemId(this.banks);
                 this.selectedPaymentSystemId = this.selectedBankAccount.id
                 console.log("selectedBankaccount")
                 console.log(this.selectedBankAccount)
@@ -1170,7 +1176,7 @@ export default {
                 const emailResponse = await axios.get(url);
 
                 this.emails = emailResponse.data.emails;
-                this.selectedEmail = await this.changePaymentMethodSystemId(this.emails, this.selectedEmail);
+                this.selectedEmail = await this.changePaymentMethodSystemId(this.emails);
                 this.options = this.emails;
             } catch (error) {
                 this.$toast(this.$t('Error connecting to the server'), 'error');
@@ -1188,19 +1194,25 @@ export default {
 
                 this.phones = phonesResponse.data.phones;
 
-                this.selectedPhone = await this.changePaymentMethodSystemId(this.phones, this.selectedPhone);
+                this.selectedPhone = await this.changePaymentMethodSystemId(this.phones);
                 this.options = this.phones;
             } catch (error) {
                 this.$toast(this.$t('Error connecting to the server'), 'error');
             }
         },
 
-        async changePaymentMethodSystemId(systemValues, selectedMethod) {
-            console.log("Entra al methodSystem");
+        async changePaymentMethodSystemId(systemValues) {
+            let selectedMethod;
+            console.log("Entra al methodSystem1");
             if (this.selectedPaymentSystemId != null) {
-                console.log("Entra al methodSystem");
-                const value = systemValues.find(value => value.id === this.selectedPaymentSystemId);
+                console.log("Entra al methodSystem2");
+                let value = systemValues.find(value => value.id === this.selectedPaymentSystemId);
+                console.log(this.selectedPaymentSystemId)
+                console.log(systemValues)
+                console.log("Value ")
+                console.log(value)
                 if (value) {
+                    console.log("if value")
                     selectedMethod = value;
                     console.log(selectedMethod);
                 } else {
@@ -1499,11 +1511,7 @@ export default {
                                 break;
                             case '2':
                                 // Asignar la fecha actual
-                                const today = new Date();
-                                const year = today.getFullYear();
-                                const month = (today.getMonth() + 1).toString().padStart(2, '0');
-                                const day = today.getDate().toString().padStart(2, '0');
-                                this.fecha = `${year}-${month}-${day}`;
+                                this.fecha = getDate();
                                 
                                 this.$toast(this.$t('The current date has been assigned.'), 'success');
 
@@ -1568,7 +1576,7 @@ export default {
             console.log("selectedPaymentSystemId")
             console.log(this.selectedPaymentSystemId)
             this.myDocument.payment_system_id = this.selectedPaymentSystemId
- 
+
             this.myDocument.document_counter = 1
             
             this.myDocument.subTotal =  this.subtotal.toFixed(2)
@@ -1735,15 +1743,12 @@ export default {
 
             // Ahora puedes manejar la respuesta del usuario
             if (respuesta === '1') {
-            console.log('Se conservará la fecha seleccionada:', fechaFormateada);
             // Aquí puedes poner el código para conservar la fecha seleccionada
             } else if (respuesta === '2') {
             let fechaActual = new Date().toISOString().split('T')[0]; // Obtén la fecha actual en formato YYYY-MM-DD
             let fechaActualFormateada = this.dateFormat(fechaActual); // Formatea la fecha actual a DD/MM/YYYY
-            console.log('Se asignará la fecha actual:', fechaActualFormateada);
             // Aquí puedes poner el código para asignar la fecha actual
             } else {
-            console.log('Opción no válida.');
             // Aquí puedes manejar opciones no válidas si es necesario
             }
         },
@@ -1980,7 +1985,7 @@ export default {
         },*/
 
         cancelInvoice() {
-            let respuesta = confirm("¿Está seguro? Los datos de esta factura serán descartados");
+            let respuesta = confirm("Los cambios no serán guardados");
             if (respuesta) {
                 this.resetData()
             }
