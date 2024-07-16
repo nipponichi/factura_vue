@@ -1,5 +1,7 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { ref } from 'vue';
+const showingNavigationDropdown = ref(false);
 </script>
 <template>
     <div class="no-imprimir">
@@ -13,7 +15,80 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                 <div class="max-w-10xl mx-auto sm:px-6 lg:px-24">
                     <div :class="{'border-blue-500 border-2': isChecked, 'bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg': true}">
                         <div class="card"> 
-                            <div class="md:flex justify-between items-center">
+                            <!-- Hamburger -->
+                            <div class="-me-2 flex items-center sm:hidden">
+                                <button class="inline-flex items-center justify-center p-2 bg-gray-100 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out" @click="showingNavigationDropdown = ! showingNavigationDropdown">
+                                    <svg
+                                        class="h-6 w-6"
+                                        stroke="currentColor"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            :class="{'hidden': showingNavigationDropdown, 'inline-flex': ! showingNavigationDropdown }"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M4 6h16M4 12h16M4 18h16"
+                                        />
+                                        <path
+                                            :class="{'hidden': ! showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Responsive Navigation Menu -->
+                            <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}" class="sm:hidden bg-white">
+                                <div class="text-center pt-2 pb-3 space-y-1">
+                                    <ResponsiveNavLink @click="selectCompany()" >
+                                        {{ selectedCompany.name }}
+                                    </ResponsiveNavLink>
+                                </div>
+                                <div class="text-center pt-2 pb-3 space-y-1">
+                                    <ResponsiveNavLink @click="handleListDocument()">
+                                        {{ $t('Document check') }}
+                                    </ResponsiveNavLink>
+                                </div>
+                                <div class="text-center pt-2 pb-3 space-y-1">
+                                    <ResponsiveNavLink @click="resetData()">
+                                        {{ $t('New invoice') }}
+                                    </ResponsiveNavLink>
+                                </div>
+                                <div class="text-center pt-2 pb-3 space-y-1">
+                                    <hr>
+                                    <h3>{{ $t('Export') }}</h3>
+                                    <hr>
+                                    <div class="flex flex-col items-center space-y-2">
+                                        <Button @click="exportToPDF">
+                                            {{ $t('Exportar a PDF') }}
+                                        </Button>
+                                        <Button @click="exportToXML">
+                                            {{ $t('Exportar a XML') }}
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <div class="text-center pt-2 pb-3 space-y-1">
+                                    <hr>
+                                    <h3>{{ $t('Save') }}</h3>
+                                    <hr>
+                                    <div class="flex flex-col items-center space-y-2">
+                                        <Button @click="saveAndReset">
+                                            {{ $t('Guardar y crear nueva') }}
+                                        </Button>
+                                        <Button @click="cancelInvoice">
+                                            {{ $t('Cancel') }}
+                                        </Button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="md:flex justify-between items-center hidden sm:block ">
                                 
                                 <div class="flex flex-col md:flex-row justify-start items-center">
                                     <div class="flex flex-wrap justify-start items-center">
@@ -272,6 +347,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                     </template>
                                 </Column>
                             </DataTable>
+  
 
                             <div class="flex justify-end mt-4 pr-4" v-if="showButton">
                                 <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white" @click="addRow()" />
@@ -418,7 +494,10 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         </div>
                     </div>
                 </div>
+
             </div>
+
+            
 
             <!-- MODAL DESCRIPTION -->
             <Dialog v-model:visible="descriptionDialog" :style="{ width: '450px' }" :header="$t('Concept')" modal>
