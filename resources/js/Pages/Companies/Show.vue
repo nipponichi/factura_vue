@@ -24,11 +24,11 @@
                                         </div>
                                         <div class="flex justify-center lg:pt-0 pt-8">
                                             <div class="p-3 text-center">
-                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">33</span>
+                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">{{ totalCustomers }}</span>
                                                 <span class="text-sm text-slate-400"> {{ $t('Customers') }}</span>
                                             </div>
                                             <div class="p-3 text-center">
-                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">564</span>
+                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">{{ totalInvoices}}</span>
                                                 <span class="text-sm text-slate-400"> {{ $t('Invoices') }}</span>
                                             </div>
                                         </div>
@@ -119,7 +119,7 @@
             
                         <div class="flex flex-col items-center justify-center w-full overflow-x-auto">
                             <div v-if="activeTab === 'documents'" class="w-full">
-                                <TableDocument />
+                                <TableDocument @updateDocument="handleDocumentUpdate"/>
                             </div>
                             <div v-else-if="activeTab === 'customers'" class="w-full">
                                 <TableCustomer />
@@ -167,7 +167,8 @@ const changeTab = (tabName) => {
 
 <script>
 export default {
-    props: ["company"],
+
+    props: ["company", "totalInvoices","totalCustomers"],
     computed: {
         emailLink() {
             return "mailto:" + this.company.email;
@@ -189,6 +190,16 @@ export default {
             this.company.post_code = address.post_code;
             this.company.province = address.province;
             this.company.country = address.country;
+        },
+
+        handleDocumentUpdate(document) {
+            console.log(document)
+            console.log(this.totalInvoices)
+            let final = this.totalInvoices - document
+            this.totalInvoices = final
+            //console.log(final);
+
+        
         },
         
     }
