@@ -24,7 +24,7 @@
                                         </div>
                                         <div class="flex justify-center lg:pt-0 pt-8">
                                             <div class="p-3 text-center">
-                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">{{ totalCustomers }}</span>
+                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">{{ totalCustomer }}</span>
                                                 <span class="text-sm text-slate-400"> {{ $t('Customers') }}</span>
                                             </div>
                                             <div class="p-3 text-center">
@@ -122,7 +122,7 @@
                                 <TableDocument @updateDocument="handleDocumentUpdate"/>
                             </div>
                             <div v-else-if="activeTab === 'customers'" class="w-full">
-                                <TableCustomer />
+                                <TableCustomer @updateCustomer="handleCustomerUpdate"/>
                             </div>
                             <div v-else-if="activeTab === 'provider'" class="w-full">
                                 <TableProvider />
@@ -167,13 +167,31 @@ const changeTab = (tabName) => {
 
 <script>
 export default {
+    props: ["company", "invoices","customers"],
 
-    props: ["company", "totalInvoices","totalCustomers"],
+    data() {
+        
+        return {
+            totalInvoices: null, 
+            totalCustomer: null, 
+        };
+    },
+    
     computed: {
         emailLink() {
             return "mailto:" + this.company.email;
         }
     },
+
+    mounted() {
+
+        //Lo que viene de prop lo paso a una variable para poder editarlar y restarla
+        this.totalInvoices = this.invoices;
+        this.totalCustomer = this.customers
+        
+
+    },
+
     
     methods: {
         handlePhoneUpdate(phone) {
@@ -193,14 +211,22 @@ export default {
         },
 
         handleDocumentUpdate(document) {
-            console.log(document)
-            console.log(this.totalInvoices)
-            let final = this.totalInvoices - document
-            this.totalInvoices = final
-            //console.log(final);
+            
+            this.totalInvoices -=document;
 
-        
         },
+
+        handleCustomerUpdate(customer) {
+            
+
+            this.totalCustomer -=customer;
+
+        },
+
+
+
+
+
         
     }
     

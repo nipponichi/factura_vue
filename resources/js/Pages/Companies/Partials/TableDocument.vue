@@ -170,8 +170,8 @@ export default {
             this.deleteDocumentDialog = true;
         },
         deleteProduct() {
-            this.updateFields()
-            /*
+            
+            
             axios.delete('/documents/' + this.myDocument.id)
                 .then(response => {
                     
@@ -191,7 +191,7 @@ export default {
                 });
 
             this.deleteDocumentDialog = false;
-            */
+            
         },
         confirmDeleteSelected() {
             console.log("CONFIRM DELETE SELECTED");
