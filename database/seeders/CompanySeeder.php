@@ -474,7 +474,107 @@ class CompanySeeder extends Seeder
         'dt_start' => now(),
     ]);
 
+    // MIREN
+
+    DB::table('companies')->insert([
+        'verified' => true,
+        'dt_start' => now(),
+    ]);
+
+    DB::table('companies_users')->insert([
+        'company_id' => 5,
+        'user_id' => 6,
+        'dt_start' => now(),
+    ]);
+
     
+    DB::table('emails')->insert([
+        'email' => 'mirrentxu@gmail.com',
+        'dt_start' => now(),
+        'favourite' =>true,
+        'company_id' => 5,
+    ]);
+    DB::table('phones')->insert([
+        'phone' => '+34697436790',
+        'favourite' =>true,
+        'isMobile' =>true,
+        'dt_start' => now(),
+        'company_id' => 5,
+    ]);
+
+    DB::table('bank_account')->insert([
+        'complete_bank_account' => 'ES40 2048 3506 36 9026752232',
+        'iban' => 'ES40',
+        'entity' => '2048',
+        'office' => '3506',
+        'control_digit' => '36',
+        'account_number' => '9026752232',
+        'bank_name' => 'EVO Banco',
+        'country' => 'España',
+        'swift' => 'EVOBESMM',
+        'currency' => 'eur',
+        'favourite' =>true,
+        'dt_start' => now(),
+        'company_id' => 5,
+    ]);
+
+
+    DB::table('addresses')->insert([
+        'company_id' => 5,
+        'town' => 'Bustarviejo',
+        'address' => 'CALLE PARRA N 28',
+        'post_code' => '28720',
+        'province' => 'Madrid',
+        'country' => 'España',
+        'favourite' => true,
+        'dt_start' => now(),
+    ]);
+
+    DB::table('companies_tax_numbers')->insert([
+        'tax_number' => '44552795R',
+        'company_id' => 5,
+        'dt_start' => now(),
+    ]);
+
+    DB::table('companies_names')->insert([
+        'name' => 'Miren Alzola Cambronero',
+        'company_id' => 5,
+        'dt_start' => now(),
+    ]);
+
+
+    DB::table('documents_series')->insert([
+        'serie' => 'R',
+        'number' => 0,
+        'company_id' => 5,
+        'documents_type_id' => 1,
+        'dt_start' => now(),
+    ]);
+
+    
+    DB::table('documents_series')->insert([
+        'serie' => 'R',
+        'number' => 0,
+        'company_id' => 5,
+        'documents_type_id' => 2,
+        'dt_start' => now(),
+    ]);
+
+    DB::table('documents_series')->insert([
+        'serie' => 'R',
+        'number' => 0,
+        'company_id' => 5,
+        'documents_type_id' => 3,
+        'dt_start' => now(),
+    ]);
+
+    DB::table('documents_series')->insert([
+        'serie' => 'R',
+        'number' => 0,
+        'company_id' => 5,
+        'documents_type_id' => 4,
+        'dt_start' => now(),
+    ]);
     
 
 }
