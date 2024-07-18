@@ -170,6 +170,8 @@ export default {
             this.deleteDocumentDialog = true;
         },
         deleteProduct() {
+            
+            
             axios.delete('/documents/' + this.myDocument.id)
                 .then(response => {
                     
@@ -181,12 +183,15 @@ export default {
                     }
                 
                     this.$toast(this.$t(response.data.message), response.data.type);
+
+                    this.updateFields()
                 })
                 .catch(error => {
                     this.$toast(this.$t(error.response.message), error.response.type);
                 });
 
             this.deleteDocumentDialog = false;
+            
         },
         confirmDeleteSelected() {
             console.log("CONFIRM DELETE SELECTED");
@@ -204,6 +209,8 @@ export default {
                         }
                             
                         this.$toast(this.$t(response.data.message), response.data.type); 
+
+                        this.updateFields()
                         
                         
                     })
@@ -286,6 +293,12 @@ export default {
                     console.error('Error al guardar los datos del documento:', error.response);
                     // this.resetData();
                 });
+        },
+
+        updateFields() {
+
+            this.$emit('updateDocument', 1);
+            
         },
     },
 };

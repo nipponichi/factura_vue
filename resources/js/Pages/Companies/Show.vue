@@ -24,11 +24,11 @@
                                         </div>
                                         <div class="flex justify-center lg:pt-0 pt-8">
                                             <div class="p-3 text-center">
-                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">33</span>
+                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">{{ totalCustomer }}</span>
                                                 <span class="text-sm text-slate-400"> {{ $t('Customers') }}</span>
                                             </div>
                                             <div class="p-3 text-center">
-                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">564</span>
+                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">{{ totalInvoices}}</span>
                                                 <span class="text-sm text-slate-400"> {{ $t('Invoices') }}</span>
                                             </div>
                                         </div>
@@ -119,10 +119,10 @@
             
                         <div class="flex flex-col items-center justify-center w-full overflow-x-auto">
                             <div v-if="activeTab === 'documents'" class="w-full">
-                                <TableDocument />
+                                <TableDocument @updateDocument="handleDocumentUpdate"/>
                             </div>
                             <div v-else-if="activeTab === 'customers'" class="w-full">
-                                <TableCustomer />
+                                <TableCustomer @updateCustomer="handleCustomerUpdate"/>
                             </div>
                             <div v-else-if="activeTab === 'provider'" class="w-full">
                                 <TableProvider />
@@ -167,12 +167,31 @@ const changeTab = (tabName) => {
 
 <script>
 export default {
-    props: ["company"],
+    props: ["company", "invoices","customers"],
+
+    data() {
+        
+        return {
+            totalInvoices: null, 
+            totalCustomer: null, 
+        };
+    },
+    
     computed: {
         emailLink() {
             return "mailto:" + this.company.email;
         }
     },
+
+    mounted() {
+
+        //Lo que viene de prop lo paso a una variable para poder editarlar y restarla
+        this.totalInvoices = this.invoices;
+        this.totalCustomer = this.customers
+        
+
+    },
+
     
     methods: {
         handlePhoneUpdate(phone) {
@@ -190,6 +209,24 @@ export default {
             this.company.province = address.province;
             this.company.country = address.country;
         },
+
+        handleDocumentUpdate(document) {
+            
+            this.totalInvoices -=document;
+
+        },
+
+        handleCustomerUpdate(customer) {
+            
+
+            this.totalCustomer -=customer;
+
+        },
+
+
+
+
+
         
     }
     

@@ -1032,6 +1032,7 @@ export default {
     },
 
     async mounted() {
+
         await this.fetchCompanies();
         await this.fetchCustomers();
 

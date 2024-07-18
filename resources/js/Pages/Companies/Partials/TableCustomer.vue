@@ -284,7 +284,7 @@ export default {
 
                     }
                     this.$toast(this.$t(response.data.message), response.data.type);
-
+                    this.updateFields();
                 })
                 .catch(error => { 
                     this.$toast(this.$t(error.response.message), error.response.type);
@@ -310,6 +310,7 @@ export default {
                     }
                     this.$toast(this.$t(response.data.message), response.data.type);
                         
+                    this.updateFields();
                     
                     
                 })
@@ -326,7 +327,13 @@ export default {
         handleInfoButtonClick(customerID) {
             let companyID = window.location.pathname.split('/').pop();
             this.$inertia.get(`/companies/${companyID}/customer/${customerID}`);
-        }
+        },
+
+        updateFields() {
+
+            this.$emit('updateCustomer', 1);
+
+        },
 
     }
 }

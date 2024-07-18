@@ -186,7 +186,18 @@ class CompanyController extends Controller
             ->first();
 
             
-            return Inertia::render('Companies/Show', ['company' => $companies]);
+            $invoices = DB::table('documents')
+            ->where('company_id_company', $id)
+            ->whereNull('dt_end')
+            ->count();
+
+            
+            $customers = DB::table('companies_customers')
+            ->where('company_id_company', $id)
+            ->whereNull('dt_end')
+            ->count();
+            
+            return Inertia::render('Companies/Show', ['company' => $companies, 'invoices' => $invoices, 'customers' => $customers ]);
             
         }catch (Exception $e) {
                 
