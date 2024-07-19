@@ -1126,16 +1126,55 @@ export default {
         },
 
         addsign(data){
+
+            if (this.myDocument.id == null) {
+                alert("Guarda el documeno");
+            } else {
+                
+                AutoScript.setForceWSMode(true);
+                AutoScript.cargarAppAfirma();
+                AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
+                window.location.origin + "/afirma-signature-retriever/RetrieveService");
+
+                const mycompany_id = this.company.id;
+                const mydocument_id = this.myDocument.id;
+
+                function successCallback(dataB64, cert) {
+                    axios.post('/documents-sign', {
+                        datasing: {
+                            'company_id': mycompany_id,
+                            'document_id': mydocument_id,
+                            'document_data': dataB64,
+                        }
+                    })
+                    .then(response => {
+                        console.log("OK in the signed"); 
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    });
+                }
+
+                //successCallback(AutoScript.getBase64FromText(data), null)
+
+                function errorCallback(type,message) { console.log("ERR"); }
+
+                let dataB64 = AutoScript.getBase64FromText(data);
+                AutoScript.sign('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "XAdES", "", null, successCallback, errorCallback);
+            }
+        },
+
+      /*  addsign(data){
             console.log("aqui")
             if (this.myDocument.id == null) {
                 alert("Guarda el documeno");
             } else {
                 
             
-          /*  AutoScript.setForceWSMode(true);
+            AutoScript.setForceWSMode(true);
             AutoScript.cargarAppAfirma();
             AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
-            window.location.origin + "/afirma-signature-retriever/RetrieveService");*/
+            window.location.origin + "/afirma-signature-retriever/RetrieveService");
             
             const myDocumentData = {
                 'company_id': this.selectedCompany.id,
@@ -1162,10 +1201,10 @@ export default {
             let dataB64 = AutoScript.getBase64FromText(data);
             AutoScript.signAndSaveToFile('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "XAdES", "", null, successCallback, errorCallback);
             }
-*/
+
         }
 
-        },
+        },*/
 
 
 
