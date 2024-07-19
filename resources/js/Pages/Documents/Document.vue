@@ -61,14 +61,17 @@ const showingNavigationDropdown = ref(false);
                                 </div>
                                 <div class="text-center pt-2 pb-3 space-y-1">
                                     <hr>
-                                    <h3>{{ $t('Export') }}</h3>
+                                    <h3>{{ $t('Download') }}</h3>
                                     <hr>
                                     <div class="flex flex-col items-center space-y-2">
                                         <Button @click="exportToPDF">
-                                            {{ $t('Exportar a PDF') }}
+                                            {{ $t('PDF') }}
                                         </Button>
                                         <Button @click="exportToXML">
-                                            {{ $t('Exportar a XML') }}
+                                            {{ $t('XML') }}
+                                        </Button>
+                                        <Button @click="exportToXML">
+                                            {{ $t('XML Firmado') }}
                                         </Button>
                                     </div>
                                 </div>
@@ -80,6 +83,9 @@ const showingNavigationDropdown = ref(false);
                                     <div class="flex flex-col items-center space-y-2">
                                         <Button @click="saveAndReset">
                                             {{ $t('Guardar y crear nueva') }}
+                                        </Button>
+                                        <Button @click="saveAndSign">
+                                            {{ $t('Firmar factura') }}
                                         </Button>
                                         <Button @click="cancelInvoice">
                                             {{ $t('Cancel') }}
@@ -142,13 +148,13 @@ const showingNavigationDropdown = ref(false);
                                         <SplitButton
                                             ref="splitButton"
                                             class="bg-purple-400 hover:bg-purple-500 focus:ring-4 focus:ring-pur-300 font-medium rounded-lg text-white text-white p-2"
-                                            :label="$t('Export')"
+                                            :label="$t('Download')"
                                             @click="handleClick"
                                             :model="itemsExport"
                                             :disabled="totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.number"
                                             :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.number}">
                                             <template v-slot:icon>
-                                                <i class="pi pi-upload mr-2" :class="{ 'opacity-50': totalConIVA <= 0 }"></i>
+                                                <i class="pi pi-download mr-2" :class="{ 'opacity-50': totalConIVA <= 0 }"></i>
                                             </template>
                                         </SplitButton>
                                     </div>
@@ -842,20 +848,31 @@ export default {
                     command: () => this.saveAndReset()
                 },
                 {
+                    label: this.$t('Firmar factura'),
+                    icon: 'pi pi-file-check',
+                    command: () => this.saveAndSign(),
+                    
+                },
+                {
                     label: this.$t('Cancelar'),
                     command: () => this.cancelInvoice()
                 },
             ],
             itemsExport: [
                 {
-                    label: this.$t('Exportar a PDF'),
+                    label: this.$t('PDF'),
                     icon: 'pi pi-file-pdf',
                     command: () => this.exportToPDF()
                 },
                 {
-                    label: this.$t('Exportar a XML'),
-                    icon: 'pi pi-file-o',
+                    label: this.$t('XML'),
+                    icon: 'pi pi-file',
                     command: () => this.exportToXML()
+                },
+                {
+                    label: this.$t('XML Firmado'),
+                    icon: 'pi pi-file-check',
+                    command: () => this.downloadSignedXml(),
                 },
             ],
             taxMap: new Map(),
@@ -1092,6 +1109,62 @@ export default {
     
     methods: {
 
+        saveAndSign() {
+
+            this.myDocumentSave()
+            this.calculateTaxes().then(() => {
+                this.myDocument.document_counter = 1
+                console.log("contador: " + this.myDocument.document_counter)
+                const xmlContent = this.convertToFacturaeXML();
+                this.addsign(xmlContent);
+            });
+            
+        },
+
+        addsign(data){
+
+            if (this.myDocument.id == null) {
+                alert("Guarda el documento");
+            } else {
+                
+            
+            AutoScript.setForceWSMode(true);
+            AutoScript.cargarAppAfirma();
+            AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
+            window.location.origin + "/afirma-signature-retriever/RetrieveService");
+            
+            const myDocumentData = {
+                'company_id': this.selectedCompany.id,
+                'document_id': this.myDocument.id,
+                'document_data': data,
+            }
+
+            const successCallback = (dataB64, cert) => {
+                axios.post('/documents-sign', {datasing: myDocumentData})
+                .then(response => {
+                    this.$toast(this.$t('Document signed successfully.'), 'success');
+                })
+                .catch(error => {
+                    this.$toast(this.$t('Error signing document: ') + error.message, 'error');
+                });
+            }
+
+            //successCallback(AutoScript.getBase64FromText(data), null)
+            const errorCallback = (type, message) => { 
+                this.$toast(message, 'error');
+            }
+
+            
+            let dataB64 = AutoScript.getBase64FromText(data);
+            AutoScript.signAndSaveToFile('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "XAdES", "", null, successCallback, errorCallback);
+            }
+
+            
+
+        },
+
+
+
         validateDate() {
             if (new Date(this.fecha) > new Date(this.expiration)) {
                 alert('La fecha seleccionada no puede ser mayor que la fecha de vencimiento.');
@@ -1189,7 +1262,6 @@ export default {
                     this.selectedSerie.serie = this.myDocument.document_series_serie;
                     this.selectedPaymentSystemId = this.myDocument.payment_system_id
                     this.selectedPaymentMethod.id = this.myDocument.payment_methods_id
-                    
 
                     let number = this.myDocument.number;
                     let numberWithoutSerie = number.replace(this.selectedSerie.serie, '');
@@ -1414,8 +1486,37 @@ export default {
                 console.error("Error:", error);
                 this.customerDialog = false;
             });
-  
+
             this.customerDialog = false;
+        },
+
+        async downloadSignedXml() {
+            if (!this.isChecked) {
+                const documentId = this.myDocument.id;
+                const url = `/documents-signed/${documentId}`;
+
+                // Hacer la solicitud al servidor
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            // La respuesta no es exitosa
+                            return response.json().then(error => {
+                                throw new Error(error.message || 'Error al cargar la factura');
+                            });
+                        }
+                        // La respuesta es exitosa
+                        return response.blob(); // O el tipo de respuesta que esperes del servidor
+                    })
+                    .then(data => {
+                        // Crear una URL de objeto para el blob y abrir una nueva ventana
+                        const objectUrl = URL.createObjectURL(data);
+                        window.open(objectUrl);
+                    })
+                    .catch(error => {
+                        this.$toast(this.$t('To download you must save and sign it'), 'error');
+                    });
+
+            }
         },
 
         async handleCompanySelection() {
@@ -1433,7 +1534,6 @@ export default {
                 console.error('Error fetching phone data:', error);
             }
         },
-
 
         async fetchDocuments() {
             await axios.get('/documents-type')
@@ -1870,7 +1970,7 @@ export default {
             }
         },*/
 
-        addsign(data){
+        /* addsign(data){
             AutoScript.setForceWSMode(true);
             AutoScript.cargarAppAfirma();
             AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
@@ -1879,22 +1979,20 @@ export default {
             function errorCallback() { console.log("ERR"); }
             var dataB64 = AutoScript.getBase64FromText(data);
             AutoScript.signAndSaveToFile('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "AUTO", "", null, successCallback, errorCallback);
-        }, 
+        },  */
 
 
         exportToXML() {
             this.myDocumentSave()
             this.calculateTaxes().then(() => {  
             this.myDocument.document_counter = 1
-            console.log("contador: " + this.myDocument.document_counter)
             const xmlContent = this.convertToFacturaeXML();
+            console.log("contador: " + this.myDocument.document_counter)
             this.$toast(this.$t('XML document generated correctly.'), 'success');
-            this.addsign(xmlContent);
-            //this.downloadXML(xmlContent, 'facturae.xml');
-            });
-            /* }).catch(error => {
+            this.downloadXML(xmlContent, 'factura.xml')
+            }).catch(error => {
                 this.$toast(this.$t('Could not generate the XML.'), 'error');
-            }); */
+            });
         },
     
         convertToFacturaeXML() {
@@ -2052,7 +2150,6 @@ export default {
             return xml;
         },
 
-        /*
         downloadXML(content, filename) {
 
             const blob = new Blob([content], { type: 'application/xml' });
@@ -2062,7 +2159,8 @@ export default {
             link.click();
             URL.revokeObjectURL(link.href);
         
-        },*/
+        },
+    
 
         cancelInvoice() {
             let respuesta = confirm("Los cambios no serán guardados");

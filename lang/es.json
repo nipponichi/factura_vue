@@ -394,5 +394,7 @@
     "To much characters, need to be 255 at maximun" : "Demasiados caracteres, el máximo permitido es de 255",
     "Payment date":"Fecha de pago",
     "Document check" : "Ver facturas",
-    "View":"Ver"
+    "View":"Ver",
+    "Download":"Descargar",
+    "To download you must save and sign it":"Para descargar debes de guardar y firmarlo"
 }

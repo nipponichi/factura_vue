@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Http\Request;
 
 class DocumentController extends Controller
 {
@@ -14,9 +15,9 @@ class DocumentController extends Controller
     public function __construct()
     {
 
-        $this->middleware(['can:read company'])->only(['index', 'show','indexDocuments','documentType','documentSerieCheck','documentSerie','documentDateCheck','fromBudgetToInvoice']);
+        $this->middleware(['can:read company'])->only(['index', 'show','indexDocuments','documentType','documentSerieCheck','documentSerie','documentDateCheck','fromBudgetToInvoice', 'downloadSignedXML']);
         $this->middleware(['can:create company'])->only(['create', 'store']);
-        $this->middleware(['can:update company'])->only(['edit', 'update']);
+        $this->middleware(['can:update company'])->only(['edit', 'update', 'documentSing']);
         $this->middleware(['can:delete company'])->only('destroy');
     }
     /**
@@ -765,4 +766,102 @@ class DocumentController extends Controller
         }
         
     }
+
+    public function documentSing(Request $request){
+
+        DB::beginTransaction();
+        
+        try {
+
+            $userId = Auth::id();
+            
+            $invoiceUser = DB::table('companies_users')
+            ->select('user_id')
+            ->where('company_id', $request->datasing['company_id'])
+            ->first();
+
+            if ($invoiceUser == null) {
+                return Redirect::to('/dashboard')->with('error', 'No se encontró la factura');
+            }
+
+            if ($userId != $invoiceUser->user_id) {
+                return Redirect::to('companies/' . $request->datasing['company_id'])->with('error', 'No se encontró la factura');
+            }
+            
+            $b64 = base64_encode($request->datasing['document_data']);
+            $blob = tempnam(sys_get_temp_dir(), 'upload');
+            file_put_contents($blob, $request->datasing['document_data']);
+            // Cambiar el tipo de hash en caso de tener que cambiarlo
+            $hash = hash_file('sha256', $blob);
+
+            DB::table('documents')
+                ->where('id', $request->datasing['document_id'])
+                ->whereNull('dt_end')
+                ->update([
+                'user_who_modified' => $userId,
+                'document_hash' => $hash,
+                'document_base64' => $b64,
+                'document_blob' => $blob
+            ]);
+
+            DB::commit();
+
+            return response()->json(['message' => 'Factura firmada correctamente']);
+
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Error al crear la factura ', $e->getMessage()], 500);
+        }
+
+    }
+    public function downloadSignedXML($documentId){
+
+        try {
+
+            $userId = Auth::id();
+
+            $document = DB::table('documents')
+            ->select('document_blob', 'company_id_company','number')
+            ->where('id', $documentId)
+            ->first();
+
+            $invoiceUser = DB::table('companies_users')
+            ->select('user_id')
+            ->where('company_id', $document->company_id_company)
+            ->first();
+
+            if ($invoiceUser == null) {
+                return Redirect::to('/dashboard')->with('error', 'No se encontró la factura');
+            }
+
+            if ($userId != $invoiceUser->user_id) {
+                return Redirect::to('companies/' . $document->company_id_company->with('error', 'No se encontró la factura'));
+            }
+            
+            $today = date("Ymd");
+            
+
+            if (empty($document->document_blob)) {
+                throw new Exception('Document path is empty');
+            }
+    
+            $blob = fopen($document->document_blob, 'r');
+
+            if ($blob === false) {
+                throw new Exception('Failed to open the document');
+            }
+            
+
+            $blobContent = stream_get_contents($blob);
+
+            return response($blobContent, 200)
+                ->header('Content-Type', 'application/xml')
+                ->header('Content-Disposition', 'attachment; filename="'. $today ."_". $document->number.'".xml"');
+        
+        } catch (Exception $e) {
+            
+            return response()->json(['message' => 'Error al cargar la factura ', $e->getMessage()], 500);
+        }
+    }
+
 }

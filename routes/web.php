@@ -88,6 +88,9 @@ Route::middleware([
     Route::get('/documents-series/{companyID}/{typeID}', [DocumentController::class, 'documentDateCheck']);
     Route::get('/documents-serie/{companyID}', [DocumentController::class, 'indexDocuments']);
     Route::post('/documents-serie/{documentID}/{date}', [DocumentController::class, 'fromBudgetToInvoice']);
+    Route::post('/documents-sign', [DocumentController::class, 'documentSing']);
+    Route::get('/documents-signed/{documentId}', [DocumentController::class, 'downloadSignedXML']);
+
 
     // Admin
     Route::resource('/admin-companies', AdminCompaniesController::class);
