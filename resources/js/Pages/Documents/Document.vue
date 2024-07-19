@@ -1043,6 +1043,10 @@ export default {
 
         this.isChecked = this.$page.props.isChecked;
 
+        this.myDocument.isReceived = this.$page.props.isChecked
+
+        console.log("isChecked Create " + this.isChecked)
+
         this.fecha = await this.getDate()
         this.fechaPaid = await this.getDate()
         this.expiration = await this.getExpirationDate()
@@ -1122,23 +1126,23 @@ export default {
         },
 
         addsign(data){
-
+            console.log("aqui")
             if (this.myDocument.id == null) {
-                alert("Guarda el documento");
+                alert("Guarda el documeno");
             } else {
                 
             
-            AutoScript.setForceWSMode(true);
+          /*  AutoScript.setForceWSMode(true);
             AutoScript.cargarAppAfirma();
             AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
-            window.location.origin + "/afirma-signature-retriever/RetrieveService");
+            window.location.origin + "/afirma-signature-retriever/RetrieveService");*/
             
             const myDocumentData = {
                 'company_id': this.selectedCompany.id,
                 'document_id': this.myDocument.id,
                 'document_data': data,
             }
-
+      
             const successCallback = (dataB64, cert) => {
                 axios.post('/documents-sign', {datasing: myDocumentData})
                 .then(response => {
@@ -1149,8 +1153,8 @@ export default {
                 });
             }
 
-            //successCallback(AutoScript.getBase64FromText(data), null)
-            const errorCallback = (type, message) => { 
+            successCallback(AutoScript.getBase64FromText(data), null)
+           /* const errorCallback = (type, message) => { 
                 this.$toast(message, 'error');
             }
 
@@ -1158,8 +1162,8 @@ export default {
             let dataB64 = AutoScript.getBase64FromText(data);
             AutoScript.signAndSaveToFile('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "XAdES", "", null, successCallback, errorCallback);
             }
-
-            
+*/
+        }
 
         },
 
@@ -1491,7 +1495,8 @@ export default {
         },
 
         async downloadSignedXml() {
-            if (!this.isChecked) {
+            window.open('/documents-signed/'+ this.myDocument.id)
+            /*if (!this.isChecked) {
                 const documentId = this.myDocument.id;
                 const url = `/documents-signed/${documentId}`;
 
@@ -1516,7 +1521,7 @@ export default {
                         this.$toast(this.$t('To download you must save and sign it'), 'error');
                     });
 
-            }
+            }*/
         },
 
         async handleCompanySelection() {
@@ -1740,7 +1745,6 @@ export default {
                 this.myDocument.date_paid = '';
             }
 
-            this.myDocument.isReceived = this.isChecked
             this.myDocument.documents_type_id = this.selectedType.id
             
             if (this.updateDate) {
@@ -1800,8 +1804,10 @@ export default {
             });
             axios.post('/documents', {documentData: this.myDocument})
             .then(response => {
-        
+                this.myDocument.id = response.data.documentId; 
+                console.log("saveDocument id" + this.myDocument.id)
                 this.$toast(this.$t('Invoice saved correctly.'), 'success');
+                
                 this.myDocument.concept = []
                 if (this.saveRestart) {
                     this.resetData();

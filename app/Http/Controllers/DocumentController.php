@@ -170,7 +170,7 @@ class DocumentController extends Controller
                 
             }
 
-            
+    
 
             // Guarda la nueva factura
             $documentsId = DB::table('documents')->insertGetId([
@@ -225,7 +225,7 @@ class DocumentController extends Controller
 
             DB::commit();
 
-            return response()->json(['message' => 'La factura se ha creado correctamente']);
+            return response()->json(['message' => 'La factura se ha creado correctamente', 'documentId' => $documentsId]);
 
         } catch (Exception $e) {
             DB::rollback();
@@ -839,20 +839,15 @@ class DocumentController extends Controller
             }
             
             $today = date("Ymd");
+        
             
-
-            if (empty($document->document_blob)) {
-                throw new Exception('Document path is empty');
+            if (file_exists($document->document_blob)) {
+                $blob = fopen($document->document_blob, 'r');
+                $blobContent = stream_get_contents($blob);
+                fclose($blob);
+            } else {
+                return Redirect::to('/dashboard')->with('error', 'No se pudo encontrar el archivo especificado');
             }
-    
-            $blob = fopen($document->document_blob, 'r');
-
-            if ($blob === false) {
-                throw new Exception('Failed to open the document');
-            }
-            
-
-            $blobContent = stream_get_contents($blob);
 
             return response($blobContent, 200)
                 ->header('Content-Type', 'application/xml')
