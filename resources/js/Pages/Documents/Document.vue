@@ -151,10 +151,10 @@ const showingNavigationDropdown = ref(false);
                                             :label="$t('Download')"
                                             @click="handleClick"
                                             :model="itemsExport"
-                                            :disabled="totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.number"
-                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.number}">
+                                            :disabled="totalConIVA === 0 || isSaving || !selectedCustomer.id || !selectedSerie.number"
+                                            :class="{ 'opacity-50': totalConIVA === 0 || isSaving || !selectedCustomer.id || !selectedSerie.number}">
                                             <template v-slot:icon>
-                                                <i class="pi pi-download mr-2" :class="{ 'opacity-50': totalConIVA <= 0 }"></i>
+                                                <i class="pi pi-download mr-2" :class="{ 'opacity-50': totalConIVA === 0 }"></i>
                                             </template>
                                         </SplitButton>
                                     </div>
@@ -165,10 +165,10 @@ const showingNavigationDropdown = ref(false);
                                             :label="$t('Save')"
                                             @click="checkDocument"
                                             :model="itemsSave"
-                                            :disabled="totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.number"
-                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id || !selectedSerie.number}">
+                                            :disabled="totalConIVA === 0 || isSaving || !selectedCustomer.id || !selectedSerie.number"
+                                            :class="{ 'opacity-50': totalConIVA === 0 || isSaving || !selectedCustomer.id || !selectedSerie.number}">
                                             <template v-slot:icon>
-                                                <i class="pi pi-save mr-2" :class="{ 'opacity-50': totalConIVA <= 0 }"></i>
+                                                <i class="pi pi-save mr-2" :class="{ 'opacity-50': totalConIVA === 0 }"></i>
                                             </template>
                                         </SplitButton>
                                     </div>
