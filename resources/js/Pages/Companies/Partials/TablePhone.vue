@@ -142,10 +142,10 @@ export default {
             
     },
     methods: {
-        
+
         fetchPhones() {
             let myCompanyId = window.location.pathname.split('/').pop();
-            return axios.get('/phones/' + myCompanyId)
+            axios.get('/phones/' + myCompanyId)
                 .then(response => {
                     this.phones = response.data.phones;
                 })
@@ -180,12 +180,14 @@ export default {
             try {
                 if (!this.myPhone.id) {
                     const response = await axios.post('/phone', this.myPhone);
+
+                    //this.phones.push({ id: newPhoneId, number: newPhoneNumber,});
                     this.$toast(this.$t(response.data.message), response.data.type);
                 } else {
-                    await this.updateMyPhone();
+                    this.updateMyPhone();
                 }
 
-                await this.fetchPhones();
+                this.fetchPhones();
                 this.phoneDialog = false;
                 this.updateFields();
             } catch (error) {
@@ -222,7 +224,7 @@ export default {
                     this.$toast(this.$t(response.data.message), response.data.type);
                     this.phoneDialog = false;
 
-                    await this.fetchPhones(); 
+                    this.fetchPhones(); 
                     this.updateFields();
                 })
                 .catch(error => {
@@ -242,7 +244,7 @@ export default {
                 this.$toast(this.$t(response.data.message), response.data.type);
                 this.phoneDialog = false;
 
-                await this.fetchPhones(); // Espera a que fetchPhones() complete
+                this.fetchPhones(); // Espera a que fetchPhones() complete
 
                 this.updateFields(); // Se ejecuta después de que fetchPhones() haya completado
             } catch (error) {

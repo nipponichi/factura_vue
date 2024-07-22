@@ -16,6 +16,7 @@ use App\Http\Controllers\EmailController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\RouteController;
+use App\Http\Controllers\LogController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -101,4 +102,7 @@ Route::middleware([
     Route::get('/admin-reload-users', [AdminUsersController::class, 'reload']);
     Route::get('/admin-reload-companies', [AdminCompaniesController::class, 'reload']);
     
+    //Logs
+    Route::get('/logs', [LogController::class, 'index']);
+
 });

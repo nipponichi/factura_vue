@@ -19,8 +19,9 @@ class LogSuccessfulLogin
         $ipAddress = request()->ip();
         $time = now();
         
-        Log::info("User logged in", [
+        Log::info("userLog", [
             'user_id' => $user->id,
+            'user_name' => $user->name,
             'email' => $user->email,
             'ip_address' => $ipAddress,
             'time' => $time

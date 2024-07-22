@@ -396,5 +396,9 @@
     "Document check" : "Ver facturas",
     "View":"Ver",
     "Download":"Descargar",
-    "To download you must save and sign it":"Para descargar debes de guardar y firmarlo"
+    "To download you must save and sign it":"Para descargar debes de guardar y firmarlo",
+    "Log Registry":"Registro de logs",
+    "View the basic log listing with information on user activity, IP addresses, and connection times. This straightforward log provides essential details for monitoring site access and usage":"Consulta el listado básico de logs con información sobre la actividad de los usuarios, direcciones IP y horas de conexión. Este registro sencillo proporciona detalles esenciales para monitorear el acceso y uso del sitio",
+    "Logs list":"Listado de logs",
+    "A list of profile logged in to the platform" : "Listado de accesos de usuarios a la plataforma"
 }
