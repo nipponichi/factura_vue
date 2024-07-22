@@ -7,24 +7,21 @@ use App\Http\Requests\AdminUserRequest;
 use App\Http\Requests\PasswordRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
-use Hash;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
 
-class AdminUsersController extends Controller
+class UserController extends Controller
 {
     public function __construct()
-    {       
-        $this->middleware(function ($request, $next) {
-            if (!auth()->user()->hasRole('admin')) {
-                abort(403, 'No tienes permiso para acceder a esta página.');
-            }
-            
-            return $next($request);
-        });   
+    {
+        $this->middleware(['can:read company'])->only('index');
+        $this->middleware(['can:create company'])->only('create');
+        $this->middleware(['can:create company'])->only('store');
+        $this->middleware(['can:read company'])->only('show');
+        $this->middleware(['can:update company'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
+        $this->middleware(['can:delete company'])->only('destroy');
     }
     /**
      * Display a listing of the resource.
@@ -32,40 +29,44 @@ class AdminUsersController extends Controller
     public function index()
     {
         try {    
+            
+            $user = auth()->user();
+
+            if ($user->hasRole('admin')) {
+                $users = DB::table('users')
+                ->leftJoin('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->leftJoin('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->select('users.id', 'users.name as name', 'users.email', 'roles.name as role_type', 'users.dt_end as active')
+                ->orderBy('users.id')
+                ->whereNot('users.id',1)
+                ->get();
+                
+                return Inertia::render('Users/Partials/TableUser', ['users' => $users]);
+            }
+            
             $users = DB::table('users')
+            ->select('users.*', 'roles.name as role_type')
             ->leftJoin('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
             ->leftJoin('roles', 'model_has_roles.role_id', '=', 'roles.id')
-            ->select('users.id', 'users.name as name', 'users.email', 'roles.name as role_type', 'users.dt_end as active')
-            ->orderBy('users.id')
-            ->whereNot('users.id',1)
+            ->whereIn('users.id', function($query) use ($user) {
+                $query->select('user_id')
+                    ->from('companies_users')
+                    ->whereIn('company_id', function($subQuery) use ($user) {
+                        $subQuery->select('company_id')
+                            ->from('companies_users')
+                            ->where('user_id', $user->id);
+                    });
+            })
             ->get();
-
+        
             
-            return Inertia::render('Admin/UsersAdmin', ['users' => $users]);
+            return Inertia::render('Users/Partials/TableUser', ['users' => $users]);
         } catch (Exception $e) {
             return response()->json(['message' => 'Error index emails: ' . $e->getMessage()], 500);
         }
         
     }
 
-    public function reload()
-    {
-        try {    
-            $users = DB::table('users')
-            ->leftJoin('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
-            ->leftJoin('roles', 'model_has_roles.role_id', '=', 'roles.id')
-            ->select('users.id', 'users.name as name', 'users.email', 'roles.name as role_type', 'users.dt_end as active')
-            ->orderBy('users.id')
-            ->whereNot('users.id',1)
-            ->get();
-
-            
-            return response()->json(['message' => 'La compañía se ha creado correctamente', 'users' => $users]);
-        } catch (Exception $e) {
-            return response()->json(['message' => 'Error index emails: ' . $e->getMessage()], 500);
-        }
-        
-    }
 
     /**
      * Show the form for creating a new resource.
@@ -199,6 +200,29 @@ class AdminUsersController extends Controller
             return response()->json(['message' => 'Error al editar usuario: ' . $e->getMessage()], 500);
         }
         
+    }
+
+    public function userActive($id)
+    {
+        try {
+            DB::beginTransaction();
+            
+            $user = User::find($id);
+    
+            if (!$user) {
+                return response()->json(['message' => 'Usuario no encontrado'], 404);
+            }
+    
+            // Alternar el estado de isActive
+            $user->isActive = !$user->isActive;
+            $user->update();
+            
+            DB::commit();
+            return response()->json(['message' => 'User status updated', 'type' => 'success']);
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Error updating user status' ,'type' => 'error']);
+        }
     }
 
 

@@ -3,7 +3,7 @@
 use App\Http\Controllers\AdminCompaniesController;
 use App\Http\Controllers\AdminProductsController;
 use App\Http\Controllers\AdminInvoicesController;
-use App\Http\Controllers\AdminUsersController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
@@ -79,6 +79,11 @@ Route::middleware([
     // Payment Methods
     Route::resource('/payment', PaymentMethodController::class);
 
+    // Users
+    Route::resource('/users', UserController::class);
+    Route::put('/users-pass/{id}', [UserController::class, 'resetPass']);
+    Route::put('/user-active/{id}', [UserController::class, 'userActive']);
+
     //Documents
     Route::resource('/documents', DocumentController::class);
     Route::get('/expense', [DocumentController::class, 'indexExpense'])->name('indexExpense');
@@ -97,9 +102,7 @@ Route::middleware([
     Route::resource('/admin-companies', AdminCompaniesController::class);
     Route::resource('/admin-products', AdminProductsController::class);
     Route::resource('/admin-invoices', AdminInvoicesController::class);
-    Route::resource('/admin-users', AdminUsersController::class);
-    Route::put('/admin-users-pass/{id}', [AdminUsersController::class, 'resetPass']);
-    Route::get('/admin-reload-users', [AdminUsersController::class, 'reload']);
+
     Route::get('/admin-reload-companies', [AdminCompaniesController::class, 'reload']);
     
     //Logs

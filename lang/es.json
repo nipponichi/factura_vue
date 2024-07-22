@@ -400,5 +400,7 @@
     "Log Registry":"Registro de logs",
     "View the basic log listing with information on user activity, IP addresses, and connection times. This straightforward log provides essential details for monitoring site access and usage":"Consulta el listado básico de logs con información sobre la actividad de los usuarios, direcciones IP y horas de conexión. Este registro sencillo proporciona detalles esenciales para monitorear el acceso y uso del sitio",
     "Logs list":"Listado de logs",
-    "A list of profile logged in to the platform" : "Listado de accesos de usuarios a la plataforma"
+    "A list of profile logged in to the platform" : "Listado de accesos de usuarios a la plataforma",
+    "User status updated":"Estado del usuario actualizado",
+    "Error updating user status":"Error actualizando estado del usuario"
 }

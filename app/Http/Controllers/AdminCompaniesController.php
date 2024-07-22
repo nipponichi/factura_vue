@@ -16,6 +16,7 @@ class AdminCompaniesController extends Controller
 {
 
     public function __construct()
+
     {
         $this->middleware(function ($request, $next) {
             if (!auth()->user()->hasRole('admin')) {
