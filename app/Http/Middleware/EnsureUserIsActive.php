@@ -19,6 +19,8 @@ class EnsureUserIsActive
         // Verifica si el usuario está autenticado y activo
         if (Auth::check() && !Auth::user()->isActive) {
             Auth::guard('web')->logout(); // Cierra la sesión del usuario
+            session()->flush();
+            session()->regenerate();
             return redirect('/login')->with('error', 'Tu cuenta ha sido desactivada.');
         }
 
