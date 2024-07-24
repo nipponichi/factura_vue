@@ -28,6 +28,7 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
+    'isActive', // Añadir el middleware aquí
 ])->group(function () {
 
 
