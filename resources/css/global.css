@@ -141,3 +141,43 @@
     transition-duration: 0.5s;
     padding:7px;
 }
+
+.status-button {
+    background-color:rgb(129, 27, 247);
+    color: #ffffff;
+    font-size:15px;
+    padding: 8px;
+}
+
+.info-active {
+    color:#01bd0a;
+    border: 1px solid;
+}
+
+.info-active:hover {
+    background-color:rgba(0, 252, 0, 0.1);
+    transition-duration: 0.5s;
+    padding:7px;
+}
+
+.info-disable {
+    color:rgb(255, 0, 0);
+    border: 1px solid;
+}
+
+.info-disable:hover {
+    background-color:rgba(155, 1, 1, 0.1);
+    transition-duration: 0.5s;
+    padding:7px;
+}
+
+.pass-button {
+    color:#a9ba3d;
+    border: 1px solid;
+}
+
+.pass-button:hover {
+    background-color:rgba(158, 178, 61, 0.1);
+    transition-duration: 0.5s;
+    padding:7px;
+}

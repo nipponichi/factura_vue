@@ -192,9 +192,15 @@
     "Edit invoice":"Editar factura",
     "Expiration":"Vencimiento",
     "Payment method":"Forma de pago",
+    "Passwords do not match":"Las contraseñas no coinciden",
+    "Password successfully modified":"Contraseña modificada correctamente",
+    "Error updating user password":"Error modificando la constraseña del usuario",
     "Could not generate the XML.":"No se pudo generar el XML.",
     "Are you sure you want to delete the selected banks?":"¿Desea eliminar las cuentas bancarias seleccionadas?",
     "Are you sure you want to delete the selected emails?":"¿Desea eliminar los emails seleccionados?",
+    "Are you sure you want to delete selected users?":"¿Desea eliminar los usuarios seleccionados?",
+    "Are you sure you want to disable selected users?":"¿Desea cambiar el estado los usuarios seleccionados?",
+    "Are you sure you want to disable the user" : "¿Seguro que quieres cambiar el estado del usuario",
     "The :attribute must be a valid role.": ":Attribute debe ser un rol válido.",
     "The :attribute must be at least :length characters and contain at least one number.": "La :attribute debe tener al menos :length caracteres y contener por lo menos un número.",
     "The :attribute must be at least :length characters and contain at least one special character and one number.": "La :attribute debe tener al menos :length caracteres y contener por lo menos un caracter especial y un número.",
@@ -329,7 +335,7 @@
     "Send": "Enviar",
     "Manage companies" : "Gestionar empresas",
     "Manage users" : "Gestionar usuarios",
-    "Are you sure you want to disable the user?" : "¿Seguro que quieres deshabilitar el usuario?",
+    
     "Are you sure you want to delete the selected users?" : "¿Está seguro de que desea eliminar los usuarios seleccionados?",
     "Are you sure you want to delete the selected concepts?" : "¿Está seguro de que desea eliminar las lineas seleccionadas?",
     "Define the role" : "Define el rol",
@@ -402,5 +408,16 @@
     "Logs list":"Listado de logs",
     "A list of profile logged in to the platform" : "Listado de accesos de usuarios a la plataforma",
     "User status updated":"Estado del usuario actualizado",
-    "Error updating user status":"Error actualizando estado del usuario"
+    "Error updating user status":"Error actualizando estado del usuario",
+    "Assigns a company":"Asigna una empresa",
+    "Password does not match":"La contraseña no coincide",
+    "You must select a user role":"Debe seleccionar un rol de usuario",
+    "User successfully created":"Usuario creado correctamente",
+    "Error creating user":"Error al crear el usuario",
+    "Created by":"Creador por",
+    "Modified by":"Modificado por",
+    "User not found":"Usuario no encontrado",
+    "User successfully updated":"Usuario modificado correctamente",
+    "Error while update user":"Error modificando usuario"
+
 }
