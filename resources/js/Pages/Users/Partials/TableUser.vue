@@ -61,7 +61,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                     <Column :exportable="false" :header="$t('Utility')" class="dateTable">
                         <template #body="slotProps">
                             <Button icon="pi pi-key" outlined rounded class="mr-2 pass-button" @click="editPass(slotProps.data)" />
-                            <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editUser(slotProps.data)" />
+                            <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editMyUser(slotProps.data)" />
                             <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteUser(slotProps.data)" />
                         </template>
                     </Column>
@@ -255,6 +255,7 @@ export default {
             resetPassDialog: false,
 
             myUser: { 
+                id: '',
                 name: '',
                 email: '',
                 password: '',
@@ -262,6 +263,7 @@ export default {
                 role_type: '',
                 selectedCompany: [],
             },
+            originalUser: {},
             selectedCompany: [],
             selectedUsers: [], // Almacena los myUser seleccionados para borrado en grupo
             filters: {}, // Almacena los filtros de búsqueda en tiempo real
@@ -273,10 +275,9 @@ export default {
             'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
         }
     },
-    mounted() {
+    async mounted() {
         // Asigna los datos de la compañía pasados desde Laravel a una variable local
         this.users = this.$page.props.users;
-        console.log(this.users)
         
     },
 
@@ -300,6 +301,7 @@ export default {
         },
 
         async openNew() {
+            this.selectedCompany = []; 
             this.myUser = {};
             await this.fetchCompanies()
             this.submitted = false;
@@ -318,13 +320,14 @@ export default {
                 // Realiza la solicitud para guardar el producto
                 axios.post('/users', this.myUser)
                 .then(response => {
-                    this.userDialog = false;
+                    
 
                     if(response.data.type === 'success'){
                         // Encuentra el usuario en la lista
                         this.myUser = response.data.user;
-                        console.log(response.data.user)
+                        console.log(this.myUser)
                         this.users.push(this.myUser);
+                        this.userDialog = false;
                         
                     }
                     this.$toast(this.$t(response.data.message), response.data.type);
@@ -338,40 +341,60 @@ export default {
 
             }else {
             
-                this.updateUser();   
+                this.updateMyUser();   
             }
         },
 
-        async editUser(slotProps) {
-
-            //Limpia selectedCompany para eliminar residuos
-            this.selectedCompany = [];    
-            this.myUser = slotProps;
-            await this.fetchCompanies()
-    
-            for (let i = 0; i < slotProps.company_ID.length; i++) {
+        //Marca las compañias asignadas al usuario 
+        async markAssignedCompanies (companyArray) {
+            await this.fetchCompanies();
+            for (let i = 0; i < companyArray.length; i++) {
                 // Encontrar la empresa correspondiente al ID actual
-                let company = this.companies.find(company => company.id === slotProps.company_ID[i]);
-                
+                let company = this.companies.find(company => company.id === companyArray[i]);
                 // Si se encuentra una empresa, añadirla al array de empresas seleccionadas
                 if (company) {
                     this.selectedCompany.push(company);
                 }
-
-                // Imprimir el índice y la empresa seleccionada en la consola
-                console.log("i: " + i);
-                console.log("Selected Company: ", company);
             }
-
-            
-            this.userDialog = true;
-            
         },
 
-        updateUser() {
+        async editMyUser(slotProps) {
+            //Limpia selectedCompany para eliminar residuos
+            this.selectedCompany = [];  
+            this.originalUser = { ...slotProps }; 
+            this.myUser = slotProps;
+            await this.markAssignedCompanies(this.myUser.company_ID)
+            this.userDialog = true;
+        
+
+        },
+
+        updateMyUser() {
+
+            if (JSON.stringify(this.originalUser) === JSON.stringify(this.myUser)) {
+                this.$toast(this.$t('Successfully updated.'), 'success');
+                this.userDialog = false;
+                return;
+            }
+
+
+            //Nuevas comañias asignadas
             this.myUser.selectedCompany = this.selectedCompany
+    
             axios.put('/users/' + this.myUser.id, this.myUser)
             .then(response => {
+
+                if(response.data.type === 'success'){
+
+                    let user = this.users.find(user => user.id === this.myUser.id);
+
+                    user.company_ID = []
+
+                    for(let i = 0; i < this.myUser.selectedCompany.length; i++) {
+                        user.company_ID[i] = this.myUser.selectedCompany[i].id
+                    }
+                }
+
                 this.$toast(this.$t(response.data.message), response.data.type);
                 this.userDialog = false; 
 
@@ -493,8 +516,6 @@ export default {
         
         deleteSelectedUsers() {
             // Envía una solicitud de eliminación para cada compañía seleccionada
-            console.log("selectedUsers")
-            console.log(this.selectedUsers)
             this.selectedUsers.forEach(user => {
                 axios.delete('/users/' + user.id)
                     .then(response => {

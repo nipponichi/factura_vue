@@ -49,6 +49,8 @@ class UserController extends Controller
                 )
                 ->where('users.id', '<>', 1) // Usa <> para "not equal" en lugar de whereNot
                 ->orderBy('users.id')
+                ->whereNull('users.dt_end')
+                ->whereNull('companies_users.dt_end')
                 ->get();
 
                 $users = $rawUsers->groupBy('id')->map(function ($group) {
@@ -75,6 +77,7 @@ class UserController extends Controller
                 'companies_users.company_id as company_ID'
             )
             ->whereNull('main.dt_end')
+            ->whereNull('companies_users.dt_end')
             ->whereIn('main.id', function($query) use ($user) {
                 $query->select('user_id')
                     ->from('companies_users')
@@ -86,7 +89,7 @@ class UserController extends Controller
             })
             ->orderBy('main.id')
             ->get();
-        
+
             // Agrupación en PHP
             $users = $rawUsers->groupBy('id')->map(function ($group) {
                 $first = $group->first();
@@ -135,6 +138,12 @@ class UserController extends Controller
                 return response()->json(['message' => 'You must select a user role','type' => 'warning']);
             }
 
+            // Check if the user already exists
+            $existingUser = User::where('email', $request->email)->first();
+            if ($existingUser) {
+                return response()->json(['message' => 'User already registered with this email', 'type' => 'warning']);
+            }
+
             // Crear el nuevo usuario
             $user = User::create([
                 'name' => $request->name,
@@ -158,9 +167,7 @@ class UserController extends Controller
                 ]);
             }
 
-
-
-            $userSave = DB::table('users as main')
+            $userDetails = DB::table('users as main')
             ->leftJoin('model_has_roles', 'main.id', '=', 'model_has_roles.model_id')
             ->leftJoin('roles', 'model_has_roles.role_id', '=', 'roles.id')
             ->leftJoin('users as creator', 'main.user_who_created', '=', 'creator.id')
@@ -173,7 +180,22 @@ class UserController extends Controller
             )
             ->where('main.id', $user->id)
             ->first();
-
+        
+            $companyIDs = DB::table('companies_users')
+            ->where('user_id', $user->id)
+            ->pluck('company_id')
+            ->toArray();
+            
+            $userSave = [
+                'id' => $userDetails->id,
+                'name' => $userDetails->name,
+                'email' => $userDetails->email,
+                'isActive'=> $userDetails->isActive,
+                'role_type' => $userDetails->role_type,
+                'user_who_created' => $userDetails->user_who_created,
+                'user_who_modified' => $userDetails->user_who_modified,
+                'company_ID' => $companyIDs
+            ];
 
 
             DB::commit();
@@ -211,6 +233,8 @@ class UserController extends Controller
             DB::beginTransaction();
             $modifier_user = Auth::id();
             $user = User::find($id);
+            $selected_companies_id = $request->selectedCompany;
+
             if (!$user) {
                 return response()->json(['message' => 'User not found', 'type' => 'error']);
             }
@@ -227,6 +251,14 @@ class UserController extends Controller
             
             $user->syncRoles([$request->role_type]);    
 
+            
+            DB::table('companies_users')
+            ->where('user_id', $user->id)
+            ->update([
+                'dt_end' => now(),
+            ]);
+    
+
             foreach ($request->selectedCompany as $company) {
                 DB::table('companies_users')->insert([
                     'user_id' => $user->id,
@@ -234,14 +266,14 @@ class UserController extends Controller
                     'dt_start' => now(),
                 ]);
             }
-
+        
             DB::commit();        
-            return response()->json(['message' => 'User successfully updated','type' => 'success', 'user' => $user]);
+            return response()->json(['message' => 'Successfully updated.', 'type' => 'success']);
         
 
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error while update user' ,'type' => 'error']);
+            return response()->json(['message' => 'Error when updating.', 'type' => 'error']);
         }
     }
 
