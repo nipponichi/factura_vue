@@ -36,9 +36,7 @@ return new class extends Migration
             $table->boolean('isReceived')->default (false);
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
-            $table->longText('document_hash')->nullable();
-            $table->longText('document_base64')->nullable();
-            $table->binary('document_blob')->nullable();
+
             
         });
     }

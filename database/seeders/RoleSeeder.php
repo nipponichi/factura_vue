@@ -26,6 +26,12 @@ class RoleSeeder extends Seeder
         $permission_update_role = Permission::create(['name'=> 'update roles']);
         $permission_delete_role = Permission::create(['name'=> 'delete roles']);
 
+        // Permisos para la categoría "Log"
+        $permission_create_log = Permission::create(['name'=> 'create log']);
+        $permission_read_log = Permission::create(['name'=> 'read log']);
+        $permission_update_log = Permission::create(['name'=> 'update log']);
+        $permission_delete_log = Permission::create(['name'=> 'delete log']);
+
         // Permisos para la categoría "compañia / company"
         $permission_read_company = Permission::create(['name'=> 'read company']);
         $permission_create_company = Permission::create(['name'=> 'create company']);
@@ -38,13 +44,13 @@ class RoleSeeder extends Seeder
         $permission_update_consulting = Permission::create(['name'=> 'update consulting']);
         $permission_delete_consulting = Permission::create(['name'=> 'delete consulting']);
         
-        // Permisos para la categoría "invoice income"
+        // Permisos para la categoría "document income"
         $permission_create_document_income = Permission::create(['name'=> 'create document income']);
         $permission_read_document_income = Permission::create(['name'=> 'read document income']);
         $permission_update_document_income = Permission::create(['name'=> 'update document income']);
         $permission_delete_document_income = Permission::create(['name'=> 'delete document income']);
 
-        // Permisos para la categoría "invoice expense"
+        // Permisos para la categoría "document expense"
         $permission_create_document_expense = Permission::create(['name'=> 'create document expense']);
         $permission_read_document_expense = Permission::create(['name'=> 'read document expense']);
         $permission_update_document_expense = Permission::create(['name'=> 'update document expense']);
@@ -75,6 +81,7 @@ class RoleSeeder extends Seeder
         $permission_delete_customer = Permission::create(['name'=> 'delete customer']);
 
         // Permisos para la categoría "provider"
+        $permission_read_provider = Permission::create(['name'=> 'create provider']);
         $permission_read_provider = Permission::create(['name'=> 'read provider']);
         $permission_update_provider = Permission::create(['name'=> 'update provider']);
         $permission_delete_provider = Permission::create(['name'=> 'delete provider']);
@@ -103,29 +110,6 @@ class RoleSeeder extends Seeder
         $permission_update_bank_account = Permission::create(['name'=> 'update bank account']);
         $permission_delete_bank_account = Permission::create(['name'=> 'delete bank account']);
 
-        // Permisos para la categoría "company"
-        $permission_create_company = Permission::create(['name'=> 'create company']);
-        $permission_read_company = Permission::create(['name'=> 'read company']);
-        $permission_update_company = Permission::create(['name'=> 'update company']);
-        $permission_delete_company = Permission::create(['name'=> 'delete company']);
-
-        // Permisos para la categoría "Role"
-        $permission_create_role = Permission::create(['name'=> 'create role']);
-        $permission_read_role = Permission::create(['name'=> 'read role']);
-        $permission_update_role = Permission::create(['name'=> 'update role']);
-        $permission_delete_role = Permission::create(['name'=> 'delete role']);
-
-        // Permisos para la categoría "Consulting"
-        $permission_create_consulting = Permission::create(['name'=> 'create consulting']);
-        $permission_read_consulting = Permission::create(['name'=> 'read consulting']);
-        $permission_update_consulting = Permission::create(['name'=> 'update consulting']);
-        $permission_delete_consulting = Permission::create(['name'=> 'delete consulting']);
-
-        // Permisos para la categoría "Log"
-        $permission_create_log = Permission::create(['name'=> 'create log']);
-        $permission_read_log = Permission::create(['name'=> 'read log']);
-        $permission_update_log = Permission::create(['name'=> 'update log']);
-        $permission_delete_log = Permission::create(['name'=> 'delete log']);
 
 
 
@@ -137,7 +121,7 @@ class RoleSeeder extends Seeder
         //Permisos company
         $permissions_company = [
             $permission_read_company, 
-            $permission_read_invoice_income, $permission_create_invoice_income, $permission_update_invoice_income, $permission_delete_invoice_income,
+            $permission_read_document_income, $permission_create_document_income, $permission_update_document_income, $permission_delete_document_income,
             $permission_read_user, $permission_create_user, $permission_update_user, $permission_delete_user,
             $permission_read_customer, $permission_create_customer, $permission_update_customer, $permission_delete_customer,
             $permission_read_address, $permission_create_address, $permission_update_address, $permission_delete_address,
