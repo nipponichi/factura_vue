@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\DB;
 
 
 class RoleSeeder extends Seeder
@@ -20,99 +21,116 @@ class RoleSeeder extends Seeder
         $role_company = Role::create(['name' => 'company']);
         $role_consulting = Role::create(['name' => 'consulting']);
 
+        DB::table('permission_group_names')->insert([
+            ['id' => 1, 'name' => 'Role'],
+            ['id' => 2, 'name' => 'Log'],
+            ['id' => 3, 'name' => 'Company'],
+            ['id' => 4, 'name' => 'Consulting'],
+            ['id' => 5, 'name' => 'Document income'],
+            ['id' => 6, 'name' => 'Document expense'],
+            ['id' => 7, 'name' => 'User'],
+            ['id' => 8, 'name' => 'Warehouse'],
+            ['id' => 9, 'name' => 'Accounting'],
+            ['id' => 10, 'name' => 'Customer'],
+            ['id' => 11, 'name' => 'Provider'],
+            ['id' => 12, 'name' => 'Address'],
+            ['id' => 13, 'name' => 'Phone'],
+            ['id' => 14, 'name' => 'Email'],
+            ['id' => 15, 'name' => 'Bank account'],
+        ]);
+
+
         // Permisos para la categoría "roles"
-        $permission_create_role = Permission::create(['name'=> 'create roles']);
-        $permission_read_role = Permission::create(['name'=> 'read roles']);
-        $permission_update_role = Permission::create(['name'=> 'update roles']);
-        $permission_delete_role = Permission::create(['name'=> 'delete roles']);
+        $permission_create_role = Permission::create(['name' => 'create roles', 'group_name_id' => 1]);
+        $permission_read_role = Permission::create(['name' => 'read roles', 'group_name_id' => 1]);
+        $permission_update_role = Permission::create(['name' => 'update roles', 'group_name_id' => 1]);
+        $permission_delete_role = Permission::create(['name' => 'delete roles', 'group_name_id' => 1]);
 
         // Permisos para la categoría "Log"
-        $permission_create_log = Permission::create(['name'=> 'create log']);
-        $permission_read_log = Permission::create(['name'=> 'read log']);
-        $permission_update_log = Permission::create(['name'=> 'update log']);
-        $permission_delete_log = Permission::create(['name'=> 'delete log']);
+        $permission_create_log = Permission::create(['name' => 'create log', 'group_name_id' => 2]);
+        $permission_read_log = Permission::create(['name' => 'read log', 'group_name_id' => 2]);
+        $permission_update_log = Permission::create(['name' => 'update log', 'group_name_id' => 2]);
+        $permission_delete_log = Permission::create(['name' => 'delete log', 'group_name_id' => 2]);
 
-        // Permisos para la categoría "compañia / company"
-        $permission_read_company = Permission::create(['name'=> 'read company']);
-        $permission_create_company = Permission::create(['name'=> 'create company']);
-        $permission_update_company = Permission::create(['name'=> 'update company']);
-        $permission_delete_company = Permission::create(['name'=> 'delete company']);
+        // Permisos para la categoría "Company"
+        $permission_read_company = Permission::create(['name' => 'read company', 'group_name_id' => 3]);
+        $permission_create_company = Permission::create(['name' => 'create company', 'group_name_id' => 3]);
+        $permission_update_company = Permission::create(['name' => 'update company', 'group_name_id' => 3]);
+        $permission_delete_company = Permission::create(['name' => 'delete company', 'group_name_id' => 3]);
 
-        // Permisos para la categoría "asesoria / consulting"
-        $permission_create_consulting = Permission::create(['name'=> 'create consulting']);
-        $permission_read_consulting = Permission::create(['name'=> 'read consulting']);
-        $permission_update_consulting = Permission::create(['name'=> 'update consulting']);
-        $permission_delete_consulting = Permission::create(['name'=> 'delete consulting']);
+        // Permisos para la categoría "Consulting"
+        $permission_create_consulting = Permission::create(['name' => 'create consulting', 'group_name_id' => 4]);
+        $permission_read_consulting = Permission::create(['name' => 'read consulting', 'group_name_id' => 4]);
+        $permission_update_consulting = Permission::create(['name' => 'update consulting', 'group_name_id' => 4]);
+        $permission_delete_consulting = Permission::create(['name' => 'delete consulting', 'group_name_id' => 4]);
+
+        // Permisos para la categoría "Document income"
+        $permission_create_document_income = Permission::create(['name' => 'create document income', 'group_name_id' => 5]);
+        $permission_read_document_income = Permission::create(['name' => 'read document income', 'group_name_id' => 5]);
+        $permission_update_document_income = Permission::create(['name' => 'update document income', 'group_name_id' => 5]);
+        $permission_delete_document_income = Permission::create(['name' => 'delete document income', 'group_name_id' => 5]);
+
+        // Permisos para la categoría "Document expense"
+        $permission_create_document_expense = Permission::create(['name' => 'create document expense', 'group_name_id' => 6]);
+        $permission_read_document_expense = Permission::create(['name' => 'read document expense', 'group_name_id' => 6]);
+        $permission_update_document_expense = Permission::create(['name' => 'update document expense', 'group_name_id' => 6]);
+        $permission_delete_document_expense = Permission::create(['name' => 'delete document expense', 'group_name_id' => 6]);
+
+        // Permisos para la categoría "User"
+        $permission_create_user = Permission::create(['name' => 'create user', 'group_name_id' => 7]);
+        $permission_read_user = Permission::create(['name' => 'read user', 'group_name_id' => 7]);
+        $permission_update_user = Permission::create(['name' => 'update user', 'group_name_id' => 7]);
+        $permission_delete_user = Permission::create(['name' => 'delete user', 'group_name_id' => 7]);
+
+        // Permisos para la categoría "Warehouse"
+        $permission_create_warehouse = Permission::create(['name' => 'create warehouse', 'group_name_id' => 8]);
+        $permission_read_warehouse = Permission::create(['name' => 'read warehouse', 'group_name_id' => 8]);
+        $permission_update_warehouse = Permission::create(['name' => 'update warehouse', 'group_name_id' => 8]);
+        $permission_delete_warehouse = Permission::create(['name' => 'delete warehouse', 'group_name_id' => 8]);
+
+        // Permisos para la categoría "Accounting"
+        $permission_create_accounting = Permission::create(['name' => 'create accounting', 'group_name_id' => 9]);
+        $permission_read_accounting = Permission::create(['name' => 'read accounting', 'group_name_id' => 9]);
+        $permission_update_accounting = Permission::create(['name' => 'update accounting', 'group_name_id' => 9]);
+        $permission_delete_accounting = Permission::create(['name' => 'delete accounting', 'group_name_id' => 9]);
+
+        // Permisos para la categoría "Customer"
+        $permission_create_customer = Permission::create(['name' => 'create customer', 'group_name_id' => 10]);
+        $permission_read_customer = Permission::create(['name' => 'read customer', 'group_name_id' => 10]);
+        $permission_update_customer = Permission::create(['name' => 'update customer', 'group_name_id' => 10]);
+        $permission_delete_customer = Permission::create(['name' => 'delete customer', 'group_name_id' => 10]);
+
+        // Permisos para la categoría "Provider"
+        $permission_create_provider = Permission::create(['name' => 'create provider', 'group_name_id' => 11]);
+        $permission_read_provider = Permission::create(['name' => 'read provider', 'group_name_id' => 11]);
+        $permission_update_provider = Permission::create(['name' => 'update provider', 'group_name_id' => 11]);
+        $permission_delete_provider = Permission::create(['name' => 'delete provider', 'group_name_id' => 11]);
+
+        // Permisos para la categoría "Address"
+        $permission_create_address = Permission::create(['name' => 'create address', 'group_name_id' => 12]);
+        $permission_read_address = Permission::create(['name' => 'read address', 'group_name_id' => 12]);
+        $permission_update_address = Permission::create(['name' => 'update address', 'group_name_id' => 12]);
+        $permission_delete_address = Permission::create(['name' => 'delete address', 'group_name_id' => 12]);
+
+        // Permisos para la categoría "Phone"
+        $permission_create_phone = Permission::create(['name' => 'create phone', 'group_name_id' => 13]);
+        $permission_read_phone = Permission::create(['name' => 'read phone', 'group_name_id' => 13]);
+        $permission_update_phone = Permission::create(['name' => 'update phone', 'group_name_id' => 13]);
+        $permission_delete_phone = Permission::create(['name' => 'delete phone', 'group_name_id' => 13]);
+
+        // Permisos para la categoría "Email"
+        $permission_create_email = Permission::create(['name' => 'create email', 'group_name_id' => 14]);
+        $permission_read_email = Permission::create(['name' => 'read email', 'group_name_id' => 14]);
+        $permission_update_email = Permission::create(['name' => 'update email', 'group_name_id' => 14]);
+        $permission_delete_email = Permission::create(['name' => 'delete email', 'group_name_id' => 14]);
+
+        // Permisos para la categoría "Bank account"
+        $permission_create_bank_account = Permission::create(['name' => 'create bank account', 'group_name_id' => 15]);
+        $permission_read_bank_account = Permission::create(['name' => 'read bank account', 'group_name_id' => 15]);
+        $permission_update_bank_account = Permission::create(['name' => 'update bank account', 'group_name_id' => 15]);
+        $permission_delete_bank_account = Permission::create(['name' => 'delete bank account', 'group_name_id' => 15]);
+
         
-        // Permisos para la categoría "document income"
-        $permission_create_document_income = Permission::create(['name'=> 'create document income']);
-        $permission_read_document_income = Permission::create(['name'=> 'read document income']);
-        $permission_update_document_income = Permission::create(['name'=> 'update document income']);
-        $permission_delete_document_income = Permission::create(['name'=> 'delete document income']);
-
-        // Permisos para la categoría "document expense"
-        $permission_create_document_expense = Permission::create(['name'=> 'create document expense']);
-        $permission_read_document_expense = Permission::create(['name'=> 'read document expense']);
-        $permission_update_document_expense = Permission::create(['name'=> 'update document expense']);
-        $permission_delete_document_expense = Permission::create(['name'=> 'delete document expense']);
-
-        // Permisos para la categoría "user"
-        $permission_create_user = Permission::create(['name'=> 'create user']);
-        $permission_read_user = Permission::create(['name'=> 'read user']);
-        $permission_update_user = Permission::create(['name'=> 'update user']);
-        $permission_delete_user = Permission::create(['name'=> 'delete user']);
-
-        // Permisos para la categoría "warehouse"
-        $permission_create_warehouse = Permission::create(['name'=> 'create warehouse']);
-        $permission_read_warehouse = Permission::create(['name'=> 'read warehouse']);
-        $permission_update_warehouse = Permission::create(['name'=> 'update warehouse']);
-        $permission_delete_warehouse = Permission::create(['name'=> 'delete warehouse']);
-
-        // Permisos para la categoría "accounting"
-        $permission_create_accounting = Permission::create(['name'=> 'create accounting']);
-        $permission_read_accounting = Permission::create(['name'=> 'read accounting']);
-        $permission_update_accounting = Permission::create(['name'=> 'update accounting']);
-        $permission_delete_accounting = Permission::create(['name'=> 'delete accounting']);
-
-        // Permisos para la categoría "customer"
-        $permission_create_customer = Permission::create(['name'=> 'create customer']);
-        $permission_read_customer = Permission::create(['name'=> 'read customer']);
-        $permission_update_customer = Permission::create(['name'=> 'update customer']);
-        $permission_delete_customer = Permission::create(['name'=> 'delete customer']);
-
-        // Permisos para la categoría "provider"
-        $permission_read_provider = Permission::create(['name'=> 'create provider']);
-        $permission_read_provider = Permission::create(['name'=> 'read provider']);
-        $permission_update_provider = Permission::create(['name'=> 'update provider']);
-        $permission_delete_provider = Permission::create(['name'=> 'delete provider']);
-
-        // Permisos para la categoría "address"
-        $permission_create_address = Permission::create(['name'=> 'create address']);
-        $permission_read_address = Permission::create(['name'=> 'read address']);
-        $permission_update_address = Permission::create(['name'=> 'update address']);
-        $permission_delete_address = Permission::create(['name'=> 'delete address']);
-
-        // Permisos para la categoría "phone"
-        $permission_create_phone = Permission::create(['name'=> 'create phone']);
-        $permission_read_phone = Permission::create(['name'=> 'read phone']);
-        $permission_update_phone = Permission::create(['name'=> 'update phone']);
-        $permission_delete_phone = Permission::create(['name'=> 'delete phone']);
-
-        // Permisos para la categoría "email"
-        $permission_create_email = Permission::create(['name'=> 'create email']);
-        $permission_read_email = Permission::create(['name'=> 'read email']);
-        $permission_update_email = Permission::create(['name'=> 'update email']);
-        $permission_delete_email = Permission::create(['name'=> 'delete email']);
-
-        // Permisos para la categoría "bank account"
-        $permission_create_bank_account = Permission::create(['name'=> 'create bank account']);
-        $permission_read_bank_account = Permission::create(['name'=> 'read bank account']);
-        $permission_update_bank_account = Permission::create(['name'=> 'update bank account']);
-        $permission_delete_bank_account = Permission::create(['name'=> 'delete bank account']);
-
-
-
-
         //Permisos admin
         $permissions_admin = [
             $permission_create_consulting, $permission_update_consulting, $permission_delete_consulting, 

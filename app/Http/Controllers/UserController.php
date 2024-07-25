@@ -15,15 +15,15 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['can:read company'])->only('index');
-        $this->middleware(['can:create company'])->only('create');
-        $this->middleware(['can:create company'])->only('store');
-        $this->middleware(['can:read company'])->only('show');
-        $this->middleware(['can:update company'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
-        $this->middleware(['can:delete company'])->only('destroy');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware(['can:read company'])->only('index');
+    //     $this->middleware(['can:create company'])->only('create');
+    //     $this->middleware(['can:create company'])->only('store');
+    //     $this->middleware(['can:read company'])->only('show');
+    //     $this->middleware(['can:update company'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
+    //     $this->middleware(['can:delete company'])->only('destroy');
+    // }
     /**
      * Display a listing of the resource.
      */
@@ -203,7 +203,7 @@ class UserController extends Controller
             
         }catch (Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Error creating user' ,'type' => 'error']);
+            return response()->json(['message' => $e , 'type' => 'error']);
         }
     }
 

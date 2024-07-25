@@ -15,7 +15,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                     <template #start>
                         <Button :label="$t('New')" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
                         <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="mr-2 danger-button" @click="confirmDeleteSelected" :disabled="!selectedUsers || !selectedUsers.length" />
-                        <Button :label="$t('Change status')" icon="pi pi-cog" class="status-button" @click="confirmChangeSelected" :disabled="!selectedUsers || !selectedUsers.length" />
+                        <Button :label="$t('Change status')" icon="pi pi-cog" class="mr-2 status-button" @click="confirmChangeSelected" :disabled="!selectedUsers || !selectedUsers.length" />
+                        <Button :label="$t('Role manager')" icon="pi pi-users" class="success-button" @click="confirmChangeSelected" />
                     </template>
                 </Toolbar>
 
@@ -236,9 +237,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 
 <script>
 import { FilterMatchMode } from 'primevue/api';
-
-
-
 import axios from 'axios';
 
 

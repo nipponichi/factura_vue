@@ -205,6 +205,10 @@ const logout = () => {
                                             {{ $t('Manage users') }}
                                         </DropdownLink>
 
+                                        <DropdownLink :href="route('roles.index')" v-if="$page.props.user.permissions.includes('read company')">
+                                            {{ $t('Manage roles') }}
+                                        </DropdownLink>
+
                                         <DropdownLink v-if="$page.props.jetstream.hasApiFeatures" :href="route('api-tokens.index')">
                                             API Tokens
                                         </DropdownLink>

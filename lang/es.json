@@ -419,6 +419,10 @@
     "User not found":"Usuario no encontrado",
     "User successfully updated":"Usuario modificado correctamente",
     "Error while update user":"Error modificando usuario",
-    "User already registered with this email":"Usuario ya registrado con este email"
+    "User already registered with this email":"Usuario ya registrado con este email",
+    "Log": "Registro",
+    "Document income": "Ingreso de documento",
+    "Document expense": "Gasto de documento",
+    "Email": "Correo electrónico"
 
 }

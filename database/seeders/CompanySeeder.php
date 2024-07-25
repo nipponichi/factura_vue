@@ -77,6 +77,7 @@ class CompanySeeder extends Seeder
         'company_id' => 1,
         'user_id' => 2,
         'dt_start' => now(),
+        'is_owner' => true,
     ]);
 
         
@@ -188,6 +189,7 @@ class CompanySeeder extends Seeder
         'company_id' => 2,
         'user_id' => 3,
         'dt_start' => now(),
+        'is_owner' => true,
     ]);
 
     
@@ -281,6 +283,7 @@ class CompanySeeder extends Seeder
         'company_id' => 3,
         'user_id' => 4,
         'dt_start' => now(),
+        'is_owner' => true,
     ]);
 
     
@@ -383,6 +386,7 @@ class CompanySeeder extends Seeder
         'company_id' => 4,
         'user_id' => 5,
         'dt_start' => now(),
+        'is_owner' => true,
     ]);
 
     
@@ -485,6 +489,7 @@ class CompanySeeder extends Seeder
         'company_id' => 5,
         'user_id' => 6,
         'dt_start' => now(),
+        'is_owner' => true,
     ]);
 
     

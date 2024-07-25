@@ -13,6 +13,7 @@ use App\Http\Controllers\PhoneController;
 use App\Http\Controllers\AccountingController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\RouteController;
@@ -80,10 +81,13 @@ Route::middleware([
     // Payment Methods
     Route::resource('/payment', PaymentMethodController::class);
 
-    // Users
+    // Manage users 
     Route::resource('/users', UserController::class);
     Route::put('/users-pass/{id}', [UserController::class, 'resetPass']);
     Route::put('/user-active/{id}', [UserController::class, 'userActive']);
+
+    // Manage roles  
+    Route::resource('/roles', RoleController::class);
 
     //Documents
     Route::resource('/documents', DocumentController::class);
