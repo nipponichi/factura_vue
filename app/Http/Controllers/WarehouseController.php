@@ -11,12 +11,10 @@ class WarehouseController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['can:read company'])->only('index');
-        $this->middleware(['can:create company'])->only('create');
-        $this->middleware(['can:create company'])->only('store');
-        $this->middleware(['can:read company'])->only('show');
-        $this->middleware(['can:update company'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
-        $this->middleware(['can:delete company'])->only('destroy');
+        $this->middleware(['can:read warehouse'])->only('index', 'show');
+        $this->middleware(['can:create warehouse'])->only('create', 'store');
+        $this->middleware(['can:update warehouse'])->only('edit', 'update');
+        $this->middleware(['can:delete warehouse'])->only('destroy');
     }
 
     public static function index()

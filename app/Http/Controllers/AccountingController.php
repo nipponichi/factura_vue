@@ -17,39 +17,45 @@ class AccountingController extends Controller
     public function __construct()
     {
 
-        $this->middleware(['can:read company'])->only(['index', 'show']);
-        $this->middleware(['can:create company'])->only(['create', 'store']);
-        $this->middleware(['can:update company'])->only(['edit', 'update']);
-        $this->middleware(['can:delete company'])->only('destroy');
+        $this->middleware(['can:read accounting'])->only(['index', 'show']);
+        $this->middleware(['can:create accounting'])->only(['create', 'store']);
+        $this->middleware(['can:update accounting'])->only(['edit', 'update']);
+        $this->middleware(['can:delete accounting'])->only('destroy');
     }
 
 
     public function index()
     {
-                // Obtiene el ID del usuario autenticado
-                $userId = Auth::id();
+        try {
+            // Obtiene el ID del usuario autenticado
+            $userId = Auth::id();
 
-                $companies = DB::table('companies')
-                    ->select(
-                        'companies.id',
-                        'companies.dt_end',
-                        'companies_names.name',
-                        
-                    )
-                    ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
-                    ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
-                    ->where('companies_users.user_id', $userId)
-                    ->whereNull('companies_users.dt_end')
-                    ->whereNull('companies_names.dt_end')
-                    ->get();
+            $companies = DB::table('companies')
+                ->select(
+                    'companies.id',
+                    'companies.dt_end',
+                    'companies_names.name',
+                    
+                )
+                ->leftJoin('companies_users', 'companies.id', '=', 'companies_users.company_id')
+                ->leftJoin('companies_names', 'companies.id', '=', 'companies_names.company_id')
+                ->where('companies_users.user_id', $userId)
+                ->whereNull('companies_users.dt_end')
+                ->whereNull('companies_names.dt_end')
+                ->get();
 
-        return Inertia::render('Accounting/TableAccounting', ['companies' => $companies]);
+            return Inertia::render('Accounting/TableAccounting', ['companies' => $companies]);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Error loading accounting', 'type' => 'error']);
+        }
     }
 
     public function show($companyId)
     {
 
-        $emittedDocuments = DB::table('documents')
+        try{
+            
+            $emittedDocuments = DB::table('documents')
             ->select(
                 'documents.id',
                 'documents.number',
@@ -113,7 +119,13 @@ class AccountingController extends Controller
             // Merge arrays
             $documents = array_merge($emittedDocumentsArray, $receivedDocumentsArray);
                     
-        return response()->json(['message' => 'Documents uploaded', 'documents' => $documents]);
+            return response()->json(['message' => 'Documents uploaded', 'documents' => $documents]);
+        
+        } catch (Exception $e) {
+            
+            return response()->json(['message' => 'Error loading accounting', 'type' => 'error']);
+        }
+        
     }
 
 }

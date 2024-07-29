@@ -19,7 +19,7 @@ class CompanyController extends Controller
     
     public function __construct()
     {
-        $this->middleware('can:read company')->only(['index', 'show', 'companyInvoice']);
+        $this->middleware('can:read company')->only(['index', 'show', 'companiesInvoice', 'hasCompany']);
         $this->middleware('can:create company')->only(['create', 'store']);
         $this->middleware('can:update company')->only(['edit', 'update']);
         $this->middleware('can:delete company')->only('destroy');
@@ -120,22 +120,6 @@ class CompanyController extends Controller
     
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create(Request $request)
-    {
-        
-        
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(CompanyRequest $request)
-    {
-    }
-
-    /**
      * Display the specified resource.
      */
 
@@ -205,32 +189,6 @@ class CompanyController extends Controller
         }
     }
     
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(CompanyRequest $request, string $id)
-    {
-    
-    }
-    
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        
-    }
-
     public function hasCompany()
     {
         $user_id = Auth::id();

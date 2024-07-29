@@ -55,28 +55,28 @@
         </div>
 
         <!-- MODAL -->
-            <template>
-                <Dialog v-model:visible="phoneDialog" :header="myPhone.id ? $t('Update phone') : $t('Create phone') " id="titlePhone" :modal="true" class="p-fluid">
-                <form style="width: 800px;" @submit.prevent="saveMyPhone">
-                    <div class="grid gap-3 mb-6 md:grid-cols-1">
-                    <div>
-                        <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Phone') }}</label>
-                        <input type="tel" id="phone" v-model="myPhone.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Update phone')" pattern="(\+34\s?)?(\d{9})" required />
-                    </div>
-                    <div v-if="!myPhone.id" class="flex items-center">
-                        <input id="link-checkbox" type="checkbox" v-model="myPhone.favourite" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                        <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark this phone number as a favourite') }}.</label>
-                    </div>
-                    </div>
-                    <div class="grid gap-3 md:grid-cols-1 justify-items-end">
-                    <div>
-                        <button type="button" class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog">{{ $t('Close') }}</button>
-                        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ myPhone.id ? $t('Update') : $t('Save') }}</button>
-                    </div>
-                    </div>
-                </form>
-                </Dialog>
-            </template>
+        <template>
+            <Dialog v-model:visible="phoneDialog" :header="myPhone.id ? $t('Update phone') : $t('Create phone') " id="titlePhone" :modal="true" class="p-fluid">
+            <form style="max-width: 600px;" @submit.prevent="saveMyPhone">
+                <div class="grid gap-3 mb-6 md:grid-cols-1">
+                <div>
+                    <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Phone') }}</label>
+                    <input type="tel" id="phone" v-model="myPhone.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="myPhone.id ? $t('Update phone') : $t('Create phone')" pattern="(\+34\s?)?(\d{9})" required />
+                </div>
+                <div v-if="!myPhone.id" class="flex items-center">
+                    <input id="link-checkbox" type="checkbox" v-model="myPhone.favourite" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                    <label for="link-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark this phone number as a favourite') }}.</label>
+                </div>
+                </div>
+                <div class="grid gap-3 md:grid-cols-1 justify-items-end">
+                <div>
+                    <button type="button" class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog">{{ $t('Close') }}</button>
+                    <button type="submit" class="text-white bg-blue-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ myPhone.id ? $t('Update') : $t('Save') }}</button>
+                </div>
+                </div>
+            </form>
+            </Dialog>
+        </template>
             
 
         <!-- MODAL DELETE SIMPLE -->

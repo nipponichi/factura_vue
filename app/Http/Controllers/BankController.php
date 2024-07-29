@@ -11,12 +11,10 @@ class BankController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['can:read company'])->only('index');
-        $this->middleware(['can:create company'])->only('create');
-        $this->middleware(['can:create company'])->only('store');
-        $this->middleware(['can:read company'])->only('show');
-        $this->middleware(['can:update company'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
-        $this->middleware(['can:delete company'])->only('destroy');
+        $this->middleware(['can:read bank account'])->only('index', 'show');
+        $this->middleware(['can:create bank account'])->only('create', 'store');
+        $this->middleware(['can:update bank account'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
+        $this->middleware(['can:delete bank account'])->only('destroy');
     }
 
     public static function index($companyId)
@@ -35,12 +33,6 @@ class BankController extends Controller
             return response()->json(['message' => 'Error loading data' ,'type' => 'error']);
         }
         
-    }
-
-    // Not needed
-    public function edit()
-    {
-        //
     }
 
     public function update($bankAccountId, BankRequest $request)

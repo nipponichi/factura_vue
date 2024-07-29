@@ -11,12 +11,10 @@ class EmailController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['can:read company'])->only('index');
-        $this->middleware(['can:create company'])->only('create');
-        $this->middleware(['can:create company'])->only('store');
-        $this->middleware(['can:read company'])->only('show');
-        $this->middleware(['can:update company'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
-        $this->middleware(['can:delete company'])->only('destroy');
+        $this->middleware(['can:read email'])->only('index', 'show');
+        $this->middleware(['can:create email'])->only('create', 'store');
+        $this->middleware(['can:update email'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
+        $this->middleware(['can:delete email'])->only('destroy');
     }
 
     public static function index($companyId)
@@ -36,11 +34,6 @@ class EmailController extends Controller
         }
     }
 
-    // Not needed
-    public function edit()
-    {
-     //
-    }
 
     public function update ($emailId, emailRequest $request)
     {

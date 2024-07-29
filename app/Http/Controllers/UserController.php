@@ -15,15 +15,13 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware(['can:read company'])->only('index');
-    //     $this->middleware(['can:create company'])->only('create');
-    //     $this->middleware(['can:create company'])->only('store');
-    //     $this->middleware(['can:read company'])->only('show');
-    //     $this->middleware(['can:update company'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
-    //     $this->middleware(['can:delete company'])->only('destroy');
-    // }
+    public function __construct()
+    {
+        $this->middleware(['can:read user'])->only('index', 'show');
+        $this->middleware(['can:create user'])->only('create','store');
+        $this->middleware(['can:update user'])->only('edit', 'resetPass', 'userActive', 'update');
+        $this->middleware(['can:delete user'])->only('destroy');
+    }
     /**
      * Display a listing of the resource.
      */
@@ -97,9 +95,6 @@ class UserController extends Controller
                 return $first;
             })->values();
 
-            
-
-            
         
             
             return Inertia::render('Users/Partials/TableUser', ['users' => $users]);
@@ -107,15 +102,6 @@ class UserController extends Controller
             return response()->json(['message' => 'Error index emails: ' . $e->getMessage()], 500);
         }
         
-    }
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -129,7 +115,7 @@ class UserController extends Controller
             $pass = $request->password;
             $confirmPass = $request->confirmPassword;
             $role_type = $request->role_type;
-            
+
             if($pass != $confirmPass) {
                 return response()->json(['message' => 'Password does not match' , 'type' => 'warning']);
             }
@@ -143,7 +129,7 @@ class UserController extends Controller
             if ($existingUser) {
                 return response()->json(['message' => 'User already registered with this email', 'type' => 'warning']);
             }
-
+            
             // Crear el nuevo usuario
             $user = User::create([
                 'name' => $request->name,
@@ -155,18 +141,30 @@ class UserController extends Controller
                 'created_at' => now(),
                 'dt_start' => now(),
             ]);
-    
+        
             // Asignar el rol al usuario
             $user ->assignRole($role_type);
-            
-            foreach ($request->selectedCompany as $company) {
+
+            $selectedCompany = $request->selectedCompany;
+            // Verifica que selectedCompany sea un array antes de iterar
+            if (count($selectedCompany) == 1) {
+
+                foreach ($selectedCompany as $company) {
+                    DB::table('companies_users')->insert([
+                        'user_id' => $user->id,
+                        'company_id' => $company['id'], // Asegúrate de que 'id' sea una clave válida
+                        'dt_start' => now(),
+                    ]);
+                }
+            } else {
+                // Si no es un array, puedes insertar directamente sin foreach
                 DB::table('companies_users')->insert([
                     'user_id' => $user->id,
-                    'company_id' => $company['id'],
+                    'company_id' => $selectedCompany['id'],
                     'dt_start' => now(),
                 ]);
             }
-
+            
             $userDetails = DB::table('users as main')
             ->leftJoin('model_has_roles', 'main.id', '=', 'model_has_roles.model_id')
             ->leftJoin('roles', 'model_has_roles.role_id', '=', 'roles.id')
@@ -207,21 +205,6 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        
-    }
 
     /**
      * Update the specified resource in storage.
@@ -274,6 +257,25 @@ class UserController extends Controller
         } catch (Exception $e) {
             DB::rollback();
             return response()->json(['message' => 'Error when updating.', 'type' => 'error']);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($id)
+    {
+        try {
+
+            DB::beginTransaction();
+            $user = User::find($id);
+            $user->delete();
+
+            DB::commit();
+            return response()->json(['message' => 'It has been successfully removed.','type' => 'success']);
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Error deleting: ' . $e->getMessage(), 'type' => 'error']);
         }
     }
 
@@ -330,26 +332,6 @@ class UserController extends Controller
         } catch (Exception $e) {
             DB::rollback();
             return response()->json(['message' => 'Error updating user status' ,'type' => 'error']);
-        }
-    }
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-    {
-        try {
-
-            DB::beginTransaction();
-            $user = User::find($id);
-            $user->delete();
-
-            DB::commit();
-            return response()->json(['message' => 'It has been successfully removed.','type' => 'success']);
-        } catch (Exception $e) {
-            DB::rollback();
-            return response()->json(['message' => 'Error deleting: ' . $e->getMessage(), 'type' => 'error']);
         }
     }
     

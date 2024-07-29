@@ -8,6 +8,14 @@ use Illuminate\Support\Facades\Auth;
 
 class LogController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware(['can:read log'])->only('index', 'show');
+        $this->middleware(['can:create log'])->only('create', 'store');
+        $this->middleware(['can:update log'])->only('edit', 'update');
+        $this->middleware(['can:delete log'])->only('destroy');
+    }
     function index()
     {
 

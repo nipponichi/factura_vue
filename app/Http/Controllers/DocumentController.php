@@ -14,11 +14,18 @@ class DocumentController extends Controller
 
     public function __construct()
     {
+        
+        // Middlewares para 'document income'
+        $this->middleware(['can:read document income'])->only(['index', 'show','indexDocuments','documentType','documentSerieCheck','documentSerie','documentDateCheck','fromBudgetToInvoice', 'downloadSignedXML']);
+        $this->middleware(['can:create document income'])->only(['create', 'store']);
+        $this->middleware(['can:update document income'])->only(['edit', 'update', 'documentSign']);
+        $this->middleware(['can:delete document income'])->only('destroy');
 
-        $this->middleware(['can:read company'])->only(['index', 'show','indexDocuments','documentType','documentSerieCheck','documentSerie','documentDateCheck','fromBudgetToInvoice', 'downloadSignedXML']);
-        $this->middleware(['can:create company'])->only(['create', 'store']);
-        $this->middleware(['can:update company'])->only(['edit', 'update', 'documentSing']);
-        $this->middleware(['can:delete company'])->only('destroy');
+        // Middlewares para 'document expense'
+        $this->middleware(['can:read document expense'])->only(['indexExpense']);
+
+
+
     }
     /**
      * Display a listing of the resource.
@@ -39,100 +46,7 @@ class DocumentController extends Controller
         ]);
     }
 
-    //Saca los tipos de documentos para empresa
-    public function documentType()
-    {
-        $types = DB::table('documents_type')
-        ->select('id','name')
-        ->get();
-
-        return response()->json(['message' => 'Document types', 'types' => $types]);
-    }
-
-    public function documentDateCheck($company_id, $type_id)
-    {
-
-        $date = DB::table('documents')
-        ->select('date')
-        ->where('documents_type_id', $type_id)
-        ->where('company_id_company', $company_id)
-        ->whereNull('dt_end')
-        ->orderBy('date', 'desc')
-        ->first();
-
-        if ($date == null) {
-            $date = today()->format('d/m/Y');
-        }
-        
     
-        return response()->json(['message' => 'Document series', 'date' => $date]);
-
-    }
-
-    //Saca la serie del documento elegido
-    public function documentSerie($type_id,$company_id)
-    {
-        $series = DB::table('documents_series')
-        ->select('id','serie','number')
-        ->where('documents_type_id',$type_id)
-        ->where('company_id',$company_id)
-        ->whereNull('dt_end')
-        ->get();
-
-
-        foreach ($series as $serie) {
-            $serie->number += 1;
-        }
-        
-        return response()->json(['message' => 'Document series1', 'series' => $series]);
-    }
-
-    // Trae fecha y numero de documento para comprobar si existe uno posterior al que se quiere guardar
-    public function documentSerieCheck($type_id,$company_id,$serie)
-    {
-
-        $serie = DB::table('documents_series')
-        ->select('number')
-        ->where('documents_type_id',$type_id)
-        ->where('company_id',$company_id)
-        ->where('serie',$serie)
-        ->whereNull('dt_end')
-        ->first();
-
-        $date = DB::table('documents')
-        ->select('date')
-        ->where('documents_type_id', $type_id)
-        ->where('company_id_company', $company_id)
-        ->whereNull('dt_end')
-        ->orderBy('date', 'desc')
-        ->first();
-
-        $counter = DB::table('documents')
-        ->select('document_counter')
-        ->where('documents_type_id', $type_id)
-        ->where('company_id_company', $company_id)
-        ->whereNull('dt_end')
-        ->orderByDesc('document_counter')
-        ->first();
-
-        if ($date == null) {
-            $date = today()->format('d/m/Y');
-        }
-        
-    
-        return response()->json(['message' => 'Document series check', 'serie' => $serie, 'date' => $date, 'counter' => $counter]);
-
-    }
-
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -443,86 +357,6 @@ class DocumentController extends Controller
     }
     
 
-    public function indexDocuments($id)
-    {
-
-        $emittedDocuments = DB::table('documents')
-        ->select(
-            'documents.id',
-            'documents.number',
-            'documents.company_id_customer',
-            'documents.documents_type_id',
-            'documents.documents_series_id',
-            'documents.payment_methods_id',
-            'documents.date',
-            'documents.amount',
-            'documents.paid',
-            'documents.expiration',
-            'documents.dt_updated',
-            'documents.invoiced',
-            'documents.active',
-            'documents.isReceived',
-            'documents_type.name as document_type_name',
-            'documents_series.serie as document_series_serie',
-            'companies_names.name as customer_name'
-        )
-        ->leftJoin('documents_type', 'documents.documents_type_id', '=', 'documents_type.id')
-        ->leftJoin('documents_series', 'documents.documents_series_id', '=', 'documents_series.id')
-        ->leftJoin('companies_names', 'documents.company_id_customer', '=', 'companies_names.company_id')
-        ->where('documents.company_id_company', $id)
-        ->where('documents_series.company_id', $id)
-        ->whereNull('documents.dt_end')
-        ->whereNull('companies_names.dt_end')
-        ->orderBy('documents.dt_updated', 'desc')
-        ->get();
-
-        $receivedDocuments = DB::table('documents')
-        ->select(
-            'documents.id',
-            'documents.number',
-            'documents.company_id_company',
-            'documents.documents_type_id',
-            'documents.payment_methods_id',
-            'documents.date',
-            'documents.amount',
-            'documents.dt_updated',
-            'documents.subtotal',
-            'documents.tax',
-            'documents.paid',
-            'documents.expiration',
-            'documents.invoiced',
-            'documents.active',
-            'documents.isReceived',
-            'documents_type.name as document_type_name',
-            'companies_names.name as customer_name'
-        )
-        ->leftJoin('documents_type', 'documents.documents_type_id', '=', 'documents_type.id')
-        ->leftJoin('companies_names', 'documents.company_id_company', '=', 'companies_names.company_id')
-        ->where('documents.company_id_customer', $id)
-        ->whereNull('documents.dt_end')
-        ->whereNull('companies_names.dt_end')
-        ->orderBy('documents.dt_updated', 'desc')
-        ->get();
-
-        // Convert collections to arrays
-        $emittedDocumentsArray = $emittedDocuments->toArray();
-        $receivedDocumentsArray = $receivedDocuments->toArray();
-
-        // Merge arrays
-        $documents = array_merge($emittedDocumentsArray, $receivedDocumentsArray);
-
-
-        return response()->json(['message' => 'Datos de las facturas cargadas correctamente', 'documents'=>$documents]);
-
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -669,6 +503,93 @@ class DocumentController extends Controller
             return response()->json(['message' => 'Error deleting.','type' => 'error']);
         }
     }
+    
+
+    //Saca los tipos de documentos para empresa
+    public function documentType()
+    {
+        $types = DB::table('documents_type')
+        ->select('id','name')
+        ->get();
+
+        return response()->json(['message' => 'Document types', 'types' => $types]);
+    }
+
+    public function documentDateCheck($company_id, $type_id)
+    {
+
+        $date = DB::table('documents')
+        ->select('date')
+        ->where('documents_type_id', $type_id)
+        ->where('company_id_company', $company_id)
+        ->whereNull('dt_end')
+        ->orderBy('date', 'desc')
+        ->first();
+
+        if ($date == null) {
+            $date = today()->format('d/m/Y');
+        }
+        
+    
+        return response()->json(['message' => 'Document series', 'date' => $date]);
+
+    }
+
+    //Saca la serie del documento elegido
+    public function documentSerie($type_id,$company_id)
+    {
+        $series = DB::table('documents_series')
+        ->select('id','serie','number')
+        ->where('documents_type_id',$type_id)
+        ->where('company_id',$company_id)
+        ->whereNull('dt_end')
+        ->get();
+
+
+        foreach ($series as $serie) {
+            $serie->number += 1;
+        }
+        
+        return response()->json(['message' => 'Document series1', 'series' => $series]);
+    }
+
+    // Trae fecha y numero de documento para comprobar si existe uno posterior al que se quiere guardar
+    public function documentSerieCheck($type_id,$company_id,$serie)
+    {
+
+        $serie = DB::table('documents_series')
+        ->select('number')
+        ->where('documents_type_id',$type_id)
+        ->where('company_id',$company_id)
+        ->where('serie',$serie)
+        ->whereNull('dt_end')
+        ->first();
+
+        $date = DB::table('documents')
+        ->select('date')
+        ->where('documents_type_id', $type_id)
+        ->where('company_id_company', $company_id)
+        ->whereNull('dt_end')
+        ->orderBy('date', 'desc')
+        ->first();
+
+        $counter = DB::table('documents')
+        ->select('document_counter')
+        ->where('documents_type_id', $type_id)
+        ->where('company_id_company', $company_id)
+        ->whereNull('dt_end')
+        ->orderByDesc('document_counter')
+        ->first();
+
+        if ($date == null) {
+            $date = today()->format('d/m/Y');
+        }
+        
+    
+        return response()->json(['message' => 'Document series check', 'serie' => $serie, 'date' => $date, 'counter' => $counter]);
+
+    }
+
 
 
     public function fromBudgetToInvoice ($documentId, $date)
@@ -767,7 +688,7 @@ class DocumentController extends Controller
         
     }
 
-    public function documentSing(Request $request){
+    public function documentSign(Request $request){
 
         DB::beginTransaction();
         
@@ -857,6 +778,80 @@ class DocumentController extends Controller
             
             return response()->json(['message' => 'Error al cargar la factura ', $e->getMessage()], 500);
         }
+    }
+
+    
+    public function indexDocuments($id)
+    {
+
+        $emittedDocuments = DB::table('documents')
+        ->select(
+            'documents.id',
+            'documents.number',
+            'documents.company_id_customer',
+            'documents.documents_type_id',
+            'documents.documents_series_id',
+            'documents.payment_methods_id',
+            'documents.date',
+            'documents.amount',
+            'documents.paid',
+            'documents.expiration',
+            'documents.dt_updated',
+            'documents.invoiced',
+            'documents.active',
+            'documents.isReceived',
+            'documents_type.name as document_type_name',
+            'documents_series.serie as document_series_serie',
+            'companies_names.name as customer_name'
+        )
+        ->leftJoin('documents_type', 'documents.documents_type_id', '=', 'documents_type.id')
+        ->leftJoin('documents_series', 'documents.documents_series_id', '=', 'documents_series.id')
+        ->leftJoin('companies_names', 'documents.company_id_customer', '=', 'companies_names.company_id')
+        ->where('documents.company_id_company', $id)
+        ->where('documents_series.company_id', $id)
+        ->whereNull('documents.dt_end')
+        ->whereNull('companies_names.dt_end')
+        ->orderBy('documents.dt_updated', 'desc')
+        ->get();
+
+        $receivedDocuments = DB::table('documents')
+        ->select(
+            'documents.id',
+            'documents.number',
+            'documents.company_id_company',
+            'documents.documents_type_id',
+            'documents.payment_methods_id',
+            'documents.date',
+            'documents.amount',
+            'documents.dt_updated',
+            'documents.subtotal',
+            'documents.tax',
+            'documents.paid',
+            'documents.expiration',
+            'documents.invoiced',
+            'documents.active',
+            'documents.isReceived',
+            'documents_type.name as document_type_name',
+            'companies_names.name as customer_name'
+        )
+        ->leftJoin('documents_type', 'documents.documents_type_id', '=', 'documents_type.id')
+        ->leftJoin('companies_names', 'documents.company_id_company', '=', 'companies_names.company_id')
+        ->where('documents.company_id_customer', $id)
+        ->whereNull('documents.dt_end')
+        ->whereNull('companies_names.dt_end')
+        ->orderBy('documents.dt_updated', 'desc')
+        ->get();
+
+        // Convert collections to arrays
+        $emittedDocumentsArray = $emittedDocuments->toArray();
+        $receivedDocumentsArray = $receivedDocuments->toArray();
+
+        // Merge arrays
+        $documents = array_merge($emittedDocumentsArray, $receivedDocumentsArray);
+
+
+        return response()->json(['message' => 'Datos de las facturas cargadas correctamente', 'documents'=>$documents]);
+
     }
 
 }

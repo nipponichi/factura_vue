@@ -19,10 +19,10 @@ class CustomerController extends Controller
     public function __construct()
     {
 
-        $this->middleware(['can:read company'])->only(['index', 'show']);
-        $this->middleware(['can:create company'])->only(['create', 'store']);
-        $this->middleware(['can:update company'])->only(['edit', 'update']);
-        $this->middleware(['can:delete company'])->only('destroy');
+        $this->middleware(['can:read customer'])->only(['index', 'show']);
+        $this->middleware(['can:create customer'])->only(['create', 'store']);
+        $this->middleware(['can:update customer'])->only(['edit', 'update']);
+        $this->middleware(['can:delete customer'])->only('destroy');
     }
 
 
@@ -237,15 +237,6 @@ class CustomerController extends Controller
             return response()->json(['message' => 'Error loading data' ,'type' => 'error']);
         }
 
-    }
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
     }
 
     /**

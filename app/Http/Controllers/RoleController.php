@@ -5,21 +5,25 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Exception;
 use App\Models\User;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 
+
 class RoleController extends Controller
 {
+
     public function __construct()
     {
-        $this->middleware(['can:read company'])->only('index');
-        $this->middleware(['can:create company'])->only('create');
-        $this->middleware(['can:create company'])->only('store');
-        $this->middleware(['can:read company'])->only('show');
-        $this->middleware(['can:update company'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
-        $this->middleware(['can:delete company'])->only('destroy');
+        
+        $this->middleware(['can:read roles'])->only('index', 'show', 'getId');
+        $this->middleware(['can:create roles'])->only('create', 'store');
+        $this->middleware(['can:update roles'])->only('edit', 'addPermission', 'assignRole','update');
+        $this->middleware(['can:delete roles'])->only('destroy');
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -27,7 +31,6 @@ class RoleController extends Controller
     {
         try {    
             
-           
 
             // if ($user->hasRole('admin')) {
             //     $rawUsers = DB::table('users')
@@ -59,6 +62,48 @@ class RoleController extends Controller
             //     return Inertia::render('Users/Partials/TableUser', ['users' => $users]);
             // }
             
+            $data = $this->getId();
+            $owner_id = $data['owner_id'];
+            $roles = $data['roles'];
+            
+            // Obtener el usuario utilizando el ID
+            $user = User::find($owner_id);
+
+            if ($user) {
+                // Obtener los permisos del usuario
+                $permissions = $user->getAllPermissions();
+                
+                
+            }
+            
+            $permissions_with_group_names = DB::table('permissions')
+            ->join('permission_group_names', 'permissions.group_name_id', '=', 'permission_group_names.id')
+            ->select('permissions.*', 'permission_group_names.name as group_name')
+            ->whereIn('permissions.id', $permissions->pluck('id'))
+            ->get();
+    
+            $result = [
+                'roles' => $roles,
+                'permission_group_names' => $permissions_with_group_names
+            ];
+
+
+            return Inertia::render('Roles/Partials/TableRole', ['result' => $result]);
+        
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Error index Roles: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        
+        try {
+            DB::beginTransaction();
+            
             $user_id = Auth::id();
 
             $owner_id = DB::table('companies_users')
@@ -72,59 +117,19 @@ class RoleController extends Controller
                     ->where('user_id',$user_id);
             })
             ->first();
+
+
+            $role = Role::create(['name' => $request->name, 'guard_name' => 'web', 'user_id' => $owner_id->owner_id]); 
+
+            DB::commit();
             
-            $roles = DB::table('roles')
-            ->select('roles.*')
-            ->where('user_id',$owner_id->owner_id)
-            ->get();
-    
-            // Obtener el usuario utilizando el ID
-            $user = User::find($owner_id->owner_id);
 
-            if ($user) {
-                // Obtener los permisos del usuario
-                $permissions = $user->getAllPermissions();
-                
-                
-            }
-
-            //$permission_group_name_ids = $permissions->pluck('group_name_id');
-            
-            $permissions_with_group_names = DB::table('permissions')
-            ->join('permission_group_names', 'permissions.group_name_id', '=', 'permission_group_names.id')
-            ->select('permissions.*', 'permission_group_names.name as group_name')
-            ->whereIn('permissions.id', $permissions->pluck('id'))
-            ->get();
-    
-            $result = [
-                'role_id' => $roles,
-                'permissions' => $permissions,
-                'permission_group_names' => $permissions_with_group_names
-            ];
-
-
-            return Inertia::render('Roles/Partials/TableRole', ['result' => $result]);
-        
+            return response()->json(['message' => 'It has been created correctly.','type' => 'success', 'role' => $role]);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Error index Roles: ' . $e->getMessage()], 500);
+            DB::rollback();
+            return response()->json(['message' => 'Error when creating.','type' => 'error']);
         }
-        
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+    
     }
 
     /**
@@ -132,23 +137,49 @@ class RoleController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $role = Role::find($id);
+
+            if (!$role) {
+                return response()->json(['error' => 'Role not found'], 404);
+            }
+
+            $permissions = $role->permissions;
+            
+            return response()->json(['permissions' => $permissions]);
+    
+        } catch (Exception $e) {
+
+            return response()->json(['message' => 'Error when loading role.','type' => 'error']);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        //
+        
+        try {
+            DB::beginTransaction();
+
+            DB::table('roles')
+            ->where('id', $id)
+            ->update([
+                'name' => $request->name,
+            ]);
+
+
+            DB::commit();
+            
+
+            return response()->json(['message' => 'It has been created correctly.','type' => 'success']);
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Error when creating.','type' => 'error']);
+        }
+        
     }
 
     /**
@@ -156,6 +187,93 @@ class RoleController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            DB::beginTransaction();
+            
+            DB::table('roles')
+            ->where('id', $id)
+            ->update([
+                'dt_end' => now()
+            ]);
+
+            DB::commit();
+            return response()->json(['message' => 'It has been successfully removed.','type' => 'success']);
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Error deleting.','type' => 'error']);
+        }
+    }
+
+    
+    public function addPermission ($roleID, $permissionID) {
+        try {
+
+        
+        $role = Role::find($roleID);
+        $permission = Permission::find($permissionID);
+
+
+        if (!$role || !$permission) {
+            return response()->json(['message' => 'Role or permission not found', 'type'=>'error']);
+        }
+
+        $exists = DB::table('role_has_permissions')
+            ->where('role_id', $roleID)
+            ->where('permission_id', $permissionID)
+            ->exists();
+
+        if ($exists) {
+            DB::table('role_has_permissions')
+                ->where('role_id', $roleID)
+                ->where('permission_id', $permissionID)
+                ->delete();
+            
+                return response()->json(['message' => 'It has been successfully extracted.','type' => 'success']);
+        } else {
+            DB::table('role_has_permissions')
+                ->insert([
+                    'role_id' => $roleID,
+                    'permission_id' => $permissionID
+                ]);
+
+            return response()->json(['message' => 'It has been successfully added.','type' => 'success']);
+        }
+    } catch (Exception $e) {
+        return response()->json(['message' => 'Role not updated', 'type'=>'error']);
+    }
+    }
+
+    public function getId () {
+        $user_id = Auth::id();
+
+        $owner_id = DB::table('companies_users')
+        ->select (
+            'user_id as owner_id',
+        )
+        ->where('companies_users.is_owner', true)
+        ->whereIn('companies_users.company_id', function($query) use ($user_id) {
+            $query->select('company_id')
+                ->from('companies_users')
+                ->where('user_id',$user_id);
+        })
+        ->first();
+        
+        $roles = DB::table('roles')
+        ->select('roles.*')
+        ->where('user_id',$owner_id->owner_id)
+        ->whereNull('dt_end')
+        ->get();
+        
+
+        return [
+            'owner_id' => $owner_id->owner_id,
+            'roles' => $roles
+        ];
+    }
+
+    public function assignRole () {
+        $roles = $this -> getId();
+
+        return response()->json(['message' => 'It has been successfully added.','roles' => $roles]);
     }
 }

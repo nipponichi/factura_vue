@@ -5,7 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
+
 {
+    public function __construct()
+    {
+        $this->middleware(['can:read product'])->only('index', 'show');
+        $this->middleware(['can:create product'])->only('create', 'store');
+        $this->middleware(['can:update product'])->only('edit', 'update');
+        $this->middleware(['can:delete product'])->only('destroy');
+    }
     /**
      * Display a listing of the resource.
      */

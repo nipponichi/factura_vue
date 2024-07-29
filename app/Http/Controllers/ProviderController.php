@@ -17,10 +17,10 @@ class ProviderController extends Controller
     public function __construct()
     {
 
-        $this->middleware(['can:read company'])->only(['index', 'show']);
-        $this->middleware(['can:create company'])->only(['create', 'store']);
-        $this->middleware(['can:update company'])->only(['edit', 'update']);
-        $this->middleware(['can:delete company'])->only('destroy');
+        $this->middleware(['can:read provider'])->only(['index', 'show']);
+        $this->middleware(['can:create provider'])->only(['create', 'store']);
+        $this->middleware(['can:update provider'])->only(['edit', 'update']);
+        $this->middleware(['can:delete provider'])->only('destroy');
     }
 
 
@@ -234,14 +234,6 @@ class ProviderController extends Controller
 
     }
 
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.

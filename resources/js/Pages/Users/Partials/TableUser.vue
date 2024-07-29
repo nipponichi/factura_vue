@@ -16,7 +16,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         <Button :label="$t('New')" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
                         <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="mr-2 danger-button" @click="confirmDeleteSelected" :disabled="!selectedUsers || !selectedUsers.length" />
                         <Button :label="$t('Change status')" icon="pi pi-cog" class="mr-2 status-button" @click="confirmChangeSelected" :disabled="!selectedUsers || !selectedUsers.length" />
-                        <Button :label="$t('Role manager')" icon="pi pi-users" class="success-button" @click="confirmChangeSelected" />
                     </template>
                 </Toolbar>
 
@@ -97,6 +96,26 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         </div>  
                     </div>
 
+                    <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select a role') }} </label>
+                    <Dropdown v-model="selectedRole" :options="roles" filter optionLabel="name" @change="onRoleChange" :placeholder="$t('Select a role')" class="mr-2 w-full md:w-64 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                        <template #value="slotProps">
+                            <div class="flex items-center min-w-[150px] max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                                <div v-if="slotProps.value && slotProps.value.name" class="truncate">
+                                    {{ slotProps.value.name }}
+                                </div>
+                                <span v-else>
+                                    {{ slotProps.placeholder }}
+                                </span>
+                            </div>
+                        </template>
+                    
+                        <template #option="slotProps">
+                            <div class="flex items-center">
+                                <div>{{ slotProps.option.name }}</div>
+                            </div>
+                        </template>
+                    </Dropdown>
+
                     <DataTable ref="dt" :value="companies" v-model:selection="selectedCompany" dataKey="id" @row-select="onRowSelect"
                         :paginator="true" :rows="10" :filters="filters"
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
@@ -122,30 +141,6 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         
                     </DataTable>
 
-                    <div class="grid gap-3 mb-6 md:grid-cols-2">  
-                                
-                        <div class="mt-4">
-                            <label for="role_type" class="block font-medium text-gray-700">{{ $t('Define the role') }}</label>
-                            <div class="mt-2 ml-12 flex justify-center">
-                                <label class="inline-flex items-center">
-                                    <input type="radio" id="sole_proprietorship" v-model="myUser.role_type" value="freelancer" class="form-radio text-indigo-600" required>
-                                    <span class="ml-2">{{ $t('Freelance') }}</span>
-                                </label>
-                                <label class="inline-flex items-center ml-6">
-                                    <input type="radio" id="partnership" v-model="myUser.role_type" value="company" class="form-radio text-indigo-600">
-                                    <span class="ml-2">{{ $t('Company') }}</span>
-                                </label>
-                                <label class="inline-flex items-center ml-6">
-                                    <input type="radio" id="corporation" v-model="myUser.role_type" value="consulting" class="form-radio text-indigo-600">
-                                    <span class="ml-2">{{ $t('Consulting') }}</span>
-                                </label>
-                                <label class="inline-flex items-center ml-6">
-                                    <input type="radio" id="corporation" v-model="myUser.role_type" value="admin" class="form-radio text-indigo-600">
-                                    <span class="ml-2">{{ $t('Admin') }}</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
                     <div class="grid gap-3 md:grid-cols-1 justify-items-end">
                         <div>
                             <button class="mr-3 text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" text @click="hideDialog">{{ $t('Close') }}</button>
@@ -245,6 +240,7 @@ export default {
         return {
             users: null, 
             companies:null,
+            roles:null,
             userDialog: false, 
             changeUserDialog: false,
             changeUsersDialog: false,
@@ -263,6 +259,7 @@ export default {
             },
             originalUser: {},
             selectedCompany: [],
+            selectedRole: [],
             selectedUsers: [], // Almacena los myUser seleccionados para borrado en grupo
             filters: {}, // Almacena los filtros de búsqueda en tiempo real
             submitted: false, // Indica si se ha enviado el formulario de creación/edición de producto
@@ -288,8 +285,23 @@ export default {
                 this.companies = response.data.companies;
 
                 if (this.companies.length === 1) {
-                    this.selectedCompany = this.companies[0];
-                    this.companyId = this.selectedCompany.id;
+                    this.selectedCompany.push(this.companies[0]);
+                    this.companyId = this.companies[0].id;
+                } 
+
+                
+            } catch (error) {
+                this.$toast(this.$t('Error connecting to the server'), 'error');
+            }
+        },
+
+        async fetchRoles() {
+            try {
+                const response = await axios.get('/assign-role');
+                this.roles = response.data.roles.roles;
+
+                if (this.roles.length === 1) {
+
                 } 
 
                 
@@ -302,6 +314,7 @@ export default {
             this.selectedCompany = []; 
             this.myUser = {};
             await this.fetchCompanies()
+            await this.fetchRoles()
             this.submitted = false;
             this.userDialog = true;
         },
@@ -313,9 +326,17 @@ export default {
         
         saveUser() {
 
+            //Nuevas comañias asignadas
+            this.myUser.selectedCompany = this.selectedCompany
+
+            //Nuevos roles asignados
+            this.myUser.role_type = this.selectedRole.name
+
             if (!this.myUser.id) {
-                this.myUser.selectedCompany = this.selectedCompany
+                
+
                 // Realiza la solicitud para guardar el producto
+                console.log(this.myUser.role_type)
                 axios.post('/users', this.myUser)
                 .then(response => {
                     
@@ -345,39 +366,43 @@ export default {
 
         //Marca las compañias asignadas al usuario 
         async markAssignedCompanies (companyArray) {
+            this.selectedCompany = [];
             await this.fetchCompanies();
             for (let i = 0; i < companyArray.length; i++) {
                 // Encontrar la empresa correspondiente al ID actual
                 let company = this.companies.find(company => company.id === companyArray[i]);
                 // Si se encuentra una empresa, añadirla al array de empresas seleccionadas
                 if (company) {
+                    console.log(Array.isArray(this.selectedCompany));
                     this.selectedCompany.push(company);
                 }
             }
         },
 
+        async markAssignedRole (role_type) {
+            this.selectedRole = []
+            this.selectedRole = this.roles.find(role => role.name === role_type)
+        },
+
         async editMyUser(slotProps) {
             //Limpia selectedCompany para eliminar residuos
             this.selectedCompany = [];  
-            this.originalUser = { ...slotProps }; 
+            this.originalUser = { ...slotProps };
+            await this.fetchRoles()
             this.myUser = slotProps;
+            console.log(slotProps)
             await this.markAssignedCompanies(this.myUser.company_ID)
+            await this.markAssignedRole(this.myUser.role_type)
             this.userDialog = true;
         
-
         },
 
         updateMyUser() {
-
             if (JSON.stringify(this.originalUser) === JSON.stringify(this.myUser)) {
                 this.$toast(this.$t('Successfully updated.'), 'success');
                 this.userDialog = false;
                 return;
             }
-
-
-            //Nuevas comañias asignadas
-            this.myUser.selectedCompany = this.selectedCompany
     
             axios.put('/users/' + this.myUser.id, this.myUser)
             .then(response => {

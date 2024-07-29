@@ -88,6 +88,8 @@ Route::middleware([
 
     // Manage roles  
     Route::resource('/roles', RoleController::class);
+    Route::put('/add-permission/{roleID}/{permissionID}', [RoleController::class, 'addPermission']);
+    Route::get('/assign-role', [RoleController::class, 'assignRole']);
 
     //Documents
     Route::resource('/documents', DocumentController::class);
@@ -99,7 +101,7 @@ Route::middleware([
     Route::get('/documents-series/{companyID}/{typeID}', [DocumentController::class, 'documentDateCheck']);
     Route::get('/documents-serie/{companyID}', [DocumentController::class, 'indexDocuments']);
     Route::post('/documents-serie/{documentID}/{date}', [DocumentController::class, 'fromBudgetToInvoice']);
-    Route::post('/documents-sign', [DocumentController::class, 'documentSing']);
+    Route::post('/documents-sign', [DocumentController::class, 'documentSign']);
     Route::get('/documents-signed/{documentId}', [DocumentController::class, 'downloadSignedXML']);
 
 
