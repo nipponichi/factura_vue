@@ -3,8 +3,8 @@
         <div class="card">
             <Toolbar class="mb-4 border border-slate-200 ...">
                 <template #start>
-                    <Button :label="$t('New')"  icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
-                    <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedCompanies || !selectedCompanies.length" />
+                    <Button :label="$t('New')"  icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" v-if="$page.props.user.permissions.includes('create customer')"/>
+                    <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedCompanies || !selectedCompanies.length" v-if="$page.props.user.permissions.includes('delete customer')" />
                 </template>
             </Toolbar>
 
@@ -35,9 +35,9 @@
                 <Column field="town" :header="$t('Town')" sortable class="dateTable"></Column>
                 <Column :exportable="false" class="dateTable">
                     <template #body="slotProps">
-                        <Button icon="pi pi-eye" outlined rounded class="mr-2 view-button" @click="handleInfoButtonClick(slotProps.data.id)" />
-                        <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editCompany(slotProps.data)" />
-                        <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteCompany(slotProps.data)" />
+                        <Button icon="pi pi-eye" outlined rounded class="mr-2 view-button" @click="handleInfoButtonClick(slotProps.data.id)" v-if="$page.props.user.permissions.includes('read customer')" />
+                        <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editCompany(slotProps.data)" v-if="$page.props.user.permissions.includes('update customer')" />
+                        <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteCompany(slotProps.data)" v-if="$page.props.user.permissions.includes('delete customer')" />
                     </template>
                 </Column>
             </DataTable>

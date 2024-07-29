@@ -3,8 +3,8 @@
         <div class="card">
             <Toolbar class="mb-4 border border-slate-200 ...">
                 <template #start>
-                    <Button :label="$t('New')" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
-                    <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedAddresses || !selectedAddresses.length" />
+                    <Button :label="$t('New')" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" v-if="$page.props.user.permissions.includes('create address')"/>
+                    <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedAddresses || !selectedAddresses.length" v-if="$page.props.user.permissions.includes('delete address')"/>
                 </template>
             </Toolbar>
 
@@ -35,7 +35,7 @@
                 <Column field="province" :header="$t('Province')" sortable class="dateTable"></Column>
                 <Column field="country" :header="$t('Country')" sortable class="dateTable"></Column>
                 
-                <Column :exportable="false" :header="$t('Favourite')" class="dateTable w-24 text-center">
+                <Column :exportable="false" :header="$t('Favourite')" class="dateTable w-24 text-center" v-if="$page.props.user.permissions.includes('update address')">
             
                     <template #body="slotProps">
                         <Button v-if="slotProps.data.favourite" icon="pi pi-star-fill"  class="mr-2 fav-button" @click="makeFavourite(slotProps.data)" />
@@ -48,8 +48,8 @@
                 <div class="utility-button">
                     <Column :exportable="false" :header="$t('Utilities')" class="headerUtil dateTable w-24">
                         <template #body="slotProps">
-                            <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editMyAddress(slotProps.data)" />
-                            <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteAddress(slotProps.data)" />
+                            <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editMyAddress(slotProps.data)" v-if="$page.props.user.permissions.includes('update address')"/>
+                            <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteAddress(slotProps.data)" v-if="$page.props.user.permissions.includes('delete address')"/>
                         </template>
                     </Column>
                 </div>

@@ -3,8 +3,8 @@
         <div class="card">
             <Toolbar class="mb-4 border border-slate-200 ...">
                 <template #start>
-                    <Button :label="$t('New')" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
-                    <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedBanks || !selectedBanks.length" />
+                    <Button :label="$t('New')" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" v-if="$page.props.user.permissions.includes('create bank account')"/>
+                    <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedBanks || !selectedBanks.length" v-if="$page.props.user.permissions.includes('delete bank account')" />
                 </template>
             </Toolbar>
 
@@ -34,7 +34,7 @@
                 <Column field="swift" :header="$t('SWIFT')" sortable class="dateTable"></Column>
                 <Column field="currency" :header="$t('Currency')" sortable class="dateTable"></Column>
                 
-                <Column :exportable="false" :header="$t('Favourite')" class="dateTable w-24 text-center">
+                <Column :exportable="false" :header="$t('Favourite')" class="dateTable w-24 text-center" v-if="$page.props.user.permissions.includes('update bank account')">
             
                     <template #body="slotProps">
                         <Button v-if="slotProps.data.favourite" icon="pi pi-star-fill"  class="mr-2 fav-button" @click="makeFavourite(slotProps.data)" />
@@ -47,8 +47,8 @@
                 <div class="utility-button">
                     <Column :exportable="false" :header="$t('Utilities')" class="headerUtil dateTable w-24">
                         <template #body="slotProps">
-                            <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editMyBank(slotProps.data)" />
-                            <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteBank(slotProps.data)" />
+                            <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editMyBank(slotProps.data)" v-if="$page.props.user.permissions.includes('update bank account')"/>
+                            <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteBank(slotProps.data)" v-if="$page.props.user.permissions.includes('delete bank account')"/>
                         </template>
                     </Column>
                 </div>

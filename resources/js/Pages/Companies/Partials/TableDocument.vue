@@ -1,9 +1,9 @@
 <template>
     <div>
         <div class="card">
-            <Toolbar class="mb-4 border border-slate-200 ...">
+            <Toolbar class="mb-4 border border-slate-200 ..." v-if="$page.props.user.permissions.includes('delete document income')">
                 <template #start>
-                    <Button label="Delete" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedDocuments || !selectedDocuments.length" />
+                    <Button label="Delete" icon="pi pi-trash" severity="danger" class="danger-button"  @click="confirmDeleteSelected" :disabled="!selectedDocuments || !selectedDocuments.length" />
                 </template>
             </Toolbar>
 
@@ -14,7 +14,7 @@
                 <template #header>
                     <div class="flex justify-between items-center mt-2">
                         <h4>{{ $t('Manage documents') }}</h4>
-                        <label class="flex items-center cursor-pointer">
+                        <label class="flex items-center cursor-pointer" v-if="$page.props.user.permissions.includes('read document expense')">
                             <span class="text-lg font-medium text-gray-900 dark:text-gray-300" v-if="!isChecked">{{ $t('Invoice-Income') }}</span>
                             <span class="text-lg font-medium text-gray-900 dark:text-gray-300" v-else>{{ $t('Invoice-Expense') }}</span>
                             <input type="checkbox" class="sr-only peer" v-model="isChecked">
@@ -42,9 +42,9 @@
                     <template #body="slotProps">
                         <Button icon="pi pi-file-check" outlined rounded class="mr-2 simpleInvoice-button" 
                             :disabled="slotProps.data.document_type_name !== 'Presupuesto'" 
-                            @click="slotProps.data.document_type_name === 'Presupuesto' ? checkDocument(slotProps.data) : null" />
+                            @click="slotProps.data.document_type_name === 'Presupuesto' ? checkDocument(slotProps.data) : null" v-if="$page.props.user.permissions.includes('update document income')" />
                         <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" 
-                            @click="confirmDeleteProduct(slotProps.data)" />
+                            @click="confirmDeleteProduct(slotProps.data)" v-if="$page.props.user.permissions.includes('delete document income')" />
                     </template>
                 </Column>
             </DataTable>
