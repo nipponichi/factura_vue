@@ -437,6 +437,8 @@
     "Group":"Grupo",
     "Status":"Estado",
     "Error when loading role.":"Error cargando el rol",
+    "Manage log":"Gestionar registros",
+    "User id":"ID Usuario",
     
 
     "To create roles": "Permite crear roles",
