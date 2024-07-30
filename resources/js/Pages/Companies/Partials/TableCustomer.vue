@@ -3,8 +3,8 @@
         <div class="card">
             <Toolbar class="mb-4 border border-slate-200 ...">
                 <template #start>
-                    <Button :label="$t('New')"  icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" />
-                    <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedCompanies || !selectedCompanies.length" />
+                    <Button :label="$t('New')"  icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="openNew" v-if="$page.props.user.permissions.includes('create customer')"/>
+                    <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedCompanies || !selectedCompanies.length" v-if="$page.props.user.permissions.includes('delete customer')" />
                 </template>
             </Toolbar>
 
@@ -35,9 +35,9 @@
                 <Column field="town" :header="$t('Town')" sortable class="dateTable"></Column>
                 <Column :exportable="false" class="dateTable">
                     <template #body="slotProps">
-                        <Button icon="pi pi-eye" outlined rounded class="mr-2 view-button" @click="handleInfoButtonClick(slotProps.data.id)" />
-                        <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editCompany(slotProps.data)" />
-                        <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteCompany(slotProps.data)" />
+                        <Button icon="pi pi-eye" outlined rounded class="mr-2 view-button" @click="handleInfoButtonClick(slotProps.data.id)" v-if="$page.props.user.permissions.includes('read customer')" />
+                        <Button icon="pi pi-pencil" outlined rounded class="mr-2 edit-button" @click="editCompany(slotProps.data)" v-if="$page.props.user.permissions.includes('update customer')" />
+                        <Button icon="pi pi-trash" outlined rounded class="simpleDelete-button" severity="danger" @click="confirmDeleteCompany(slotProps.data)" v-if="$page.props.user.permissions.includes('delete customer')" />
                     </template>
                 </Column>
             </DataTable>
@@ -80,7 +80,7 @@
                         </div>  
                         <div>
                             <label for="post_code" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Post code') }}</label>
-                            <input type="text" id="post_code" v-model="myCompany.post_code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Post code')" pattern="^\d+$" required />
+                            <input type="text" id="post_code" v-model="myCompany.post_code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Post code')" pattern="^(?:0[1-9]|[1-4]\d|5[0-2])\d{3}$" required />
                         </div>
                         <div>
                             <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Country') }}</label>
@@ -92,7 +92,7 @@
                         </div>    
                         <div>
                             <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Phone') }}</label>
-                            <input type="tel" id="phone" v-model="myCompany.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Phone')" pattern="^\+\d{1,3}\s?\d{1,14}$" required />
+                            <input type="tel" id="phone" v-model="myCompany.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Phone')" pattern="(\+34\s?)?(\d{9})" required />
                         </div>
 
                         
@@ -284,7 +284,7 @@ export default {
 
                     }
                     this.$toast(this.$t(response.data.message), response.data.type);
-
+                    this.updateFields();
                 })
                 .catch(error => { 
                     this.$toast(this.$t(error.response.message), error.response.type);
@@ -310,6 +310,7 @@ export default {
                     }
                     this.$toast(this.$t(response.data.message), response.data.type);
                         
+                    this.updateFields();
                     
                     
                 })
@@ -326,7 +327,13 @@ export default {
         handleInfoButtonClick(customerID) {
             let companyID = window.location.pathname.split('/').pop();
             this.$inertia.get(`/companies/${companyID}/customer/${customerID}`);
-        }
+        },
+
+        updateFields() {
+
+            this.$emit('updateCustomer', 1);
+
+        },
 
     }
 }

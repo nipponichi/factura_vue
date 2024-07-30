@@ -20,6 +20,9 @@ class Kernel implements KernelContract
 {
     use InteractsWithTime;
 
+
+
+
     /**
      * The application implementation.
      *
@@ -76,7 +79,9 @@ class Kernel implements KernelContract
      *
      * @var array<string, class-string|string>
      */
-    protected $middlewareAliases = [];
+    protected $middlewareAliases = [
+        'isActive' => \App\Http\Middleware\EnsureUserIsActive::class, // Añadido el middleware personalizado
+    ];
 
     /**
      * All of the registered request duration handlers.

@@ -3,16 +3,21 @@
 use App\Http\Controllers\AdminCompaniesController;
 use App\Http\Controllers\AdminProductsController;
 use App\Http\Controllers\AdminInvoicesController;
-use App\Http\Controllers\AdminUsersController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PhoneController;
+use App\Http\Controllers\AccountingController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\RouteController;
+use App\Http\Controllers\LogController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -24,6 +29,7 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
+    'isActive', // Añadir el middleware aquí
 ])->group(function () {
 
 
@@ -36,11 +42,21 @@ Route::middleware([
     Route::get('/companies/{documentId}{date}', [DocumentController::class, 'fromBudgetToInvoice']);
     Route::get('/companies/{companyID}/document/{documentID}', [DocumentController::class, 'show']);
     Route::get('/companies/{companyID}/customer/{customerID}', [CustomerController::class, 'show']);
-    
+    Route::get('/companies/{companyID}/provider/{customerID}', [ProviderController::class, 'show']);
+
+    // Accounting
+    Route::resource('/accountings', AccountingController::class);
+
+    // Warehouse
+    Route::resource('/warehouses', WarehouseController::class);
 
     //Customers
     Route::resource('/customer', CustomerController::class);
     Route::get('/customers/{id}', [CustomerController::class, 'index']);
+
+    //Providers
+    Route::resource('/provider', ProviderController::class);
+    Route::get('/providers/{id}', [ProviderController::class, 'index']);
     
     //Phones
     Route::put('/phones/{id}', [PhoneController::class, 'makeFavourite']);
@@ -65,8 +81,19 @@ Route::middleware([
     // Payment Methods
     Route::resource('/payment', PaymentMethodController::class);
 
+    // Manage users 
+    Route::resource('/users', UserController::class);
+    Route::put('/users-pass/{id}', [UserController::class, 'resetPass']);
+    Route::put('/user-active/{id}', [UserController::class, 'userActive']);
+
+    // Manage roles  
+    Route::resource('/roles', RoleController::class);
+    Route::put('/add-permission/{roleID}/{permissionID}', [RoleController::class, 'addPermission']);
+    Route::get('/assign-role', [RoleController::class, 'assignRole']);
+
     //Documents
     Route::resource('/documents', DocumentController::class);
+    Route::get('/expense', [DocumentController::class, 'indexExpense'])->name('indexExpense');
     Route::get('/documents-type', [DocumentController::class, 'documentType']);
     Route::get('/documents-show/{companyId}/{documentId}', [DocumentController::class, 'show']);
     Route::get('/documents-serie/{typeID}/{companyID}', [DocumentController::class, 'documentSerie']);
@@ -74,14 +101,18 @@ Route::middleware([
     Route::get('/documents-series/{companyID}/{typeID}', [DocumentController::class, 'documentDateCheck']);
     Route::get('/documents-serie/{companyID}', [DocumentController::class, 'indexDocuments']);
     Route::post('/documents-serie/{documentID}/{date}', [DocumentController::class, 'fromBudgetToInvoice']);
+    Route::post('/documents-sign', [DocumentController::class, 'documentSign']);
+    Route::get('/documents-signed/{documentId}', [DocumentController::class, 'downloadSignedXML']);
+
 
     // Admin
     Route::resource('/admin-companies', AdminCompaniesController::class);
     Route::resource('/admin-products', AdminProductsController::class);
     Route::resource('/admin-invoices', AdminInvoicesController::class);
-    Route::resource('/admin-users', AdminUsersController::class);
-    Route::put('/admin-users-pass/{id}', [AdminUsersController::class, 'resetPass']);
-    Route::get('/admin-reload-users', [AdminUsersController::class, 'reload']);
+
     Route::get('/admin-reload-companies', [AdminCompaniesController::class, 'reload']);
     
+    //Logs
+    Route::get('/logs', [LogController::class, 'index']);
+
 });

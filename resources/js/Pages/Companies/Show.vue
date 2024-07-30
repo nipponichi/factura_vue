@@ -24,11 +24,11 @@
                                         </div>
                                         <div class="flex justify-center lg:pt-0 pt-8">
                                             <div class="p-3 text-center">
-                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">33</span>
+                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">{{ totalCustomer }}</span>
                                                 <span class="text-sm text-slate-400"> {{ $t('Customers') }}</span>
                                             </div>
                                             <div class="p-3 text-center">
-                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">564</span>
+                                                <span class="text-xl font-bold block uppercase tracking-wide text-slate-700">{{ totalInvoices}}</span>
                                                 <span class="text-sm text-slate-400"> {{ $t('Invoices') }}</span>
                                             </div>
                                         </div>
@@ -73,15 +73,21 @@
                         <div class="border-b border-gray-200 dark:border-gray-700">
                             <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400">
                                 <li class="me-2">
-                                    <button @click="changeTab('documents')" :class="{'border-b-2 border-blue-500': activeTab === 'documents'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                    <button  v-if="$page.props.user.permissions.includes('read document income')" @click="changeTab('documents')" :class="{'border-b-2 border-blue-500': activeTab === 'documents'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-file w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
                                         {{ $t('Invoices') }}
+                                    </button >
+                                </li>
+                                <li class="me-2">
+                                    <button v-if="$page.props.user.permissions.includes('read customer')" @click="changeTab('customers')" :class="{'border-b-2 border-blue-500': activeTab === 'customers'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                        <i class="pi pi-users w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
+                                        {{ $t('Customers') }}
                                     </button>
                                 </li>
                                 <li class="me-2">
-                                    <button @click="changeTab('customers')" :class="{'border-b-2 border-blue-500': activeTab === 'customers'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                    <button v-if="$page.props.user.permissions.includes('read provider')" @click="changeTab('provider')" :class="{'border-b-2 border-blue-500': activeTab === 'provider'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-users w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
-                                        {{ $t('Customers') }}
+                                        {{ $t('Providers') }}
                                     </button>
                                 </li>
                                 <li class="me-2">
@@ -91,19 +97,19 @@
                                     </button>
                                 </li>
                                 <li class="me-2">
-                                    <button @click="changeTab('email')" :class="{'border-b-2 border-blue-500': activeTab === 'email'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                    <button v-if="$page.props.user.permissions.includes('read email')" @click="changeTab('email')" :class="{'border-b-2 border-blue-500': activeTab === 'email'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-envelope w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
                                         {{ $t('Email') }}
                                     </button>
                                 </li>
                                 <li class="me-2">
-                                    <button @click="changeTab('address')" :class="{'border-b-2 border-blue-500': activeTab === 'address'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                    <button v-if="$page.props.user.permissions.includes('read address')" @click="changeTab('address')" :class="{'border-b-2 border-blue-500': activeTab === 'address'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-home w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>
                                         {{ $t('Address') }}
                                     </button>
                                 </li>
                                 <li class="me-2">
-                                    <button @click="changeTab('bank')" :class="{'border-b-2 border-blue-500': activeTab === 'bank'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
+                                    <button v-if="$page.props.user.permissions.includes('read bank account')" @click="changeTab('bank')" :class="{'border-b-2 border-blue-500': activeTab === 'bank'}" class="inline-flex items-center justify-center p-4 rounded-t-lg hover:text-gray-800 dark:hover:text-gray-300 group">
                                         <i class="pi pi-wallet w-4 h-4 me-2 text-gray-500 group-hover:text-gray-800 dark:text-gray-500 dark:group-hover:text-gray-300"></i>     
                                         {{ $t('Bank account') }}
                                     </button>
@@ -113,10 +119,13 @@
             
                         <div class="flex flex-col items-center justify-center w-full overflow-x-auto">
                             <div v-if="activeTab === 'documents'" class="w-full">
-                                <TableDocument />
+                                <TableDocument @updateDocument="handleDocumentUpdate"/>
                             </div>
                             <div v-else-if="activeTab === 'customers'" class="w-full">
-                                <TableCustomers />
+                                <TableCustomer @updateCustomer="handleCustomerUpdate"/>
+                            </div>
+                            <div v-else-if="activeTab === 'provider'" class="w-full">
+                                <TableProvider />
                             </div>
                             <div v-else-if="activeTab === 'phone'" class="w-full">
                                 <TablePhone @updatePhone="handlePhoneUpdate" />
@@ -140,12 +149,13 @@
 
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import TableCustomers from '@/Pages/Companies/Partials/TableCustomer.vue';
+import TableCustomer from '@/Pages/Companies/Partials/TableCustomer.vue';
 import TableDocument from '@/Pages/Companies/Partials/TableDocument.vue';
 import TablePhone from '@/Pages/Companies/Partials/TablePhone.vue';
 import TableBank from '@/Pages/Companies/Partials/TableBank.vue';
 import TableEmail from '@/Pages/Companies/Partials/TableEmail.vue';
 import TableAddress from '@/Pages/Companies/Partials/TableAddress.vue';
+import TableProvider from '@/Pages/Companies/Partials/TableProvider.vue';
 import { ref } from 'vue';
 
 const activeTab = ref('documents');
@@ -157,12 +167,31 @@ const changeTab = (tabName) => {
 
 <script>
 export default {
-    props: ["company"],
+    props: ["company", "invoices","customers"],
+
+    data() {
+        
+        return {
+            totalInvoices: null, 
+            totalCustomer: null, 
+        };
+    },
+    
     computed: {
         emailLink() {
             return "mailto:" + this.company.email;
         }
     },
+
+    mounted() {
+
+        //Lo que viene de prop lo paso a una variable para poder editarlar y restarla
+        this.totalInvoices = this.invoices;
+        this.totalCustomer = this.customers
+        
+
+    },
+
     
     methods: {
         handlePhoneUpdate(phone) {
@@ -180,6 +209,23 @@ export default {
             this.company.province = address.province;
             this.company.country = address.country;
         },
+
+        handleDocumentUpdate(document) {
+            
+            this.totalInvoices -=document;
+
+        },
+
+        handleCustomerUpdate(customer) {
+            
+            this.totalCustomer -=customer;
+
+        },
+
+
+
+
+
         
     }
     

@@ -11,8 +11,17 @@ background-color: #0056b3; /* Cambio de color de fondo en hover */
 border-color: #0056b3; /* Cambio de color de borde en hover */
 }
 
-.p-splitbutton .p-button:hover {
-    background-color: #0056b3; /* Cambio de color de fondo en hover de los items del menú */
+.purple-button {
+background-color: #804BF7; /* Azul según el esquema de colores de Tailwind CSS */
+color: white; /* Texto en blanco */
+border-color: #804BF7; /* Color del borde igual que el fondo */
+padding: 0.5rem 1rem; /* Ajusta el relleno según sea necesario */
+transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.purple-button:hover {
+background-color: #7042da; /* Cambio de color de fondo en hover */
+border-color: #7042da; /* Cambio de color de borde en hover */
 }
 
 .dateTable {
@@ -168,7 +177,6 @@ border-color: #0056b3; /* Cambio de color de borde en hover */
         display: none;
     }
 
-
     ::-webkit-scrollbar {
         display: none;
     }
@@ -287,3 +295,49 @@ border-color: #0056b3; /* Cambio de color de borde en hover */
     font-size: 18px;
     font-weight: 700;
 }
+.input-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 10rem;
+}
+
+.styled-input {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    background: none;
+    border: 1px solid #d1d5db; /* border-gray-300 */
+    border-radius: 0.375rem; /* rounded-md */
+    padding: 0.5rem 0.75rem; /* py-2 px-3 */
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.input-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 28%; 
+    border: 1px solid #d1d5db;
+    background-color: #f9fafb; /* bg-gray-50 */
+    border-top-right-radius: 0.375rem; /* rounded-md */
+    border-bottom-right-radius: 0.375rem; /* rounded-md */
+    z-index: 0;
+}
+
+.input-wrapper:hover::after {
+    transition: 0.3s;
+    background-color: #e4e4e4;
+}
+
+.button-search {
+    z-index: 1;
+}
+
+::-webkit-calendar-picker-indicator{
+    cursor: pointer;
+}
+
+

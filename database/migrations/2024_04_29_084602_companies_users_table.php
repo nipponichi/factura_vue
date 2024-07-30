@@ -13,13 +13,17 @@ return new class extends Migration
     {
         Schema::create('companies_users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('company_id')->constrained('companies');
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
         });
     }
 
+
+
+
+    
     /**
      * Reverse the migrations.
      */

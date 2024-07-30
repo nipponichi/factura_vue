@@ -1,14 +1,14 @@
 <template>
     <div>
         <div class="card">
-            <DataTable ref="dt" :value="documents" v-model:selection="selectedDocuments" dataKey="id"
+
+            <DataTable ref="dt" :value="valueToUse" v-model:selection="selectedDocuments" dataKey="id"
                 :paginator="true" :rows="10" :filters="filters"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 :rowsPerPageOptions="[5,10,25]" :currentPageReportTemplate="`${$t('Showing')} {first} ${$t('of')} {last} ${$t('of')} {totalRecords} ${$t('documents')}`"
                 selectionMode="single" @rowClick="handleRowClick">
                 <template #header>
-                    <div class="flex justify-between items-center mt-2">
-                        <h4>{{ $t('') }}</h4>
+                    <div class="flex justify-between items-center">
                         <div class="relative rounded-md shadow-sm w-1/4">
                             <input type="search" class="block w-full h-11 rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
                                 v-model="filters['global'].value" :placeholder="$t('Search...')">
@@ -24,10 +24,15 @@
                     </div>
 
                 </template>
+                <Column :exportable="false" :header="$t('View')"  class="dateTable">
+                    <template #body="slotProps">
+                        <Button icon="pi pi-eye" outlined rounded class="mr-2 view-button" @click="handleRowClick(slotProps)" />
+                    </template>
+                </Column>
                 <Column field="number" :header="$t('Number')" sortable class="dateTable"></Column>
                 <Column field="document_type_name" :header="$t('Type')" sortable class="dateTable"></Column>
-                <Column field="customer_name" :header="$t('Receiver')" sortable class="dateTable"></Column>
-                <Column field="date" :header="$t('Date')" sortable class="dateTable"></Column>
+                <Column field="customer_name" :header="isChecked ? $t('Provider') : $t('Customer')" sortable class="dateTable"></Column>
+                <Column field="dateFormatted" :header="$t('Date')" sortable class="dateTable"></Column>
                 <Column field="amount" :header="$t('Amount')" sortable class="dateTable"></Column>
             </DataTable>
         </div>
@@ -43,12 +48,18 @@ export default {
         companyId: {
             type: String,
             required: true
-        }
+        },
+        isChecked: {
+            type: Boolean,
+            required: true
+        },
     },
     data() {
         return {
             documents: null,
             selectedDocuments: [],
+            receivedDocuments: [],
+            emitedDocuments: [],
             filters: {
                 'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
             },
@@ -64,11 +75,36 @@ export default {
         this.fetchDocuments();
     },
 
+    computed: {
+        valueToUse() {
+            return this.isChecked ? this.receivedDocuments : this.emitedDocuments;
+        },
+    },
+
     methods: {
         fetchDocuments() {
             axios.get(`/documents-serie/${this.companyId}`)
                 .then(response => {
+
+                    let date
+                    let dateFormatted
+                    
+                    for(let i = 0; i < response.data.documents.length; i++ ) {
+                        date = response.data.documents[i].date
+                        dateFormatted = this.dateFormat(date)
+                        response.data.documents[i].dateFormatted = dateFormatted
+                        
+                    }
+                    
                     this.documents = response.data.documents;
+                    this.documents.forEach(document => {
+                        if (document.isReceived === 0) {
+                            this.emitedDocuments.push(document);
+                        } else if (document.isReceived === 1) {
+                            this.receivedDocuments.push(document);
+                        }
+                    });
+
                 })
                 .catch(error => {
                     console.error('Error fetching documents data:', error);
@@ -81,7 +117,31 @@ export default {
         },
         sendDocumentId(documentId) {
             this.$emit('document-selected', documentId);
-        }
+        },
+        
+        dateFormat(fecha) {
+            // Convierte la fecha seleccionada a un objeto Date
+            let date = new Date(fecha);
+
+            // Obtén el día, mes y año de la fecha
+            let dia = date.getDate();
+            let mes = date.getMonth() + 1; // Los meses en JavaScript son de 0 a 11, por lo que se suma 1
+            let año = date.getFullYear();
+
+            // Añade un cero inicial si el día o mes son menores de 10
+            if (dia < 10) {
+            dia = '0' + dia;
+            }
+            if (mes < 10) {
+            mes = '0' + mes;
+            }
+
+            // Construye la cadena con el formato español
+            let fechaFormateada = `${dia}/${mes}/${año}`;
+
+            return fechaFormateada;
+        },
+
     },
 
 }

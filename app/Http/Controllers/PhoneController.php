@@ -11,12 +11,10 @@ class PhoneController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['can:read company'])->only('index');
-        $this->middleware(['can:create company'])->only('create');
-        $this->middleware(['can:create company'])->only('store');
-        $this->middleware(['can:read company'])->only('show');
-        $this->middleware(['can:update company'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
-        $this->middleware(['can:delete company'])->only('destroy');
+        $this->middleware(['can:read phone'])->only('index', 'show');
+        $this->middleware(['can:create phone'])->only('create', 'store');
+        $this->middleware(['can:update phone'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
+        $this->middleware(['can:delete phone'])->only('destroy');
     }
 
     public static function index($companyId)
@@ -34,11 +32,6 @@ class PhoneController extends Controller
         }
     }
 
-    // Not needed
-    public function edit()
-    {
-        //
-    }
 
     public function update ($phoneId, PhoneRequest $request)
     {
@@ -95,9 +88,6 @@ class PhoneController extends Controller
             if ($request->favourite === true) {
                 $this->makeFavourite($newPhoneId);
             }
-
-            
-        
 
             DB::commit();
 

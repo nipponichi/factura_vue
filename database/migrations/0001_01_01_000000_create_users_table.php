@@ -20,7 +20,10 @@ return new class extends Migration
             $table->rememberToken();
             $table->foreignId('current_team_id')->nullable();
             $table->string('profile_photo_path', 2048)->nullable();
+            $table->integer('user_who_created')->nullable();
+            $table->integer('user_who_modified')->nullable();
             $table->timestamps();
+            $table->boolean('isActive')->default (true);
             $table->dateTime('dt_start')->useCurrent();
             $table->dateTime('dt_end')->nullable();
         });

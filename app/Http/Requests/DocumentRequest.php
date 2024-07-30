@@ -35,6 +35,7 @@ class DocumentRequest extends FormRequest
             'subTotal' => 'decimal',
             'paid' => 'boolean',
             'invoiced' => 'boolean',
+            'isReceived' => 'boolean',
             'bank_account_id' => 'string',
             'payment_methods_id' => 'string',
             //'active' => 'boolean'

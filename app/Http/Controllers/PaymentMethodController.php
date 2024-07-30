@@ -11,8 +11,12 @@ class PaymentMethodController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['can:read company'])->only('show');
+        $this->middleware(['can:read document income'])->only('index', 'show');
+        $this->middleware(['can:create document income'])->only('create', 'store');
+        $this->middleware(['can:update document income'])->only('edit', 'update');
+        $this->middleware(['can:delete document income'])->only('destroy');
     }
+
 
     public function show($companyId)
     {

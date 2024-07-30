@@ -58,20 +58,37 @@ const logout = () => {
                             </div>
                             -->
                             
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')">
-                                <NavLink :href="route('documents.index')" :active="route().current('documents.*')">
-                                    {{ $t('Invoice') }}
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read document income')">
+                                <NavLink :href="route('documents.index')" :active="route().current('documents.index')">
+                                    {{ $t('Invoice-Income') }}
                                 </NavLink>
-                            </div>  
+                            </div>
                             
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view company')" >
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read accounting')" >
+                                <NavLink :href="route('accountings.index')" :active="route().current('accountings.*')">
+                                    {{ $t('Accounting') }}
+                                </NavLink>
+                            </div>
+
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read warehouses')" >
+                                <NavLink :href="route('warehouses.index')" :active="route().current('warehouses.*')">
+                                    {{ $t('Warehouse') }}
+                                </NavLink>
+                            </div>
+                            
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read document expense')">
+                                <NavLink :href="route('indexExpense')" :active="route().current('indexExpense')">
+                                    {{ $t('Invoice-Expense') }}
+                                </NavLink>
+                            </div>
+
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read company')" >
                                 <NavLink :href="route('companies.index')" :active="route().current('companies.*')">
                                     {{ $t('My Company') }}
                                 </NavLink>
                             </div>
-
                             
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('view consulting')">
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read consulting')">
                                 <NavLink :href="route('companies.index')">
                                     {{ $t('Consulting') }}
                                 </NavLink>
@@ -79,21 +96,21 @@ const logout = () => {
 
 
                             <!-- NAVIGATION ADMIN -->
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
-                                <NavLink :href="route('admin-users.index')" :active="route().current('admin-users.*')">
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read admin')">
+                                <NavLink :href="route('users.index')" :active="route().current('admin-users.*')">
                                     {{ $t('Users') }}
                                 </NavLink>
                             </div>    
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
-                                <NavLink :href="route('admin-companies.index')" :active="route().current('admin-companies.*')">
+                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read admin')">
+                                <NavLink :href="route('companies.index')" :active="route().current('admin-companies.*')">
                                     {{ $t('Companies') }}
                                 </NavLink>
                             </div>
-                            <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
-                                <NavLink :href="route('admin-invoices.index')" :active="route().current('admin-invoices.*')">
+                            <!--<div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" v-if="$page.props.user.permissions.includes('read roles')">
+                                <NavLink :href="route('invoices.index')" :active="route().current('admin-invoices.*')">
                                     {{ $t('Invoices') }}
                                 </NavLink>
-                            </div>                                           
+                            </div>        -->                                   
                         </div>
                         
                         <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -183,7 +200,14 @@ const logout = () => {
                                         <DropdownLink :href="route('profile.show')">
                                             {{ $t('Profile') }}
                                         </DropdownLink>
-                                        
+
+                                        <DropdownLink :href="route('users.index')" v-if="$page.props.user.permissions.includes('read user')">
+                                            {{ $t('Manage users') }}
+                                        </DropdownLink>
+
+                                        <DropdownLink :href="route('roles.index')" v-if="$page.props.user.permissions.includes('read roles')">
+                                            {{ $t('Manage roles') }}
+                                        </DropdownLink>
 
                                         <DropdownLink v-if="$page.props.jetstream.hasApiFeatures" :href="route('api-tokens.index')">
                                             API Tokens
@@ -233,49 +257,68 @@ const logout = () => {
 
                 <!-- Responsive Navigation Menu -->
                 <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}" class="sm:hidden">
-                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view company')">
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read company')">
                         <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')" >
                             {{ $t('Dashboard') }}
                         </ResponsiveNavLink>
                     </div>
-                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view company')">
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read document income')">
                         <ResponsiveNavLink :href="route('documents.index')" :active="route().current('documents.*')">
                             {{ $t('Invoices') }}
                         </ResponsiveNavLink>
                     </div>
-                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view company')">
+
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read accounting')">
+                        <ResponsiveNavLink :href="route('accountings.index')" :active="route().current('accountings.*')">
+                            {{ $t('Accounting') }}
+                        </ResponsiveNavLink>
+                    </div>
+
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read warehouse')">
+                        <ResponsiveNavLink :href="route('warehouses.index')" :active="route().current('warehouses.*')">
+                            {{ $t('Warehouse') }}
+                        </ResponsiveNavLink>
+                    </div>
+
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read document expense')">
+                        <ResponsiveNavLink :href="route('indexExpense')" :active="route().current('indexExpense')" >
+                            {{ $t('Invoice-Expense') }}
+                        </ResponsiveNavLink>
+                    </div>
+
+                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read company')">
                         <ResponsiveNavLink :href="route('companies.index')" :active="route().current('companies.*')">
                             {{ $t('My Company') }}
                         </ResponsiveNavLink>
                     </div>
-                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('view consulting')">
+                    <!--<div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read consulting')">
                         <ResponsiveNavLink :href="route('products.index')" :active="route().current('products.*')">
                             {{ $t('My Consulting') }}
                         </ResponsiveNavLink>
-                    </div>
+                    </div>-->
 
 
                     <!-- NAVIGATION ADMIN -->
-                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
+                    <!--<div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
                         <ResponsiveNavLink :href="route('admin-users.index')" :active="route().current('admin-user.*')">
                             {{ $t('Users') }}
                         </ResponsiveNavLink>
-                    </div>
+                    </div>-->
                     <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
                         <ResponsiveNavLink :href="route('admin-companies.index')" :active="route().current('admin-companies.*')">
                             {{ $t('Companies') }}
                         </ResponsiveNavLink>
                     </div>
-                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
+                    <!--<div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
                         <ResponsiveNavLink :href="route('admin-invoices.index')" :active="route().current('admin-invoice.*')">
                             {{ $t('Invoices') }}
                         </ResponsiveNavLink>
-                    </div>
-                    <div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
+                    </div>-->
+                    <!--<div class="pt-2 pb-3 space-y-1" v-if="$page.props.user.permissions.includes('read roles')">
                         <ResponsiveNavLink :href="route('admin-products.index')" :active="route().current('admin-products.*')">
                             {{ $t('Products') }}
                         </ResponsiveNavLink>
-                    </div>
+                    </div>-->
                     
                     
                     <!-- Responsive Settings Options -->

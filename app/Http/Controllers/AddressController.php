@@ -13,21 +13,16 @@ class AddressController extends Controller
     
     public function __construct()
     {
-        $this->middleware(['can:read company'])->only('index');
-        $this->middleware(['can:create company'])->only('create');
-        $this->middleware(['can:create company'])->only('store');
-        $this->middleware(['can:read company'])->only('show');
-        $this->middleware(['can:update company'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
-        $this->middleware(['can:delete company'])->only('destroy');
+        $this->middleware(['can:read address'])->only('index', 'show');
+        $this->middleware(['can:create address'])->only('create', 'store');
+        $this->middleware(['can:update address'])->only('edit', 'makeFavourite', 'favouriteTrue', 'update');
+        $this->middleware(['can:delete address'])->only('destroy');
     }
     
-
     public static function index($companyId)
     {
         try {
 
-
-            
             $addresses = DB::table('addresses')
             ->select(
                 'addresses.id',

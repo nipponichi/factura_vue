@@ -44,6 +44,7 @@ export default {
         return {
             companies: null, 
             filters: {}, 
+            
             submitted: false,
             singleCompany: false
         };

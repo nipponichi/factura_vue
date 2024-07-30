@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
             'email'=> 'company@gmail.com',
             'password'=> Hash::make('12345678')
         ]);
-        $company -> assignRole('company');
+        $company -> assignRole('demo');
 
         $consulting = User::create([
             'name' => 'consulting',
@@ -42,7 +42,21 @@ class UserSeeder extends Seeder
             'email'=> 'grovelec@grovelec.es',
             'password'=> Hash::make('12345678')
         ]);
-        $userDemo -> assignRole('company');
+        $userDemo -> assignRole('demo');
+
+        $userDemo2 = User::create([
+            'name' => 'Alberto Emilio',
+            'email'=> 'axenciag@gmail.com',
+            'password'=> Hash::make('12345678')
+        ]);
+        $userDemo2 -> assignRole('demo');
+
+        $userDemo3 = User::create([
+            'name' => 'Miren Alzola',
+            'email'=> 'mirrentxu@gmail.com',
+            'password'=> Hash::make('12345678')
+        ]);
+        $userDemo3 -> assignRole('demo');
     
     }
 }

@@ -1,5 +1,7 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { ref } from 'vue';
+const showingNavigationDropdown = ref(false);
 </script>
 <template>
     <div class="no-imprimir">
@@ -11,105 +13,166 @@ import AppLayout from '@/Layouts/AppLayout.vue';
             </template>
             <div class="py-12">
                 <div class="max-w-10xl mx-auto sm:px-6 lg:px-24">
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">   
-
-                        <div class="card">
-                            <div class="relative inline-block flex mb-5">
-                                <button
-                                    v-if="!loading && (companies.length > 0)"
-                                    type="button"
-                                    class="px-4 py-2 bg-black text-white border border-gray-200 rounded-md flex items-center justify-between"
-                                    @click="selectCompany">
-                                    <span class="font-bold text-lg">
-                                        <i class="pi pi-plus mr-2"></i>
-                                        {{ selectedCompany.name }}
-                                    </span>
+                    <div :class="{'border-blue-500 border-2': isChecked, 'bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg': true}">
+                        <div class="card"> 
+                            <!-- Hamburger -->
+                            <div class="-me-2 flex items-center sm:hidden">
+                                <button class="inline-flex items-center justify-center p-2 bg-gray-100 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out" @click="showingNavigationDropdown = ! showingNavigationDropdown">
+                                    <svg
+                                        class="h-6 w-6"
+                                        stroke="currentColor"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            :class="{'hidden': showingNavigationDropdown, 'inline-flex': ! showingNavigationDropdown }"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M4 6h16M4 12h16M4 18h16"
+                                        />
+                                        <path
+                                            :class="{'hidden': ! showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"
+                                        />
+                                    </svg>
                                 </button>
                             </div>
-                            
-                            
-                            <!-- Botones normales para pantallas grandes -->
-                            <div class="md:flex justify-between items-center">
-                                <div class="flex flex-col md:flex-row justify-start items-center">
-                                    <div class="flex flex-wrap justify-start items-center">
-                                        <div class="relative inline-block w-50">
-                                            <Button :label="$t('Customer')" icon="pi pi-plus" class="success-button text-white p-2" @click="selectACustomer()" />
-                                        </div>
 
-                                        <div class="flex items-center ml-2">
-                                            <label for="link-checkbox" class="ms-2 mr-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $t('Mark as paid') }}</label>
-                                            <input id="link-checkbox" type="checkbox" v-model="myDocument.paid" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                        </div>
+                            <!-- Responsive Navigation Menu -->
+                            <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}" class="sm:hidden bg-white">
+                                <div class="text-center pt-2 pb-3 space-y-1">
+                                    <ResponsiveNavLink @click="selectCompany()" >
+                                        {{ selectedCompany.name }}
+                                    </ResponsiveNavLink>
+                                </div>
+                                <div class="text-center pt-2 pb-3 space-y-1">
+                                    <ResponsiveNavLink @click="handleListDocument()">
+                                        {{ $t('Document check') }}
+                                    </ResponsiveNavLink>
+                                </div>
+                                <div class="text-center pt-2 pb-3 space-y-1">
+                                    <ResponsiveNavLink @click="resetData()">
+                                        {{ $t('New invoice') }}
+                                    </ResponsiveNavLink>
+                                </div>
+                                <div class="text-center pt-2 pb-3 space-y-1">
+                                    <hr>
+                                    <h3>{{ $t('Download') }}</h3>
+                                    <hr>
+                                    <div class="flex flex-col items-center space-y-2">
+                                        <Button @click="exportToPDF">
+                                            {{ $t('PDF') }}
+                                        </Button>
+                                        <Button @click="exportToXML">
+                                            {{ $t('XML') }}
+                                        </Button>
+                                        <Button @click="exportToXML">
+                                            {{ $t('XML Firmado') }}
+                                        </Button>
                                     </div>
                                 </div>
 
-                                <!-- Mantén estos divs a la derecha -->
-                                <div class="flex items-center">
-                                    <div id="app" class="relative inline-block w-50 ml-2">
-                                        <div class="flex">
+                                <div class="text-center pt-2 pb-3 space-y-1">
+                                    <hr>
+                                    <h3>{{ $t('Save') }}</h3>
+                                    <hr>
+                                    <div class="flex flex-col items-center space-y-2">
+                                        <Button @click="saveAndReset">
+                                            {{ $t('Guardar y crear nueva') }}
+                                        </Button>
+                                        <Button @click="saveAndSign">
+                                            {{ $t('Firmar factura') }}
+                                        </Button>
+                                        <Button @click="cancelInvoice">
+                                            {{ $t('Cancel') }}
+                                        </Button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="md:flex justify-between items-center hidden sm:block ">
+                                
+                                <div class="flex flex-col md:flex-row justify-start items-center">
+                                    <div class="flex flex-wrap justify-start items-center">
+                                        <div class="relative inline-block w-50 flex justify-between">
+                                            <button
+                                                v-if="!loading && (companies.length > 0)"
+                                                type="button"
+                                                class="px-4 py-2 bg-gray-800 hover:bg-gray-900 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-white flex items-center"
+                                                @click="companies.length > 1 ? selectCompany() : null"
+                                                :disabled="companies.length === 1">
+                                                <span class="font-bold text-lg">
+                                                    <i v-if="companies.length > 1" class="pi pi-plus mr-2"></i>
+                                                    {{ selectedCompany.name }}
+                                                </span>
+                                            </button>
+                
                                             <button
                                                 type="button"
-                                                class="px-4 py-2 mr-2 danger-button text-white rounded flex items-center justify-between"
+                                                class="ml-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-white rounded flex items-center justify-between"
                                                 @click="handleListDocument()"
                                                 :class="{ 'opacity-50': !selectedCompany.id }"
                                                 :disabled="!selectedCompany.id">
                                                 <span>
-                                                    <i class="pi pi-plus mr-2"></i>
-                                                    {{ $t('Document list') }}
+                                                    <i class="pi pi-eye mr-2"></i>
+                                                    {{ $t('Document check') }}
                                                 </span>
                                             </button>
-                                            <button
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <div id="app" class="relative inline-block w-50 ml-2">
+                                        <div class="flex">
+                                            <Button
                                                 type="button"
-                                                class="px-4 py-2 mr-2 success-button text-white rounded flex items-center justify-between"
-                                                @click="selectDocument()"
+                                                class="px-4 ml-2 py-2 bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white rounded flex items-center justify-between"
+                                                @click="resetData()"
                                                 :class="{ 'opacity-50': !selectedCompany.id }"
                                                 :disabled="!selectedCompany.id">
                                                 <span>
                                                     <i class="pi pi-plus mr-2"></i>
-                                                    {{ $t('Document type') }}
-                                                </span>
-                                            </button>
-                                            <button
-                                                type="button"
-                                                class="px-4 py-2 bg-purple-600 text-white rounded-md flex items-center justify-between"
-                                                @click="toggleDropdownExport"
-                                                :disabled="totalConIVA <= 0 || isSaving"
-                                                :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id}">
-                                                <i class="pi pi-upload mr-2"></i>
-                                                {{ $t('Export') }}
-                                            </button>
-                                        </div>
-
-                                        <!-- Desplegable Export -->
-                                        <div v-show="isDropdownOpenExport" class="absolute right-0 w-48 bg-white border border-gray-300 rounded shadow-lg">
-                                            <button type="button" class="px-4 py-2 rounded-l flex items-center justify-between" @click="exportToPDF()">
-                                                <span>
-                                                    <i class="pi pi-file-pdf mr-2"></i>
-                                                    {{ $t('PDF') }}
-                                                </span>
-                                            </button>
-                                            <button type="button" class="px-4 py-2 rounded-r flex items-center" @click="exportToXML()">
-                                                <span>
-                                                    <i class="pi pi-file-export mr-2"></i>
-                                                    {{ $t('XML') }}
+                                                    {{ $t('New invoice') }}
                                                 </span>
                                             </button>
                                         </div>
                                     </div>
 
+                                    <div v-if="!isChecked" class="split-button-container ml-2">
+                                        <SplitButton
+                                            ref="splitButton"
+                                            class="bg-purple-400 hover:bg-purple-500 focus:ring-4 focus:ring-pur-300 font-medium rounded-lg text-white text-white p-2"
+                                            :label="$t('Download')"
+                                            @click="handleClick"
+                                            :model="itemsExport"
+                                            :disabled="totalConIVA === 0 || isSaving || !selectedCustomer.id || !selectedSerie.number"
+                                            :class="{ 'opacity-50': totalConIVA === 0 || isSaving || !selectedCustomer.id || !selectedSerie.number}">
+                                            <template v-slot:icon>
+                                                <i class="pi pi-download mr-2" :class="{ 'opacity-50': totalConIVA === 0 }"></i>
+                                            </template>
+                                        </SplitButton>
+                                    </div>
+                                    
                                     <div class="split-button-container ml-2">
                                         <SplitButton
                                             class="blue-button"
                                             :label="$t('Save')"
                                             @click="checkDocument"
-                                            :model="items"
-                                            :disabled="totalConIVA <= 0 || isSaving"
-                                            :class="{ 'opacity-50': totalConIVA <= 0 || isSaving || !selectedCustomer.id}">
+                                            :model="itemsSave"
+                                            :disabled="totalConIVA === 0 || isSaving || !selectedCustomer.id || !selectedSerie.number"
+                                            :class="{ 'opacity-50': totalConIVA === 0 || isSaving || !selectedCustomer.id || !selectedSerie.number}">
                                             <template v-slot:icon>
-                                                <i class="pi pi-save mr-2" :class="{ 'opacity-50': totalConIVA <= 0 }"></i>
+                                                <i class="pi pi-save mr-2" :class="{ 'opacity-50': totalConIVA === 0 }"></i>
                                             </template>
                                         </SplitButton>
                                     </div>
+
                                 </div>
                             </div>
 
@@ -118,56 +181,110 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         
                             <div class="selector flex flex-col md:flex-row justify-between mt-5 ml-12">
                                 
-                                <div class="showCustomer"> 
+                                <div class="showCustomer mt-12"> 
                                     <div class="grid md:grid-cols-1 text-m gap-y-1">
                                         <div class="flex items-center justify-between w-full">
-                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Customer') }}:</div>
+                                            <div>
+                                                <div v-if="!selectedCustomer.name" class="font-semibold whitespace-nowrap mr-3">
+                                                    {{ isChecked ? $t('Select a provider') : $t('Select a customer') }}
+                                                </div>
+                                                <div v-else class="font-semibold mr-3 flex-shrink-0 w-32">
+                                                    {{ isChecked ? $t('Provider') : $t('Customer') }}:
+                                                </div>
+                                            </div>
                                             <div class="text-gray-700 w-full font-bold text-lg">{{ selectedCustomer.name }}</div>
+                                            <div class="relative w-full mr-20">
+                                                <Button type="button" icon="pi pi-search" id="voice-search" @click="selectACustomer" class="bg-gray-100 p-2 rounded-md text-gray-900 text-sm hover:bg-gray-300"/>
+                                            </div>
                                         </div>
-                                        <div class="flex items-center justify-between w-full">
-                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Tax number') }}:</div>
-                                            <div class="text-gray-700 w-full uppercase">{{ selectedCustomer.tax_number }}</div>
-                                        </div>
-                                        <div class="flex items-center justify-between w-full">
-                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Phone') }}:</div>
-                                            <div class="text-gray-700 w-full">{{ selectedCustomer.phone }}</div>
-                                        </div>
-                                        <div class="flex items-center justify-between w-full">
-                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Email') }}:</div>
-                                            <div class="text-gray-700 w-full">{{ selectedCustomer.email }}</div>
-                                        </div>
-                                        <div class="flex items-center justify-between w-full">
-                                            <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Address') }}:</div>
-                                            <div class="text-gray-700 w-full">
-                                                {{ selectedCustomer.address }}, {{ selectedCustomer.post_code }}, {{ selectedCustomer.town }}, {{ selectedCustomer.province }} ( {{ selectedCustomer.country }} )
+                                        <div> 
+                                            <div class="flex items-center justify-between w-full">
+                                                <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Tax number') }}:</div>
+                                                <div class="text-gray-700 w-full uppercase">{{ selectedCustomer.tax_number }}</div>
+                                            </div>
+                                            <div class="flex items-center justify-between w-full">
+                                                <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Phone') }}:</div>
+                                                <div class="text-gray-700 w-full">{{ selectedCustomer.phone }}</div>
+                                            </div>
+                                            <div class="flex items-center justify-between w-full">
+                                                <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Email') }}:</div>
+                                                <div class="text-gray-700 w-full">{{ selectedCustomer.email }}</div>
+                                            </div>
+                                            <div class="flex items-center justify-between w-full">
+                                                <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Address') }}:</div>
+                                                <div class="text-gray-700 w-full" v-if="selectedCustomer.name">
+                                                    {{ selectedCustomer.address }}, {{ selectedCustomer.post_code }}, {{ selectedCustomer.town }}, {{ selectedCustomer.province }} ( {{ selectedCustomer.country }} )
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
+                                
+                            
                                 <div class="grid md:grid-cols-1 text-sm gap-y-1 mr-28">
-                                    <div class="flex items-center justify-between w-full">
-                                        <div class="font-semibold mr-3 min-w-20 flex-shrink-0">Nº {{ selectedType.name }}:</div>
-                                        <div class="text-gray-700 ml-3 flex-shrink-0 font-bold text-lg">{{ selectedSerie.serie }}&nbsp;&nbsp;/&nbsp;</div>
-                                        <input type="text" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400" v-model="selectedSerie.number">
+
+                                    <label class="flex items-center cursor-pointer justify-end max-w-xs ml-auto">
+                                        <span class="text-m font-medium text-gray-900 dark:text-gray-300 flex-shrink-0">{{ $t('Mark as paid') }}</span>
+
+                                        <input type="checkbox" class="sr-only peer" v-model="myDocument.paid">
+                                        <div class="relative w-11 h-6 ml-3 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                    </label>
+                                    
+                                    <div class="flex items-center justify-end w-full mt-4">
+                                        <div class="font-semibold mr-4 flex-shrink-0">{{ $t('Payment date') }}:</div>
+
+                                        <div class="input-wrapper">
+                                        <input type="date" :min="fecha"  v-model="fechaPaid" @change="cambiarFormatoFecha" 
+                                            :disabled="false"
+                                            :class="{
+                                                'bg-gray-100 text-gray-300 cursor-not-allowed': !myDocument.paid, 
+                                                'bg-white text-black': myDocument.paid,
+                                                'pointer-events-none': !myDocument.paid
+                                            }" 
+                                            class="styled-input bg-gray-50 border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                        </div>
                                     </div>
+                                    
+        
+                                    <form class="flex items-center">   
+                                        <div class="font-semibold mr-8 min-w-20 flex-shrink-0">Nº {{ selectedType.name }}:</div>
+                                        <div class="relative w-full">
+                                            
+                                            <div v-if="!isChecked" class="input-wrapper">
+                                                <div class=" font-bold flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                                                    {{ selectedSerie.serie }} /
+                                                </div>    
+                                                <input type="text" id="voice-search" class="border-gray-300 rounded-md text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="selectedSerie.number" required="">
+                                                <Button type="button" icon="pi pi-search" @click="selectDocument()" class=" button-search font-bold flex absolute inset-y-0 right-0 items-center border-gray-300 pr-1"/>
+                                            </div>
+                                            <input v-else type="text" id="voice-search" class="border-gray-300 rounded-md text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-[161px] pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="selectedSerie.number" required="">
+                                        </div>
+                                    </form>
+                                    
                                     <div class="flex items-center justify-between w-full">
                                         <div class="font-semibold mr-3 flex-shrink-0">{{ $t('Date') }}:</div>
-                                        <input type="date" v-model="fecha" @change="cambiarFormatoFecha" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                        <div class="input-wrapper">
+                                            <input type="date" v-model="fecha" @change="cambiarFormatoFecha" class="styled-input bg-gray-50 border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                        </div>
                                     </div>
+                                    
                                     <div class="flex items-center justify-between w-full">
                                         <div class="font-semibold mr-3 flex-shrink-0">{{ $t('Expiration') }}:</div>
-                                        <input type="date" v-model="expiration" @change="cambiarFormatoFecha" class="border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                        <div class="input-wrapper">
+                                            <input type="date" v-model="expiration" :min="fecha" @change="cambiarFormatoFecha" class="styled-input bg-gray-50 border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                        </div>
                                     </div>
-                                </div>            
+                                    
+                                </div>       
                             </div>  
+
 
                             <Toolbar class="mb-4 mt-8 border border-slate-200 ...">
                                 <template #start>
                                     <div class="flex items-center justify-between ">
                                         <div class="flex items-center">
-                                            <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="mr-2 success-button" @click="addRow" />
-                                            <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="danger-button" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
+                                            <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="mr-2 bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white rounded-md p-2" @click="addRow" />
+                                            <Button :label="$t('Delete')" icon="pi pi-trash" severity="danger" class="bg-red-400 hover:bg-red-500 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-white rounded-md p-2" @click="confirmDeleteSelected" :disabled="!selectedProducts || !selectedProducts.length" />
                                         </div>
                                         <div class="flex-grow"></div>
                                     </div>
@@ -184,7 +301,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                     </div>
                                 </template>
                             </Toolbar>
-                            <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id" class="w-full lg:w-4/4 mx-auto">
+                            <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id" class="w-full lg:w-4/4 mx-auto" :filters="filters">
                 
                                 <Column selectionMode="multiple" :exportable="false" class="datetable checkbox"></Column>
                                 <Column field="reference" :header="$t('Reference')" sortable class="dateTable w-1/4">
@@ -192,9 +309,12 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         <InputText class="input w-full" :placeholder="$t('Reference')" v-model="slotProps.data.reference" />
                                     </template>
                                 </Column>
-                                <Column field="product" :header="$t('Description')" sortable class="dateTable w-full">
+                                <Column field="description" :header="$t('Concept')" sortable class="dateTable w-full">
                                     <template #body="slotProps">
-                                        <InputText class="input w-full" :placeholder="$t('Description')" v-model="slotProps.data.description" />
+                                        <div class="relative text-gray-600">
+                                            <InputText v-model="slotProps.data.description" :placeholder="$t('Concept')"  class="input bg-white mt-3 rounded-md border border-gray-100 text-m"/>
+                                            <Button type="submit" icon="pi pi-search-plus" @click="openDescriptionDialog(slotProps.data)" class="bg-gray-100 hover:bg-gray-200 p-2 absolute right-0 top-0 mt-3 mr-0.5 rounded rounded-r-lg rounded-l-none"/>
+                                        </div>
                                     </template>
                                 </Column>
                                 <Column field="quantity" :header="$t('Quantity')" sortable class="dateTable w-1/8">
@@ -202,7 +322,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                         <InputText class="input input-short w-full" v-model="slotProps.data.quantity" />
                                     </template>
                                 </Column>
-                                <Column field="price" :header="$t('Price')" sortable class="dateTable w-1/4">
+                                <Column field="price" :header="$t('Price')" sortable class="dateTable w-1/8">
                                     <template #body="slotProps">
                                         <InputText class="input input-short w-full" v-model="slotProps.data.price" />
                                     </template>
@@ -233,23 +353,31 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                     </template>
                                 </Column>
                             </DataTable>
+  
 
                             <div class="flex justify-end mt-4 pr-4" v-if="showButton">
-                                <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="success-button" @click="addRow()" />
+                                <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white" @click="addRow()" />
                             </div>
                                                     <!-- Totals section for large screens -->
                             <div class="hidden md:flex justify-between mt-4 pr-4 mb-4">
                                 <!-- Columna izquierda -->
-                                <div class="totals-container w-1/3">
-                                    <button class="ml-4 mb-2 success-button text-white rounded-md p-2" @click="selectAPaymentMethod()">
-                                        <i class="pi pi-plus"></i> {{ $t('Payment method') }}
-                                    </button>
-                                    <div class="ml-4 totals p-4 rounded-md">
+                                <div class="totals-container w-1/3"> <div class="ml-4 totals p-4 rounded-md">
                                         <table class="w-full">
                                             <tbody>
                                                 <tr>
                                                     <td class="text-gray-600 pr-4">{{ $t('Payment method') }}:</td>
-                                                    <td class="pl-4">{{ selectedPaymentMethod.name }}</td>
+                                                    <td class="text-gray-600 pr-4">
+                                                        <div class="relative w-full ml-4">
+                                                            <div class="flex items-center pointer-events-none">
+                                                                {{ selectedPaymentMethod.name }}
+                                                            </div>
+                                                            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                                                <Button type="button" icon="pi pi-search" id="voice-search" @click="selectAPaymentMethod()" class="bg-gray-100 p-2 rounded-md text-gray-900 text-sm hover:bg-gray-300"/>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    
+                                                    
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2">
@@ -317,7 +445,9 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                                 <table class="w-full">
                                     <tbody>
                                         <tr>
-                                            <td class="text-gray-600 pr-4">{{ $t('Payment method') }}:</td>
+                                            <td class="text-gray-600 pr-4">
+                                                {{ $t('Payment method') }}:
+                                            </td>
                                             <td class="pl-4">{{ selectedPaymentMethod.name }}</td>
                                         </tr>
                                         <tr>
@@ -370,7 +500,30 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         </div>
                     </div>
                 </div>
+
             </div>
+
+            
+
+            <!-- MODAL DESCRIPTION -->
+            <Dialog v-model:visible="descriptionDialog" :style="{ width: '450px' }" :header="$t('Concept')" modal>
+                <template v-slot:footer>
+                    <Button :label="$t('Save')" icon="pi pi-check" @click="saveDescription"/>
+                </template>
+            
+                <div style="display: flex; flex-direction: column;">
+                    <textarea v-model="selectedDescription" rows="7"
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        :placeholder="$t('Insert the description here')"></textarea>
+                        <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+                            <div :class="{'char-counter': true, 'text-red-500': charCount > 255}">
+                                {{ charCount }}/255
+                            </div>
+                        </div>
+                </div>
+            </Dialog>
+
+            
 
             <!-- MODAL COMPANY -->
             <Dialog v-model:visible="productDialog" :header="$t('Select companies')" :modal="true" @change="handleCompanySelection" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
@@ -420,8 +573,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
             </Dialog>
 
             <!-- MODAL DOCUMENT LIST -->
-            <Dialog v-model:visible="documentListDialog" class="w-3/4" :header="$t('Select document')" :modal="true">
-                <TableDocumentSelector :companyId="selectedCompany.id" @document-selected="handleDocumentSelected" />
+            <Dialog v-model:visible="documentListDialog" class="w-3/4" :header="isChecked ? $t('Received invoices') : $t('Emitted invoices')" :modal="true">
+                <TableDocumentSelector :companyId="selectedCompany.id" :isChecked="isChecked" @document-selected="handleDocumentSelected"  />
             </Dialog>
 
             <!-- MODAL DELETE SIMPLE -->
@@ -450,7 +603,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
         
 
             <!-- SELECT A CUSTOMER -->
-            <Dialog v-model:visible="selectACustomerDialog" :header="$t('Select a customer')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
+            <Dialog v-model:visible="selectACustomerDialog" :header="isChecked ? $t('Select a provider') : $t('Select a customer')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
                 <Dropdown v-model="selectedCustomer" :options="customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class=" flex align-items-center ">
@@ -465,8 +618,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                 </Dropdown>
                 <div class="grid gap-3 md:grid-cols-1 justify-items">
                     <div class="flex justify-between">
-                        <button class="success-button mr-1 mr-1 rounded-md" @click="openNew">
-                            <i class="pi pi-plus"></i> {{ $t('Create customer') }}
+                        <button class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white p-2 mr-1 mr-1 rounded-md" @click="openNew">
+                            <i class="pi pi-plus"></i> {{ isChecked ? $t('Create provider') : $t('Create customer') }}
                         </button>
                         <button class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog()">{{ $t('Close') }}</button>
                     </div>   
@@ -514,43 +667,43 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                     <div class="grid gap-3 mb-6 md:grid-cols-2">
                         <div>
                         <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Company name') }}</label>
-                        <input type="text" id="name" v-model="customer.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Company name')" :required="!selectedCustomer" />
+                        <input type="text" id="name" v-model="customer.name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Company name')" required />
                         </div>
                         <div>
                         <label for="tax_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Tax number') }}</label>
-                        <input type="text" id="tax_number" v-model="customer.tax_number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Tax number')"  :required="!selectedCustomer" />
+                        <input type="text" id="tax_number" v-model="customer.tax_number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Tax number')" required />
                         </div>
                     </div>
                 
                     <div class="mb-6">
                         <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Address') }}</label>
-                        <input type="text" id="address1" v-model="customer.address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Address')" :required="!selectedCustomer" />
+                        <input type="text" id="address1" v-model="customer.address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Address')" required/>
                     </div>
                 
                     <div class="grid gap-3 mb-6 md:grid-cols-2"> 
                         <div>
                             <label for="town" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Town') }}</label>
-                            <input type="text" id="town" v-model="customer.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Town')" :required="!selectedCustomer" />
+                            <input type="text" id="town" v-model="customer.town" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Town')" required />
                         </div>  
                         <div>
                             <label for="province" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Province') }}</label>
-                            <input type="text" id="province" v-model="customer.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Province')" :required="!selectedCustomer" />
+                            <input type="text" id="province" v-model="customer.province" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Province')" required />
                         </div>  
                         <div>
                             <label for="post_code" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Post code') }}</label>
-                            <input type="text" id="post_code" v-model="customer.post_code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Post code')" pattern="^\d+$" :required="!selectedCustomer" />
+                            <input type="text" id="post_code" v-model="customer.post_code" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Post code')" pattern="^\d+$" required />
                         </div>
                         <div>
                             <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Country') }}</label>
-                            <input type="text" id="country" v-model="customer.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Country')" :required="!selectedCustomer" />
+                            <input type="text" id="country" v-model="customer.country" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Country')" required />
                         </div>
                         <div>
                             <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Email') }}</label>
-                            <input type="email" id="email" v-model="customer.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('info@mycompany.com')" :required="!selectedCustomer" />
+                            <input type="email" id="email" v-model="customer.email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('info@mycompany.com')" required/>
                         </div>    
                         <div>
                             <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Phone') }}</label>
-                            <input type="tel" id="phone" v-model="customer.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Phone')" pattern="^\+\d{1,3}\s?\d{1,14}$" :required="!selectedCustomer" />
+                            <input type="tel" id="phone" v-model="customer.phone" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" :placeholder="$t('Phone')" pattern="(?:\+?(\d{1,3}))?\s?(?:\(?\d{1,4}\)?)?\s?\d{6,10}$" required />
                         </div>
                     </div>
                 
@@ -638,9 +791,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
                         <tr v-for="(entry, index) in taxMap" :key="index">
                             <td class="title">{{ $t('Total IVA') }} {{ Object.values(entry)[0] }} %</td>
                             <td> {{ Object.values(entry)[1].toFixed(2) }}€</td>
-                        </tr> --
+                        </tr>
                         
-
                         <tr>
                             <td class="title"><strong>{{ $t('Total (with IVA)') }}</strong></td>
                             <td><strong>{{ totalConIVA.toFixed(2) }}€</strong></td>
@@ -689,31 +841,56 @@ export default {
     },
     data() {
         return {
-            items: [
+            itemsSave: [
                 {
                     label: this.$t('Guardar y crear nueva'),
                     icon: 'pi pi-refresh',
                     command: () => this.saveAndReset()
                 },
                 {
+                    label: this.$t('Firmar factura'),
+                    icon: 'pi pi-file-check',
+                    command: () => this.saveAndSign(),
+                    
+                },
+                {
                     label: this.$t('Cancelar'),
                     command: () => this.cancelInvoice()
                 },
             ],
+            itemsExport: [
+                {
+                    label: this.$t('PDF'),
+                    icon: 'pi pi-file-pdf',
+                    command: () => this.exportToPDF()
+                },
+                {
+                    label: this.$t('XML'),
+                    icon: 'pi pi-file',
+                    command: () => this.exportToXML()
+                },
+                {
+                    label: this.$t('XML Firmado'),
+                    icon: 'pi pi-file-check',
+                    command: () => this.downloadSignedXml(),
+                },
+            ],
             taxMap: new Map(),
+            today: new Date(),
             fecha: '',
+            fechaPaid: '',
             expiration: '',
             fechaFormateada: '',
             loading: true,
             isSaving: false,
+            isChecked: false,
             isMobileMenuOpen: false,
             showTable: false,
             isDropdownOpen: false,
-            isDropdownOpenExport: false,
+            selectedOption: null,
             saveRestart: false,
             taxTypes: [],
             taxValues: [],
-            documents1: [],
             taxOptions: [
                 { label: '0', value: 0 },
                 { label: '4', value: 4 },
@@ -739,6 +916,7 @@ export default {
             series: [],
             serie: '',
             counter: '',
+            updateDate: false,
             showButton: false,
             productDialog: false,
             documentDialog: false,
@@ -748,7 +926,9 @@ export default {
             selectACustomerDialog: false,
             selectAPaymentMethodDialog: false,
             documentListDialog: false,
-            selectedOption: [],
+            descriptionDialog: false,
+            selectedDescription: '',
+            productDescription: '',
             options: [],
             concepts: [],
             selectedBankAccount: [],
@@ -764,6 +944,7 @@ export default {
             selectedProducts: [],
             selectedPaymentMethod: [],
             selectedPaymentSystemId: '',
+            payment_methods: null,
             filters: {},
             submitted: false,
             myDocument: { 
@@ -776,12 +957,14 @@ export default {
                 payment_system_id: '',
                 expiration: '',
                 date: '',
+                date_paid: '',
                 amount: '',
                 payment_methods_id: '',
                 totalTax: '',
                 subTotal: '',
                 paid: false, 
-                invoiced: false,               
+                invoiced: false,  
+                isReceived: false,             
                 concept: [],
             },
             
@@ -815,6 +998,14 @@ export default {
 
     computed: {
 
+        charCount() {
+            if (this.selectedDescription === null) {
+                return "";
+            } else {
+                return this.selectedDescription.length;
+            }
+        },
+
         dynamicOptionLabel() {
             switch (this.selectedPaymentMethod.id) {
                 case 1:
@@ -845,38 +1036,59 @@ export default {
 
     },
 
-
-
-    created() {
+    async created() {
         this.filters = {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
         };
 
-        // Inicializa la fecha con la fecha de hoy
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = (today.getMonth() + 1).toString().padStart(2, '0');
-        const day = today.getDate().toString().padStart(2, '0');
-        this.fecha = `${year}-${month}-${day}`;
-        this.expiration = `${year}-${month}-${day}`;
+        this.isChecked = this.$page.props.isChecked;
+
+        this.myDocument.isReceived = this.$page.props.isChecked
+
+        console.log("isChecked Create " + this.isChecked)
+
+        this.fecha = await this.getDate()
+        this.fechaPaid = await this.getDate()
+        this.expiration = await this.getExpirationDate()
     },
 
     async mounted() {
+
         await this.fetchCompanies();
-        await this.fetchDocuments();
+        await this.fetchCustomers();
+
         await this.fetchPayments();
+
+
+
+        if (!this.isChecked) {
+                await this.fetchDocuments()
+            } else {
+                this.selectedType.id = 1
+                this.selectedType.name = "Factura"
+                this.selectedSerie = []
+        }
 
     },
 
     watch: {
+
+        fecha(date) {
+            this.validateDate()
+        },
+
         selectedPaymentMethod(newMethod) {
             console.log("PaymentId " + newMethod.id)
             this.handlePaymentMethodChange(newMethod);
         },
 
         selectedOption(newValue) {
+            console.log("NewValue")
+            console.log(newValue)
+            
             if (newValue) {
                 switch (this.selectedPaymentMethod.id) {
+                    
                 case 1:
                 case 7:
                     this.selectedBankAccount = newValue;
@@ -901,6 +1113,130 @@ export default {
     
     methods: {
 
+        saveAndSign() {
+
+            this.myDocumentSave()
+            this.calculateTaxes().then(() => {
+                this.myDocument.document_counter = 1
+                console.log("contador: " + this.myDocument.document_counter)
+                const xmlContent = this.convertToFacturaeXML();
+                this.addsign(xmlContent);
+            });
+            
+        },
+
+        addsign(data){
+
+            if (this.myDocument.id == null) {
+                alert("Guarda el documeno");
+            } else {
+                
+                AutoScript.setForceWSMode(true);
+                AutoScript.cargarAppAfirma();
+                AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
+                window.location.origin + "/afirma-signature-retriever/RetrieveService");
+
+                const mycompany_id = this.company.id;
+                const mydocument_id = this.myDocument.id;
+
+                function successCallback(dataB64, cert) {
+                    axios.post('/documents-sign', {
+                        datasing: {
+                            'company_id': mycompany_id,
+                            'document_id': mydocument_id,
+                            'document_data': dataB64,
+                        }
+                    })
+                    .then(response => {
+                        console.log("OK in the signed"); 
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    });
+                }
+
+                //successCallback(AutoScript.getBase64FromText(data), null)
+
+                function errorCallback(type,message) { console.log("ERR"); }
+
+                let dataB64 = AutoScript.getBase64FromText(data);
+                AutoScript.sign('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "XAdES", "", null, successCallback, errorCallback);
+            }
+        },
+
+      /*  addsign(data){
+            console.log("aqui")
+            if (this.myDocument.id == null) {
+                alert("Guarda el documeno");
+            } else {
+                
+            
+            AutoScript.setForceWSMode(true);
+            AutoScript.cargarAppAfirma();
+            AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
+            window.location.origin + "/afirma-signature-retriever/RetrieveService");
+            
+            const myDocumentData = {
+                'company_id': this.selectedCompany.id,
+                'document_id': this.myDocument.id,
+                'document_data': data,
+            }
+      
+            const successCallback = (dataB64, cert) => {
+                axios.post('/documents-sign', {datasing: myDocumentData})
+                .then(response => {
+                    this.$toast(this.$t('Document signed successfully.'), 'success');
+                })
+                .catch(error => {
+                    this.$toast(this.$t('Error signing document: ') + error.message, 'error');
+                });
+            }
+
+            successCallback(AutoScript.getBase64FromText(data), null)
+           /* const errorCallback = (type, message) => { 
+                this.$toast(message, 'error');
+            }
+
+            
+            let dataB64 = AutoScript.getBase64FromText(data);
+            AutoScript.signAndSaveToFile('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "XAdES", "", null, successCallback, errorCallback);
+            }
+
+        }
+
+        },*/
+
+
+
+        validateDate() {
+            if (new Date(this.fecha) > new Date(this.expiration)) {
+                alert('La fecha seleccionada no puede ser mayor que la fecha de vencimiento.');
+                this.fecha = this.getDate();
+                this.expiration = this.getExpirationDate();
+                this.fechaPaid = this.fecha;            }
+        },
+
+        openDescriptionDialog(data) {
+            this.productDescription = data
+            this.selectedDescription = data.description;
+            this.descriptionDialog = true;
+        },
+        
+        saveDescription() {
+            if ((this.selectedDescription === null) || (this.selectedDescription.length <= 255)) {
+                this.products.forEach(product => {
+                    if (this.productDescription.id === product.id) {
+                        product.description = this.selectedDescription;
+                    }
+                });
+                this.descriptionDialog = false;
+                this.selectedDescription = '';
+                
+            } else {
+                this.$toast(this.$t('Too many characters, need to be 255 at maximum'), 'error');
+            }
+        },
+        
         async handlePaymentMethodChange(paymentMethod) {
             switch (paymentMethod.id) {
                 case 1:
@@ -948,36 +1284,38 @@ export default {
             }
         },
 
-        handleDocumentSelected(documentId) {
+        async handleDocumentSelected(documentId) {
             if (documentId) {
                 this.documentListDialog = false
             }
             this.company = this.selectedCompany;
             this.company.documentId = documentId
 
-            axios.get('/documents-show/' + this.company.id + '/' + this.company.documentId)
-                .then(response => {
+            const response = await axios.get('/documents-show/' + this.company.id + '/' + this.company.documentId)
+                if(response) {
 
                     // Document
                     this.myDocument = response.data.documents;
                     this.fecha = this.myDocument.date;
+                    
                     this.expiration = this.myDocument.expiration;
                     this.selectedType.name = this.myDocument.document_type_name;
                     this.selectedType.id = this.myDocument.documents_type_id;
                     this.selectedSerie.id = this.myDocument.documents_series_id;
                     this.selectedSerie.serie = this.myDocument.document_series_serie;
-                    console.log("carga")
                     this.selectedPaymentSystemId = this.myDocument.payment_system_id
                     this.selectedPaymentMethod.id = this.myDocument.payment_methods_id
-                    
 
                     let number = this.myDocument.number;
                     let numberWithoutSerie = number.replace(this.selectedSerie.serie, '');
+
                     this.selectedSerie.number = numberWithoutSerie;
 
                     if (this.myDocument.paid === 0 ) {
+                        this.fechaPaid = await this.getDate();
                         this.myDocument.paid = false
                     } else {
+                        this.fechaPaid = this.myDocument.date_paid;
                         this.myDocument.paid = true
                     }
 
@@ -1000,10 +1338,9 @@ export default {
                     this.selectedPaymentMethod.id = this.myDocument.payment_methods_id;
                     //this.handlePaymentMethodChange(this.selectedPaymentMethod)
 
-                })
-                .catch(error => {
+                } else { 
                     this.$toast(this.$t('Error connecting to the server'), 'error');
-                });   
+                };   
         },
 
 
@@ -1011,7 +1348,12 @@ export default {
             try {
                 const response = await axios.get('/banks/' + this.selectedCompany.id);
                 this.banks = response.data.accounts;
-                this.selectedBankAccount = await this.changePaymentMethodSystemId(this.banks, this.selectedBankAccount);
+                console.log("this.banks")
+                console.log(this.banks)
+                this.selectedBankAccount = await this.changePaymentMethodSystemId(this.banks);
+                this.selectedPaymentSystemId = this.selectedBankAccount.id
+                console.log("selectedBankaccount")
+                console.log(this.selectedBankAccount)
                 this.options = this.banks;
             } catch (error) {
                 this.$toast(this.$t('Error connecting to the server'), 'error');
@@ -1022,9 +1364,14 @@ export default {
 
         async fetchEmails() {
             try {
-                const response = await axios.get('/emails/' + this.selectedCompany.id);
-                this.emails = response.data.emails;
-                this.selectedEmail = await this.changePaymentMethodSystemId(this.emails, this.selectedEmail);
+                const url = this.isChecked 
+                        ? `/emails/${this.selectedCustomer.id}` 
+                        : `/emails/${this.selectedCompany.id}`;
+                    
+                const emailResponse = await axios.get(url);
+
+                this.emails = emailResponse.data.emails;
+                this.selectedEmail = await this.changePaymentMethodSystemId(this.emails);
                 this.options = this.emails;
             } catch (error) {
                 this.$toast(this.$t('Error connecting to the server'), 'error');
@@ -1032,22 +1379,35 @@ export default {
         },
 
         async fetchPhones() {
+            
             try {
-                const response = await axios.get('/phones/' + this.selectedCompany.id);
-                this.phones = response.data.phones;
-                this.selectedPhone = await this.changePaymentMethodSystemId(this.phones, this.selectedPhone);
+                const url = this.isChecked 
+                        ? `/phones/${this.selectedCustomer.id}` 
+                        : `/phones/${this.selectedCompany.id}`;
+                    
+                const phonesResponse = await axios.get(url);
+
+                this.phones = phonesResponse.data.phones;
+
+                this.selectedPhone = await this.changePaymentMethodSystemId(this.phones);
                 this.options = this.phones;
             } catch (error) {
                 this.$toast(this.$t('Error connecting to the server'), 'error');
             }
         },
 
-        async changePaymentMethodSystemId(systemValues, selectedMethod) {
-            console.log("Entra al methodSystem");
+        async changePaymentMethodSystemId(systemValues) {
+            let selectedMethod;
+            console.log("Entra al methodSystem1");
             if (this.selectedPaymentSystemId != null) {
-                console.log("Entra al methodSystem");
-                const value = systemValues.find(value => value.id === this.selectedPaymentSystemId);
+                console.log("Entra al methodSystem2");
+                let value = systemValues.find(value => value.id === this.selectedPaymentSystemId);
+                console.log(this.selectedPaymentSystemId)
+                console.log(systemValues)
+                console.log("Value ")
+                console.log(value)
                 if (value) {
+                    console.log("if value")
                     selectedMethod = value;
                     console.log(selectedMethod);
                 } else {
@@ -1064,32 +1424,18 @@ export default {
 
 
         async fetchPayments () {
-            await axios.get('/payment/' + this.selectedCompany.id)
-            .then(response => {
-                this.payment_methods = response.data.methods;
-                this.selectedPaymentMethod = this.payment_methods[0]
-            })
-        },
 
-        handleScroll() {
-            let scrollPosition = window.scrollY;
-            if (scrollPosition > 200) {
-                this.showButton = true;
-            } else {
-                this.showButton = false;
-            }
-        },
+            const url = this.isChecked 
+                    ? `/payment/${this.selectedCustomer.id}` 
+                    : `/payment/${this.selectedCompany.id}`;
+                
+            const paymentResponse = await axios.get(url);
+
+            this.payment_methods = paymentResponse.data.methods;
+
+            this.selectedPaymentMethod = this.payment_methods[0]
+            console.log(this.selectedPaymentMethod)
         
-        toggleDropdown() {
-            this.isDropdownOpen = !this.isDropdownOpen;
-        },
-
-        toggleDropdownExport() {
-            this.isDropdownOpenExport = !this.isDropdownOpenExport;
-        },
-
-        toggleMobileMenu() {
-            this.isMobileMenuOpen = !this.isMobileMenuOpen;
         },
 
         async fetchCompanies() {
@@ -1104,8 +1450,29 @@ export default {
                     this.selectedCompany = this.companies[0];
                 }
 
-                const customersResponse = await axios.get('/customers/' + this.selectedCompany.id);
-                this.customers = customersResponse.data.customers;
+                this.loading = false;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                this.loading = false;
+            }
+        },
+
+        async fetchCustomers() {
+
+            try {
+                
+                const url = this.isChecked 
+                    ? `/providers/${this.selectedCompany.id}` 
+                    : `/customers/${this.selectedCompany.id}`;
+                
+                
+                const customersResponse = await axios.get(url);
+
+                if (this.isChecked) {
+                    this.customers = customersResponse.data.providers;
+                } else {
+                    this.customers = customersResponse.data.customers;
+                }
 
                 if (this.customers.length === 1) {
                     this.selectedCustomer = this.customers[0];
@@ -1138,40 +1505,78 @@ export default {
             this.selectACustomerDialog = true;
         },
 
+        selectAProvider() {
+            this.selectACustomerDialog = true;
+        },
+
         selectAPaymentMethod() {
             this.selectAPaymentMethodDialog = true;
         },
 
         saveCustomer() {
 
-            axios.post('/customer', this.customer)
-            .then(response => {
-                this.customer.id = response.data.companyId;
+            let customersResponse
+            if (this.isChecked) {
+                customersResponse = axios.post('/provider', this.customer)
+            } else {
+                customersResponse = axios.post('/customer', this.customer)
+            }
+    
+            customersResponse.then(result => {
+                this.customer.id = result.data.companyId;
                 this.selectedCustomer = this.customer;
-                this.customerDialog = false;      
-            })
-            .catch(error => {
-                this.$toast(this.$t('Error connecting to the server'), 'error');
+            }).catch(error => {
+                console.error("Error:", error);
                 this.customerDialog = false;
-            });   
+            });
 
+            this.customerDialog = false;
         },
 
-        handleCompanySelection() {
-            this.selectedCustomer = [];
-            axios.get('/customers/'+this.selectedCompany.id)
-                .then(response => {
-            
-                    this.customers = response.data.customers;   
-                    
-                    if (this.customers.length === 1) {
-                        this.selectedCustomer = this.customers[0];
-                    }
+        async downloadSignedXml() {
+            window.open('/documents-signed/'+ this.myDocument.id)
+            /*if (!this.isChecked) {
+                const documentId = this.myDocument.id;
+                const url = `/documents-signed/${documentId}`;
 
-                })
-                .catch(error => {
-                    console.error('Error fetching phone data:', error);
-                });
+                // Hacer la solicitud al servidor
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            // La respuesta no es exitosa
+                            return response.json().then(error => {
+                                throw new Error(error.message || 'Error al cargar la factura');
+                            });
+                        }
+                        // La respuesta es exitosa
+                        return response.blob(); // O el tipo de respuesta que esperes del servidor
+                    })
+                    .then(data => {
+                        // Crear una URL de objeto para el blob y abrir una nueva ventana
+                        const objectUrl = URL.createObjectURL(data);
+                        window.open(objectUrl);
+                    })
+                    .catch(error => {
+                        this.$toast(this.$t('To download you must save and sign it'), 'error');
+                    });
+
+            }*/
+        },
+
+        async handleCompanySelection() {
+            this.selectedCustomer = [];
+            try {
+                const response = await axios.get('/customers/' + this.selectedCompany.id);
+                await this.fetchDocuments();
+                await this.fetchPayments();
+                this.customers = response.data.customers;   
+                
+                if (this.customers.length === 1) {
+                    this.selectedCustomer = this.customers[0];
+                }
+            } catch (error) {
+                console.error('Error fetching phone data:', error);
+            }
         },
 
         async fetchDocuments() {
@@ -1239,11 +1644,11 @@ export default {
         addRow() {
 
             let newProduct = {
-                reference: '5.01.02.003',
-                description: 'Collar',
-                price: 8,
-                quantity: 1,
-                discount: 15,
+                reference: '',
+                description: '',
+                price: 0,
+                quantity: 0,
+                discount: 0,
                 discount_reason: 'Descuento profesional',
                 subtotal: 0,
                 taxes: 21,
@@ -1258,111 +1663,148 @@ export default {
         //Identifica que boton de guardado le ha dado
         saveAndReset() {
             this.saveRestart = true;
-            this.checkDocument(); 
+            this.checkDocument();
         },
 
-        checkDocument() {
-            axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
-            .then(response => {             
-                this.date = response.data.date.date
-                this.serie = response.data.serie.number;
+        handleClick() {
+            // Simula un clic en el ícono del desplegable para abrirlo
+            this.$nextTick(() => {
+                const splitButton = this.$refs.splitButton.$el;
+                const dropdownIcon = splitButton.querySelector('.p-splitbutton-menubutton');
+                if (dropdownIcon) {
+                    dropdownIcon.classList.add('no-print');
+                    dropdownIcon.click();
 
-                if (this.selectedSerie.number <= this.serie) {
-                
-                    let respuesta = prompt(`El número de documento ya existe. ¿Qué deseas hacer?\n1. Conservar el número ingresado: ${(this.selectedSerie.serie)}${this.selectedSerie.number} \n2. Asignar el siguiente valor disponible: ${(this.selectedSerie.serie)}${++this.serie}`);
-
-                    switch (respuesta) {
-                        case null:
-                            // Cancelar la operación en el prompt
-                            this.$toast(this.$t('Operation cancelled.'), 'error');
-                            break;
-                        case '1':
-                            // Conservar el número ingresado por el cliente
-                            this.$toast(this.$t('The number entered will be retained: ') + this.selectedSerie.serie +this.selectedSerie.number, 'success');
-                            this.serie = '';
-                            this.saveDocument();
-                            break;
-                        case '2':
-                            // Asignar el siguiente valor disponible
-                            this.selectedSerie.number = this.serie;
-                            this.$toast(this.$t('The following available number has been assigned: ') + this.selectedSerie.serie + this.selectedSerie.number, 'success');
-                            this.serie = '';
-                            this.saveDocument();
-                            break;
-                        default:
-                            // Entrada no válida
-                            this.$toast(this.$t('Invalid input.'), 'error');
-                    }
-
-
-                } else if (this.date > this.fecha) {
-
-                    let dateFormateado = this.dateFormat(this.date)
-                    let fechaFormateada = this.dateFormat(this.fecha)
-
-                    let respuesta = prompt(`La fecha seleccionada es anterior a la de la última factura, ¿deseas asignarle la fecha actual?\n1. Conservar la fecha seleccionada: ${fechaFormateada} \n2. Asignar la fecha actual: ${dateFormateado}`);
-
-                    switch (respuesta) {
-                        case null:
-                            // Cancelar la operación en el prompt
-                            this.$toast(this.$t('Operation cancelled.'), 'error');
-                            break;
-                        case '1':
-                            // Conservar la fecha ingresada por el cliente
-                            this.$toast(this.$t('The date will be retained: ') + this.fecha, 'success');
-                            this.saveDocument();
-                            break;
-                        case '2':
-                            // Asignar la fecha actual
-                            const today = new Date();
-                            const year = today.getFullYear();
-                            const month = (today.getMonth() + 1).toString().padStart(2, '0');
-                            const day = today.getDate().toString().padStart(2, '0');
-                            this.fecha = `${year}-${month}-${day}`;
-                            
-                            this.$toast(this.$t('The current date has been assigned.'), 'success');
-
-                            this.saveDocument();
-                            break;
-
-                        default:
-                            // Entrada no válida
-                            this.$toast(this.$t('Invalid input.'), 'error');
-                    }
-                    
-                
-                
-                }else{
-                    this.saveDocument();
                 }
-            })
-            .catch(error => {
-                this.$toast(this.$t('Error saving document data.'), 'error');
-                console.log(error)
-            });    
+            });
+        },
+
+
+        checkDocument() {
+            if (!this.isChecked) {
+                axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
+                .then(response => {             
+                    this.date = response.data.date.date
+                    this.serie = response.data.serie.number;
+
+                    if (this.selectedSerie.number <= this.serie) {
+                    
+                        let respuesta = prompt(`El número de documento ya existe. ¿Qué deseas hacer?\n1. Conservar el número ingresado: ${(this.selectedSerie.serie)}${this.selectedSerie.number} \n2. Asignar el siguiente valor disponible: ${(this.selectedSerie.serie)}${++this.serie}`);
+
+                        switch (respuesta) {
+                            case null:
+                                // Cancelar la operación en el prompt
+                                this.$toast(this.$t('Operation cancelled.'), 'error');
+                                break;
+                            case '1':
+                                // Conservar el número ingresado por el cliente
+                                this.$toast(this.$t('The number entered will be retained: ') + this.selectedSerie.serie +this.selectedSerie.number, 'success');
+                                this.serie = '';
+                                this.saveDocument();
+                                break;
+                            case '2':
+                                // Asignar el siguiente valor disponible
+                                this.updateDate = true;
+                                this.selectedSerie.number = this.serie;
+                                this.$toast(this.$t('The following available number has been assigned: ') + this.selectedSerie.serie + this.selectedSerie.number, 'success');
+                                this.serie = '';
+                                this.saveDocument();
+                                break;
+                            default:
+                                // Entrada no válida
+                                this.$toast(this.$t('Invalid input.'), 'error');
+                        }
+
+
+                    } else if (this.date > this.fecha) {
+
+                        let dateFormateado = this.dateFormat(this.date)
+                        let fechaFormateada = this.dateFormat(this.fecha)
+
+                        let respuesta = prompt(`La fecha seleccionada es anterior a la de la última factura, ¿deseas asignarle la fecha actual?\n1. Conservar la fecha seleccionada: ${fechaFormateada} \n2. Asignar la fecha actual: ${dateFormateado}`);
+
+                        switch (respuesta) {
+                            case null:
+                                // Cancelar la operación en el prompt
+                                this.$toast(this.$t('Operation cancelled.'), 'error');
+                                break;
+                            case '1':
+                                // Conservar la fecha ingresada por el cliente
+                                this.$toast(this.$t('The date will be retained: ') + this.fecha, 'success');
+                                this.saveDocument();
+                                break;
+                            case '2':
+                                // Asignar la fecha actual
+                                this.fecha = getDate();
+                                
+                                this.$toast(this.$t('The current date has been assigned.'), 'success');
+
+                                this.saveDocument();
+                                break;
+
+                            default:
+                                // Entrada no válida
+                                this.$toast(this.$t('Invalid input.'), 'error');
+                        }
+                        
+                    
+                    
+                    }else{
+                        this.saveDocument();
+                    }
+                })
+                .catch(error => {
+                    this.$toast(this.$t('Error saving document data.'), 'error');
+                    console.log(error)
+                });
+            }else{
+                this.saveDocument();
+            } 
         },
 
         myDocumentSave() {
-            
-            
-            this.myDocument.number = this.selectedSerie.serie + this.selectedSerie.number
-            this.myDocument.document_counter = this.selectedSerie.number
-            this.myDocument.expiration = this.expiration
-            this.myDocument.payment_methods_id = this.selectedPaymentMethod.id
-            this.myDocument.payment_system_id = this.selectedPaymentSystemId
-            this.myDocument.company_id_company = this.selectedCompany.id 
-            this.myDocument.company_id_customer = this.selectedCustomer.id
+
+            if (!this.isChecked) {
+                this.myDocument.number = this.selectedSerie.serie + this.selectedSerie.number
+                this.myDocument.document_counter = this.selectedSerie.number
+                this.myDocument.company_id_company = this.selectedCompany.id 
+                this.myDocument.company_id_customer = this.selectedCustomer.id
+                this.myDocument.documents_series_id = this.selectedSerie.id
+            } else {
+                this.myDocument.number = this.selectedSerie.number
+                this.myDocument.company_id_company = this.selectedCustomer.id 
+                this.myDocument.company_id_customer = this.selectedCompany.id
+                this.myDocument.documents_series_id = ''
+                
+            }
+
+            if (this.myDocument.paid) {
+                this.myDocument.date_paid = this.fechaPaid
+            } else {
+                this.myDocument.date_paid = '';
+            }
+
             this.myDocument.documents_type_id = this.selectedType.id
-            this.myDocument.documents_series_id = this.selectedSerie.id
-            this.myDocument.date = this.fecha
             
+            if (this.updateDate) {
+                this.fecha =  this.getDate();
+                this.expiration =  this.getExpirationDate();
+            } 
+
+            this.myDocument.expiration = this.expiration
+            this.myDocument.date = this.fecha
+
+            this.updateDate = false;
+            this.myDocument.payment_methods_id = this.selectedPaymentMethod.id
+            console.log("selectedPaymentSystemId")
+            console.log(this.selectedPaymentSystemId)
+            this.myDocument.payment_system_id = this.selectedPaymentSystemId
+
             this.myDocument.document_counter = 1
             
-            
-            
-            this.myDocument.subTotal = this.subtotal.toFixed(2)
-            this.myDocument.totalTax = this.totalIVA.toFixed(2)
-            this.myDocument.amount = this.totalConIVA.toFixed(2)
+            this.myDocument.subTotal =  this.subtotal.toFixed(2)
+            this.myDocument.totalTax =  this.totalIVA.toFixed(2)
+            this.myDocument.amount =  this.totalConIVA.toFixed(2)
             
         },
 
@@ -1373,7 +1815,8 @@ export default {
             if(this.selectedType.id == 1 ) {
                 this.myDocument.invoiced = true
             }
-
+            console.log(this.fecha);
+            console.log(this.expiration);
             this.myDocument.concept = []
             this.products.forEach(product => {
                 
@@ -1400,8 +1843,10 @@ export default {
             });
             axios.post('/documents', {documentData: this.myDocument})
             .then(response => {
-        
+                this.myDocument.id = response.data.documentId; 
+                console.log("saveDocument id" + this.myDocument.id)
                 this.$toast(this.$t('Invoice saved correctly.'), 'success');
+                
                 this.myDocument.concept = []
                 if (this.saveRestart) {
                     this.resetData();
@@ -1416,7 +1861,24 @@ export default {
             });
         },
 
+        getDate() {    
+            const year = this.today.getFullYear();
+            const month = (this.today.getMonth() + 1).toString().padStart(2, '0');
+            const day = this.today.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        },
 
+        getExpirationDate() {
+            const expirationDate = new Date();
+            expirationDate.setDate(this.today.getDate() + 15);
+            const expYear = expirationDate.getFullYear();
+            const expMonth = (expirationDate.getMonth() + 1).toString().padStart(2, '0');
+            const expDay = expirationDate.getDate().toString().padStart(2, '0');
+            return `${expYear}-${expMonth}-${expDay}`;
+        },
+
+
+        
         resetData() {
             this.isSaving = true;
             setTimeout(function() {
@@ -1506,15 +1968,12 @@ export default {
 
             // Ahora puedes manejar la respuesta del usuario
             if (respuesta === '1') {
-            console.log('Se conservará la fecha seleccionada:', fechaFormateada);
             // Aquí puedes poner el código para conservar la fecha seleccionada
             } else if (respuesta === '2') {
             let fechaActual = new Date().toISOString().split('T')[0]; // Obtén la fecha actual en formato YYYY-MM-DD
             let fechaActualFormateada = this.dateFormat(fechaActual); // Formatea la fecha actual a DD/MM/YYYY
-            console.log('Se asignará la fecha actual:', fechaActualFormateada);
             // Aquí puedes poner el código para asignar la fecha actual
             } else {
-            console.log('Opción no válida.');
             // Aquí puedes manejar opciones no válidas si es necesario
             }
         },
@@ -1556,7 +2015,7 @@ export default {
             }
         },*/
 
-        addsign(data){
+        /* addsign(data){
             AutoScript.setForceWSMode(true);
             AutoScript.cargarAppAfirma();
             AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
@@ -1565,22 +2024,20 @@ export default {
             function errorCallback() { console.log("ERR"); }
             var dataB64 = AutoScript.getBase64FromText(data);
             AutoScript.signAndSaveToFile('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "AUTO", "", null, successCallback, errorCallback);
-        }, 
+        },  */
 
 
         exportToXML() {
             this.myDocumentSave()
             this.calculateTaxes().then(() => {  
             this.myDocument.document_counter = 1
-            console.log("contador: " + this.myDocument.document_counter)
             const xmlContent = this.convertToFacturaeXML();
+            console.log("contador: " + this.myDocument.document_counter)
             this.$toast(this.$t('XML document generated correctly.'), 'success');
-            this.addsign(xmlContent);
-            //this.downloadXML(xmlContent, 'facturae.xml');
-            });
-            /* }).catch(error => {
+            this.downloadXML(xmlContent, 'factura.xml')
+            }).catch(error => {
                 this.$toast(this.$t('Could not generate the XML.'), 'error');
-            }); */
+            });
         },
     
         convertToFacturaeXML() {
@@ -1738,7 +2195,6 @@ export default {
             return xml;
         },
 
-        /*
         downloadXML(content, filename) {
 
             const blob = new Blob([content], { type: 'application/xml' });
@@ -1748,10 +2204,11 @@ export default {
             link.click();
             URL.revokeObjectURL(link.href);
         
-        },*/
+        },
+    
 
         cancelInvoice() {
-            let respuesta = confirm("¿Está seguro? Los datos de esta factura serán descartados");
+            let respuesta = confirm("Los cambios no serán guardados");
             if (respuesta) {
                 this.resetData()
             }
@@ -1785,3 +2242,11 @@ export default {
             },
 }
 </script>
+
+<style scoped>
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}
+</style>
