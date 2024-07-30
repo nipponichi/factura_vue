@@ -218,7 +218,6 @@ export default {
 
         handleCustomerUpdate(customer) {
             
-
             this.totalCustomer -=customer;
 
         },

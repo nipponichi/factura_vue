@@ -38,8 +38,10 @@
                 <Column field="dateFormatted" :header="$t('Date')" sortable class="dateTable"></Column>
                 <Column field="amount" :header="$t('Amount')" sortable class="dateTable"></Column>
 
-                <Column :exportable="false" class="dateTable">
+                <Column :exportable="false" class="dateTable" :header="$t('Utilidades')">
                     <template #body="slotProps">
+                        <Button icon="pi pi-envelope" outlined rounded class="mr-2 simpleDelete-button" severity="danger" 
+                            @click="confirmDeleteProduct(slotProps.data)" v-if="$page.props.user.permissions.includes('delete document income')" />
                         <Button icon="pi pi-file-check" outlined rounded class="mr-2 simpleInvoice-button" 
                             :disabled="slotProps.data.document_type_name !== 'Presupuesto'" 
                             @click="slotProps.data.document_type_name === 'Presupuesto' ? checkDocument(slotProps.data) : null" v-if="$page.props.user.permissions.includes('update document income')" />
