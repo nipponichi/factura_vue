@@ -3,7 +3,6 @@ const resultError = {
                 type: 'error',
                 message: 'Error connecting to the server',
             }
-
 export var DataAccess = function () {
 
     async function fetchData(url) {
@@ -22,9 +21,7 @@ export var DataAccess = function () {
     }
 
     async function saveData(url, object) {
-
         try {
-            console.log(url)
             const dataResponse = await axios.post(url, object);
             let result = dataResponse.data;
             console.log("DataAccess POST")

@@ -13,7 +13,7 @@ const showingNavigationDropdown = ref(false);
             </template>
             <div class="py-12">
                 <div class="max-w-10xl mx-auto sm:px-6 lg:px-24">
-                    <div :class="{'border-blue-500 border-2': isChecked, 'bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg': true}">
+                    <div :class="{'border-blue-500 border-2': isExpense, 'bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg': true}">
                         <div class="card"> 
                             <!-- Hamburger -->
                             <div class="-me-2 flex items-center sm:hidden">
@@ -144,7 +144,7 @@ const showingNavigationDropdown = ref(false);
                                         </div>
                                     </div>
 
-                                    <div v-if="!isChecked" class="split-button-container ml-2">
+                                    <div v-if="!isExpense" class="split-button-container ml-2">
                                         <SplitButton
                                             ref="splitButton"
                                             class="bg-purple-400 hover:bg-purple-500 focus:ring-4 focus:ring-pur-300 font-medium rounded-lg text-white text-white p-2"
@@ -163,7 +163,7 @@ const showingNavigationDropdown = ref(false);
                                         <SplitButton
                                             class="blue-button"
                                             :label="$t('Save')"
-                                            @click="checkDocument"
+                                            @click="tryToSaveDocument"
                                             :model="itemsSave"
                                             :disabled="totalConIVA === 0 || isSaving || !myDocument.customer.id || !myDocument.serie.number"
                                             :class="{ 'opacity-50': totalConIVA === 0 || isSaving || !myDocument.customer.id || !myDocument.serie.number}">
@@ -186,10 +186,10 @@ const showingNavigationDropdown = ref(false);
                                         <div class="flex items-center justify-between w-full">
                                             <div>
                                                 <div v-if="!myDocument.customer.name" class="font-semibold whitespace-nowrap mr-3">
-                                                    {{ isChecked ? $t('Select a provider') : $t('Select a customer') }}
+                                                    {{ isExpense ? $t('Select a provider') : $t('Select a customer') }}
                                                 </div>
                                                 <div v-else class="font-semibold mr-3 flex-shrink-0 w-32">
-                                                    {{ isChecked ? $t('Provider') : $t('Customer') }}:
+                                                    {{ isExpense ? $t('Provider') : $t('Customer') }}:
                                                 </div>
                                             </div>
                                             <div class="text-gray-700 w-full font-bold text-lg">{{ myDocument.customer.name }}</div>
@@ -234,7 +234,7 @@ const showingNavigationDropdown = ref(false);
                                         <div class="font-semibold mr-4 flex-shrink-0">{{ $t('Payment date') }}:</div>
 
                                         <div class="input-wrapper">
-                                        <input type="date" :min="fecha"  v-model="fechaPaid" @change="cambiarFormatoFecha" 
+                                        <input type="date" :min="myDocument.date"  v-model="myDocument.datePaid" @change="cambiarFormatoFecha" 
                                             :disabled="false"
                                             :class="{
                                                 'bg-gray-100 text-gray-300 cursor-not-allowed': !myDocument.paid, 
@@ -250,7 +250,7 @@ const showingNavigationDropdown = ref(false);
                                         <div class="font-semibold mr-8 min-w-20 flex-shrink-0">Nº {{ myDocument.type.name }}:</div>
                                         <div class="relative w-full">
                                             
-                                            <div v-if="!isChecked" class="input-wrapper">
+                                            <div v-if="!isExpense" class="input-wrapper">
                                                 <div class=" font-bold flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                                                     {{ myDocument.serie.serie }} /
                                                 </div>    
@@ -264,14 +264,14 @@ const showingNavigationDropdown = ref(false);
                                     <div class="flex items-center justify-between w-full">
                                         <div class="font-semibold mr-3 flex-shrink-0">{{ $t('Date') }}:</div>
                                         <div class="input-wrapper">
-                                            <input type="date" v-model="fecha" @change="cambiarFormatoFecha" class="styled-input bg-gray-50 border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                            <input type="date" v-model="myDocument.date" @change="cambiarFormatoFecha" class="styled-input bg-gray-50 border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
                                         </div>
                                     </div>
                                     
                                     <div class="flex items-center justify-between w-full">
                                         <div class="font-semibold mr-3 flex-shrink-0">{{ $t('Expiration') }}:</div>
                                         <div class="input-wrapper">
-                                            <input type="date" v-model="expiration" :min="fecha" @change="cambiarFormatoFecha" class="styled-input bg-gray-50 border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
+                                            <input type="date" v-model="myDocument.expirationDate" :min="myDocument.date" @change="cambiarFormatoFecha" class="styled-input bg-gray-50 border border-gray-300 rounded-md w-48 px-3 py-2 focus:outline-none focus:border-blue-400">
                                         </div>
                                     </div>
                                     
@@ -353,7 +353,6 @@ const showingNavigationDropdown = ref(false);
                                     </template>
                                 </Column>
                             </DataTable>
-  
 
                             <div class="flex justify-end mt-4 pr-4" v-if="showButton">
                                 <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white" @click="addRow()" />
@@ -573,8 +572,8 @@ const showingNavigationDropdown = ref(false);
             </Dialog>
 
             <!-- MODAL DOCUMENT LIST -->
-            <Dialog v-model:visible="documentListDialog" class="w-3/4" :header="isChecked ? $t('Received invoices') : $t('Emitted invoices')" :modal="true">
-                <TableDocumentSelector :companyId="myDocument.company.id" :isChecked="isChecked" @document-selected="handleDocumentSelected"  />
+            <Dialog v-model:visible="documentListDialog" class="w-3/4" :header="isExpense ? $t('Received invoices') : $t('Emitted invoices')" :modal="true">
+                <TableDocumentSelector :companyId="myDocument.company.id" :isExpense="isExpense" @document-selected="handleDocumentSelected"  />
             </Dialog>
 
             <!-- MODAL DELETE SIMPLE -->
@@ -593,7 +592,7 @@ const showingNavigationDropdown = ref(false);
             <Dialog v-model:visible="deleteProductsDialog" :style="{width: '450px'}" :header="$t('Confirm')" :modal="true">
                 <div class="confirmation-content">
                     <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                    <span v-if="companies">{{ $t('Are you sure you want to delete the selected concepts?') }}</span>
+                    <span v-if="companies">{{ $t('Are you sure you want to delete the selected conceptsTax?') }}</span>
                 </div>
                 <template #footer>
                     <Button :label="$t('No')" icon="pi pi-times" text @click="deleteProductsDialog = false" />
@@ -602,7 +601,7 @@ const showingNavigationDropdown = ref(false);
             </Dialog>
         
             <!-- SELECT A CUSTOMER -->
-            <Dialog v-model:visible="selectACustomerDialog" :header="isChecked ? $t('Select a provider') : $t('Select a customer')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
+            <Dialog v-model:visible="selectACustomerDialog" :header="isExpense ? $t('Select a provider') : $t('Select a customer')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
                 <Dropdown v-model="myDocument.customer" :options="customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class=" flex align-items-center ">
@@ -618,7 +617,7 @@ const showingNavigationDropdown = ref(false);
                 <div class="grid gap-3 md:grid-cols-1 justify-items">
                     <div class="flex justify-between">
                         <button class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white p-2 mr-1 mr-1 rounded-md" @click="openNew">
-                            <i class="pi pi-plus"></i> {{ isChecked ? $t('Create provider') : $t('Create customer') }}
+                            <i class="pi pi-plus"></i> {{ isExpense ? $t('Create provider') : $t('Create customer') }}
                         </button>
                         <button class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" @click="hideDialog()">{{ $t('Close') }}</button>
                     </div>   
@@ -628,7 +627,7 @@ const showingNavigationDropdown = ref(false);
             <!-- MODAL PAYMENT METHOD -->
             <Dialog v-model:visible="selectAPaymentMethodDialog" :header="$t('Select a payment method')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
                 <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ $t('Payment method') }}</label>
-                <Dropdown v-model="selectedPaymentMethod" :options="payment_methods" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                <Dropdown v-model="selectedPaymentMethod" :options="paymentMethods" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class="flex items-center">
                             <div>{{ slotProps.value.name }}</div>
@@ -719,7 +718,7 @@ const showingNavigationDropdown = ref(false);
     
     <!-- PDF -->
 
-    <!-- <div class="imprimir">
+    <div class="imprimir">
         <div class="invoice">
             <div class="invoice-header">
                 <div class="logo">
@@ -727,8 +726,8 @@ const showingNavigationDropdown = ref(false);
                 </div>
                 <div class="invoice_details">
                     <h3>{{ myDocument.type.name }}</h3>
-                    <p><strong>{{ $t('Date') }}: </strong>{{ fecha }}</p>
-                    <p><strong>{{ $t('Expiration') }}: </strong>{{ expiration }}</p>
+                    <p><strong>{{ $t('Date') }}: </strong>{{ myDocument.date }}</p>
+                    <p><strong>{{ $t('Expiration') }}: </strong>{{ myDocument.expirationDate }}</p>
                     <p><strong>{{ $t('Number of') }} {{ myDocument.type.name }}:</strong> {{ myDocument.serie.serie }} {{ myDocument.serie.number }}</p>
                 </div>
             </div>
@@ -736,8 +735,8 @@ const showingNavigationDropdown = ref(false);
             <div class="invoice-info">
                 <div class="company-details">
                     <h3><strong>{{ $t('Company') }}</strong></h3>
-                    <p class="name">{{ mydocument.company.name }}</p>
-                    <p>{{ mydocument.company.tax_number }}</p>
+                    <p class="name">{{ myDocument.company.name }}</p>
+                    <p>{{ myDocument.company.tax_number }}</p>
                     <p> {{ myDocument.company.address }}<br> {{ myDocument.company.post_code }}, {{ myDocument.company.town}}, {{ myDocument.company.province }}, {{'(' }} {{ myDocument.company.country }} {{ ')' }}</p>
                     <p> {{ myDocument.company.email }}</p>   
                     <p> {{ myDocument.company.phone }}</p>
@@ -823,7 +822,7 @@ const showingNavigationDropdown = ref(false);
                 </table>
             </div>
         </div>   
-    </div> -->
+    </div>
 </template>
 
 
@@ -879,13 +878,10 @@ export default {
                 },
             ],
             taxMap: new Map(),
-            fecha: '',
-            fechaPaid: '',
-            expiration: '',
-            fechaFormateada: '',
+            formattedDate: '',
             loading: true,
             isSaving: false,
-            isChecked: false,
+            isExpense: false,
             showTable: false,
             selectedOption: null,
             saveRestart: false,
@@ -900,68 +896,80 @@ export default {
                 { label: '18', value: 18},
                 { label: '21', value: 21 },
             ],
-            paymentMethods: [
-                { id: 1 },
-                { id: 2 },
-                { id: 3 },
-                { id: 4 }
-            ],
             imageUrl: 'https://placehold.co/300x300/e2e8f0/e2e8f0',
+
+            // Load arrays from DB
             companies: null,
             customers: null,
-            types: [],
-            series: [],
-            serie: '',
-            counter: '',
-            showButton: false,
-            productDialog: false,
-            documentDialog: false,
-            customerDialog: false,
+            paymentMethods: null,
+            types: null,
+            series: null,
+            emails: null,
+            phones: null,
+            banks: null,
+            products: [],
+
+            //Modals
+            
             deleteProductDialog: false,
             deleteProductsDialog: false,
             selectACustomerDialog: false,
             selectAPaymentMethodDialog: false,
             documentListDialog: false,
             descriptionDialog: false,
+            productDialog: false,
+            documentDialog: false,
+            customerDialog: false,
+
+            //PaymentMethods
+            selectedPaymentMethod: '',
+            selectedBankAccount: '',
+            selectedEmail: '',
+            selectedPhone: '',
+            
+
+            counter: '',
+
+            //Buttons
+
+            
+            showButton: false, //Boton que tenemos que arreglar y es para que aparezca cuando haya mas de x productos
+            
+            
+            
+            
+
             selectedDescription: '',
             productDescription: '',
             options: [],
-            concepts: [],
-            selectedBankAccount: [],
-            selectedEmail: [],
-            selectedPhone: [],
-            products: [],
-            emails:[],
-            phones:[],
+            conceptsTax: [],
+
+            
             selectedProducts: [],
-            selectedPaymentMethod: [],
-            selectedPaymentSystemId: '',
-            payment_methods: null,
+            selectedPaymentSystem: '',
+            
             filters: {},
+            customer: {},
             submitted: false,
             myDocument: { 
-                document_counter: '',
+                documentCounter: '',
                 number: '', 
-                company_id_company: '',
-                company_id_customer: '',
-                documents_type_id: '',
-                documents_series_id: '',
-                payment_system_id: '',
-                expiration: '',
+                expirationDate: '',
                 date: '',
-                date_paid: '',
+                datePaid: '',
                 amount: '',
-                payment_methods_id: '',
                 totalTax: '',
                 subTotal: '',
                 paid: false, 
                 invoiced: false,  
                 isReceived: false,             
-                concept: [],
+                concept: {},
                 customer: {},
                 company: {},
                 type: {},
-                serie: {}
+                serie: {},
+                paymentMethod: {},
+                paymentSystem: {}
 
             },
         };
@@ -1012,13 +1020,13 @@ export default {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
         };
 
-        this.isChecked = this.$page.props.isChecked;
+        this.isExpense = this.$page.props.isExpense;
 
-        this.myDocument.isReceived = this.$page.props.isChecked
+        this.myDocument.isReceived = this.$page.props.isExpense
 
-        this.fecha = Datejs.getDate()
-        this.fechaPaid = Datejs.getDate()
-        this.expiration = Datejs.getExpirationDate()
+        this.myDocument.date = Datejs.getDate()
+        this.myDocument.datePaid = Datejs.getDate()
+        this.myDocument.expirationDate = Datejs.getExpirationDate()
     },
 
     async mounted() {
@@ -1027,7 +1035,7 @@ export default {
         await this.fetchCustomers();
         await this.fetchPayments();
 
-        if (!this.isChecked) {
+        if (!this.isExpense) {
                 await this.fetchDocumentsType()
                 await this.fetchDocumentsSerie () 
     
@@ -1040,7 +1048,7 @@ export default {
     },
 
     watch: {
-        selectedPaymentMethod(newMethod) {
+        selectedPaymentMethod (newMethod) {
             this.handlePaymentMethodChange(newMethod);
         },
 
@@ -1052,18 +1060,18 @@ export default {
                 case 1:
                 case 7:
                     this.selectedBankAccount = newValue;
-                    this.selectedPaymentSystemId = newValue.id
+                    this.selectedPaymentSystem = newValue
                     break;
                 case 3:
                     this.selectedPhone = newValue;
-                    this.selectedPaymentSystemId = newValue.id
+                    this.selectedPaymentSystem = newValue
                     break;
                 case 4:
                     this.selectedEmail = newValue;
-                    this.selectedPaymentSystemId = newValue.id
+                    this.selectedPaymentSystem = newValue
                     break;
                 default:
-                    this.selectedPaymentSystemId = '';
+                    this.selectedPaymentSystem = '';
                     break;
                 }
             }
@@ -1098,8 +1106,8 @@ export default {
         // Prepara la llamada para traer metodos de pago
         async fetchPayments () {
             
-            this.payment_methods = await this.fetchData(this.mountUrl('payment'));
-            this.selectedPaymentMethod =  this.payment_methods[0]
+            this.paymentMethods = await this.fetchData(this.mountUrl('payment'));
+            this.selectedPaymentMethod =  this.paymentMethods[0]
 
         },
 
@@ -1125,7 +1133,7 @@ export default {
         //Trae todos las empresas de la base de datos dependiendo si estas en facturas ingresos / gastos pasa a provider o a cliente       
         async fetchCustomers() {
 
-            const url = this.isChecked 
+            const url = this.isExpense 
                     ? `/providers/${this.myDocument.company.id}` 
                     : `/customers/${this.myDocument.company.id}`;
 
@@ -1151,6 +1159,23 @@ export default {
             this.myDocument.serie = this.series[0]; 
             this.loading = false;     
         },
+
+        changePaymentMethodSystemId(systemValues) {
+            let selectedMethod;
+            if (this.selectedPaymentSystem != null) {
+                let value = systemValues.find(value => value.id === this.selectedPaymentSystem);
+                if (value) {
+                    selectedMethod = value;
+                } else {
+                    selectedMethod = systemValues.length > 0 ? systemValues[0] : null;
+                }
+            } else {
+                selectedMethod = systemValues.length > 0 ? systemValues[0] : null;
+            }
+
+            return selectedMethod;
+        },
+        
 
         async handlePaymentMethodChange(paymentMethod) {
             switch (paymentMethod.id) {
@@ -1192,17 +1217,15 @@ export default {
             }
         },
 
-        //Construye una url para diferenciar si estamos en la parte de facturas ingresos / gastos
-        
+        //Construye una url para diferenciar si estamos en la parte de facturas ingresos / gastos 
         mountUrl (url) {
-            url = this.isChecked 
+            url = this.isExpense 
                 ? `/${url}/${this.myDocument.customer.id}` 
                 : `/${url}/${this.myDocument.company.id}`;
 
             return url;
         },
 
-        
         addsign(data){
             if (this.myDocument.id == null) {
                 alert("Guarda el documento");
@@ -1263,83 +1286,8 @@ export default {
             }
         },
 
-        async handleDocumentSelected(documentId) {
-            if (documentId) {
-                this.documentListDialog = false
-            }
-            this.company = this.myDocument.company;
-            this.company.documentId = documentId
-
-
-            const response = await this.fetchData('/documents-show/' + this.company.id + '/' + this.company.documentId)
-                if(response) {
-                    this.myDocument = response.documents;
-                    this.fecha = this.myDocument.date;
-                    
-                    this.expiration = this.myDocument.expiration;
-                    this.myDocument.type.name = this.myDocument.document_type_name;
-                    this.myDocument.type.id = this.myDocument.documents_type_id;
-                    this.myDocument.serie.id = this.myDocument.documents_series_id;
-                    this.myDocument.serie.serie = this.myDocument.document_series_serie;
-                    this.selectedPaymentSystemId = this.myDocument.payment_system_id
-                    this.selectedPaymentMethod.id = this.myDocument.payment_methods_id
-
-                    let number = this.myDocument.number;
-                    let numberWithoutSerie = number.replace(this.myDocument.serie.serie, '');
-
-                    this.myDocument.serie.number = numberWithoutSerie;
-
-                    if (this.myDocument.paid === 0 ) {
-                        this.fechaPaid = await Datejs.getDate();
-                        this.myDocument.paid = false
-                    } else {
-                        this.fechaPaid = this.myDocument.date_paid;
-                        this.myDocument.paid = true
-                    }
-
-                    // Company
-                    this.myDocument.company = response.company;
-
-                    // Customer
-                    this.myDocument.customer = response.customer;
-
-                    // Concepts
-                    this.concepts = response.concepts;
-                    this.products = response.concepts;
-
-                    for (let i = 0; i < this.concepts.length; i++) {
-                        this.products[i].taxes = parseFloat(this.concepts[i].tax);
-                    }
-
-                    // Payment
-                    this.selectedPaymentMethod = [];
-                    this.selectedPaymentMethod.id = this.myDocument.payment_methods_id;
-                    //this.handlePaymentMethodChange(this.selectedPaymentMethod)
-
-                } else { 
-                    this.$toast(this.$t('Error connecting to the server'), 'error');
-                };   
-        },
-
-        changePaymentMethodSystemId(systemValues) {
-            let selectedMethod;
-            if (this.selectedPaymentSystemId != null) {
-                let value = systemValues.find(value => value.id === this.selectedPaymentSystemId);
-                if (value) {
-                    selectedMethod = value;
-                } else {
-                    selectedMethod = systemValues.length > 0 ? systemValues[0] : null;
-                }
-            } else {
-                selectedMethod = systemValues.length > 0 ? systemValues[0] : null;
-            }
-
-            return selectedMethod;
-        },
-
-
         exportToXML() {
-            this.myDocumentSave()
+            this.addValuesToDocument()
             this.calculateTaxes().then(() => {  
             this.myDocument.document_counter = 1
             const xmlContent = GenerateXML.convertToFacturaeXML(this.myDocument.company, this.myDocument.serie, this.myDocument, 
@@ -1409,7 +1357,7 @@ export default {
         
         async saveCustomer() {
 
-            const url = this.isChecked 
+            const url = this.isExpense 
                     ? `/provider/` 
                     : `/customer/`;
 
@@ -1470,11 +1418,11 @@ export default {
         addRow() {
 
             let newProduct = {
-                reference: '',
-                description: '',
-                price: 0,
-                quantity: 0,
-                discount: 0,
+                reference: '1.1.1.1',
+                description: 'pruebaDesc',
+                price: 1,
+                quantity: 10,
+                discount: 1,
                 discount_reason: 'Descuento profesional',
                 subtotal: 0,
                 taxes: 21,
@@ -1505,172 +1453,141 @@ export default {
             });
         },
 
+        async tryToSaveDocument(){
+
+            await this.checkDocument()
+            await this.addValuesToDocument()
+            await this.addProducts()
+            await this.saveDocument()
+            
+        },
 
         async checkDocument() {
-            if (!this.isChecked) {
-                let response = await this.fetchData('/documents-serie/'+this.myDocument.type.id+'/'+this.myDocument.company.id+'/'+this.myDocument.serie.serie)
 
-                    this.date = response.date.date
-                    this.serie = response.number.number;
-
-
-                    if (this.myDocument.serie.number <= this.serie) {
-                    
-                        let respuesta = prompt(`El número de documento ya existe. ¿Qué deseas hacer?\n1. Conservar el número ingresado: ${(this.myDocument.serie.serie)}${this.myDocument.serie.number} \n2. Asignar el siguiente valor disponible: ${(this.myDocument.serie.serie)}${++this.serie}`);
-
-                        switch (respuesta) {
-                            case null:
-                                // Cancelar la operación en el prompt
-                                this.$toast(this.$t('Operation cancelled.'), 'error');
-                                break;
-                            case '1':
-                                // Conservar el número ingresado por el cliente
-                                this.$toast(this.$t('The number entered will be retained: ') + this.myDocument.serie.serie +this.myDocument.serie.number, 'success');
-                                this.serie = '';
-                                this.saveDocument();
-                                break;
-                            case '2':
-                                // Asignar el siguiente valor disponible
-                                this.updateDate = true;
-                                this.myDocument.serie.number = this.serie;
-                                this.$toast(this.$t('The following available number has been assigned: ') + this.myDocument.serie.serie + this.myDocument.serie.number, 'success');
-                                this.serie = '';
-                                this.saveDocument();
-                                break;
-                            default:
-                                // Entrada no válida
-                                this.$toast(this.$t('Invalid input.'), 'error');
-                        }
-
-
-                    } else if (this.date > this.fecha) {
-
-                        let dateFormateado = Datejs.dateFormat(this.date)
-                        let fechaFormateada = Datejs.dateFormat(this.fecha)
-
-                        let respuesta = prompt(`La fecha seleccionada es anterior a la de la última factura, ¿deseas asignarle la fecha actual?\n1. Conservar la fecha seleccionada: ${fechaFormateada} \n2. Asignar la fecha actual: ${dateFormateado}`);
-
-                        switch (respuesta) {
-                            case null:
-                                // Cancelar la operación en el prompt
-                                this.$toast(this.$t('Operation cancelled.'), 'error');
-                                break;
-                            case '1':
-                                // Conservar la fecha ingresada por el cliente
-                                this.$toast(this.$t('The date will be retained: ') + this.fecha, 'success');
-                                this.saveDocument();
-                                break;
-                            case '2':
-                                // Asignar la fecha actual
-                                this.fecha = Datejs.getDate();
-                                
-                                this.$toast(this.$t('The current date has been assigned.'), 'success');
-
-                                this.saveDocument();
-                                break;
-
-                            default:
-                                // Entrada no válida
-                                this.$toast(this.$t('Invalid input.'), 'error');
-                        }
-                        
-                    
-                    
-                    }else{
-                        this.saveDocument();
-                    }
-                
-            }else{
+            //Factura Gastos
+            if (this.isExpense) {
                 this.saveDocument();
-            } 
-        },
-
-        myDocumentSave() {
-
-            if (!this.isChecked) {
-                this.myDocument.number = this.myDocument.serie.serie + this.myDocument.serie.number
-                this.myDocument.document_counter = this.myDocument.serie.number
-                this.myDocument.company_id_company = this.myDocument.company.id 
-                this.myDocument.company_id_customer = this.myDocument.customer.id
-                this.myDocument.documents_series_id = this.myDocument.serie.id
-            } else {
-                this.myDocument.number = this.myDocument.serie.number
-                this.myDocument.company_id_company = this.myDocument.customer.id 
-                this.myDocument.company_id_customer = this.myDocument.company.id
-                this.myDocument.documents_series_id = ''
-                
+                return;
             }
 
-            if (this.myDocument.paid) {
-                this.myDocument.date_paid = this.fechaPaid
-            } else {
-                this.myDocument.date_paid = '';
-            }
-
-            this.myDocument.documents_type_id = this.myDocument.type.id
-            
-            if (this.updateDate) {
-                this.fecha =  Datejs.getDate();
-                this.expiration =  Datejs.getExpirationDate();
-            } 
-
-            this.myDocument.expiration = this.expiration
-            this.myDocument.date = this.fecha
-
-            this.updateDate = false;
-            this.myDocument.payment_methods_id = this.selectedPaymentMethod.id
-            this.myDocument.payment_system_id = this.selectedPaymentSystemId
-
-            this.myDocument.document_counter = 1
-            
-            this.myDocument.subTotal =  this.subtotal.toFixed(2)
-            this.myDocument.totalTax =  this.totalIVA.toFixed(2)
-            this.myDocument.amount =  this.totalConIVA.toFixed(2)
-            
-        },
-
-        async saveDocument(){
-            
-            this.myDocumentSave()
+            //Factura Ingresos
 
             if(this.myDocument.type.id == 1 ) {
                 this.myDocument.invoiced = true
             }
-            this.myDocument.concept = []
-            this.products.forEach(product => {
-                
-                try {
-                    let newProduct = {
-                        reference: product.reference,
-                        description: product.description,
-                        quantity: product.quantity,
-                        price: product.price,
-                        taxes: product.taxes,
-                        discount: product.discount,
-                        discount_reason: product.discount_reason,
-                        total: Calculator.calculateTotal(product),
-                        
-                    };
-                
-                    this.myDocument.concept.push(newProduct);
-                } catch (error) {
-                    console.error("Error al crear el objeto newProduct:", error);
-                }
-                
-                
-                
-            });
-            let response = await this.saveData('/documents', {documentData: this.myDocument})
             
+            let response = await this.fetchData(`/documents-serie/${this.myDocument.type.id}/${this.myDocument.company.id}/${this.myDocument.serie.serie}`);
+            let oldDate = response.date.date;
+            let serie = response.number.number;
+
+            if (this.myDocument.serie.number <= serie) {
+                await this.handleExistingSerie(serie);
+            } else if (oldDate > this.myDocument.date) {
+                await this.handleOldDate(oldDate);
+            } 
+        },
+
+        async handleExistingSerie(serie) {
+            let userInput = prompt(
+                `El número de documento ya existe. ¿Qué deseas hacer?\n1. Conservar el número ingresado: ${this.myDocument.serie.serie}${this.myDocument.serie.number} \n2. Asignar el siguiente valor disponible: ${this.myDocument.serie.serie}${++serie}`
+            );
+
+            switch (userInput) {
+                case null:
+                    this.$toast(this.$t('Operation cancelled.'), 'error');
+                    break;
+                case '1':
+                    this.$toast(this.$t('The number entered will be retained: ') + this.myDocument.serie.serie + this.myDocument.serie.number, 'success');
+                    break;
+                case '2':
+                    this.updateDate = true;
+                    this.myDocument.serie.number = serie;
+                    this.$toast(this.$t('The following available number has been assigned: ') + this.myDocument.serie.serie + this.myDocument.serie.number, 'success');
+                    break;
+                default:
+                    this.$toast(this.$t('Invalid input.'), 'error');
+            }
+        },
+
+        async handleOldDate(oldDate) {
+            let formattedOldDate = Datejs.dateFormat(oldDate);
+            let formattedDate = Datejs.dateFormat(this.myDocument.date);
+
+            let userInput = prompt(
+                `La fecha seleccionada es anterior a la de la última factura, ¿deseas asignarle la fecha actual?\n1. Conservar la fecha seleccionada: ${formattedDate} \n2. Asignar la fecha actual: ${formattedOldDate}`
+            );
+
+            switch (userInput) {
+                case null:
+                    this.$toast(this.$t('Operation cancelled.'), 'error');
+                    break;
+                case '1':
+                    this.$toast(this.$t('The date will be retained: ') + this.myDocument.date, 'success');
+                    this.addValuesToDocument();
+                    break;
+                case '2':
+                    this.myDocument.date = Datejs.getDate();
+                    this.$toast(this.$t('The current date has been assigned.'), 'success');
+                    this.addValuesToDocument();
+                    break;
+                default:
+                    this.$toast(this.$t('Invalid input.'), 'error');
+            }
+        },
+
+        async addValuesToDocument() {
+            this.assignDocumentNumber();
+            this.assignDatePaid();
+            this.updateDocumentDates();
+
+            this.myDocument.paymentMethod = this.selectedPaymentMethod;
+            this.myDocument.paymentSystem = this.selectedPaymentSystem;
+            this.myDocument.documentCounter = 1;
+            this.myDocument.subTotal = this.subtotal.toFixed(2);
+            this.myDocument.totalTax = this.totalIVA.toFixed(2);
+            this.myDocument.amount = this.totalConIVA.toFixed(2);
+        },
+
+        assignDocumentNumber() {
+            if (!this.isExpense) {
+                this.myDocument.number = this.myDocument.serie.serie + this.myDocument.serie.number;
+                this.myDocument.document_counter = this.myDocument.serie.number;
+            } else {
+                this.myDocument.number = this.myDocument.serie.number;
+                this.myDocument.documents_series_id = '';
+            }
+        },
+
+        assignDatePaid() {
+            this.myDocument.datePaid = this.myDocument.paid ? this.myDocument.datePaid : '';
+        },
+
+        updateDocumentDates() {
+            if (this.updateDate) {
+                this.myDocument.date = Datejs.getDate();
+                this.myDocument.expirationDate = Datejs.getExpirationDate();
+                this.updateDate = false;
+            } else {
+                this.myDocument.expirationDate = this.myDocument.expirationDate;
+                this.myDocument.date = this.myDocument.date;
+            }
+        },
+
+        async addProducts () {
+            this.myDocument.concept = {}
+            this.myDocument.concept = this.products;         
+        },
+        
+        async saveDocument() {
+            console.log(this.myDocument)
+            let response = await this.saveData('/documents', this.myDocument)      
             this.myDocument.id = response
-            
             this.myDocument.concept = []
             if (this.saveRestart) {
                 this.resetData();
             }
-            
         },
-        
+                
         resetData() {
             this.isSaving = true;
             setTimeout(function() {
@@ -1681,7 +1598,7 @@ export default {
         },
         
         exportToPDF() {
-            this.myDocumentSave()
+            this.addValuesToDocument()
             this.calculateTaxes().then(() => {
                 this.showTable = !this.showTable;
                 window.print();

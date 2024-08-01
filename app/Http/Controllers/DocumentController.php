@@ -32,7 +32,7 @@ class DocumentController extends Controller
     {
         //El isChecked es para diferenciar que va a cargar si Facturas Recibidas o Emitidas
         return Inertia::render('Documents/Document', [
-            'isChecked' => false,
+            'isExpense' => false,
         ]);
     }
 
@@ -40,7 +40,7 @@ class DocumentController extends Controller
     {
         //El isChecked es para diferenciar que va a cargar si Facturas Recibidas o Emitidas
         return Inertia::render('Documents/Document', [
-            'isChecked' => true,
+            'isExpense' => true,
         ]);
     }
 
@@ -52,6 +52,7 @@ class DocumentController extends Controller
     public function store(DocumentRequest $request)
     {
 
+        dd($request);
         DB::beginTransaction();
         
         try {

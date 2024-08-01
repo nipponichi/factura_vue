@@ -23,22 +23,23 @@ class DocumentRequest extends FormRequest
     {
         return [
             'number' => 'string',
-            'document_counter' => 'string',
-            'company_id_company' => 'string',
-            'company_id_customer' => 'string',
-            'documents_type_id' => 'string',
-            'documents_series_id' => 'string',
-            'date' => 'datetime',
-            'expiration' => 'datetime',
-            'amount' => 'decimal',
-            'totalTax' => 'decimal',
-            'subTotal' => 'decimal',
+            'documentCounter' => 'numeric',
+            'date' => 'date',
+            'expirationDate' => 'date',
+            'amount' => 'numeric',
+            'totalTax' => 'numeric',
+            'subTotal' => 'numeric',
             'paid' => 'boolean',
             'invoiced' => 'boolean',
             'isReceived' => 'boolean',
-            'bank_account_id' => 'string',
-            'payment_methods_id' => 'string',
             //'active' => 'boolean'
+            // 'concept' => 'array',
+            // 'customer' => 'array',
+            // 'company' => 'array',
+            // 'type' => 'array',
+            // 'serie' => 'array',
+            // 'paymentMethod' => 'array',
+            // 'paymentSystem' => 'array',
         ];
     }
 }

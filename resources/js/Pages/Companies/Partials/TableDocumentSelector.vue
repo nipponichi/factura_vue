@@ -142,6 +142,66 @@ export default {
             return fechaFormateada;
         },
 
+
+        
+        //Tine que estar en la modal de seleccion de facturas
+        async handleDocumentSelected(documentId) {
+            if (documentId) {
+                this.documentListDialog = false
+            }
+            this.company = this.myDocument.company;
+            this.company.documentId = documentId
+
+
+            const response = await this.fetchData('/documents-show/' + this.company.id + '/' + this.company.documentId)
+                if(response) {
+                    this.myDocument = response.documents;
+
+                    this.selectedPaymentSystem = this.myDocument.payment_system_id
+
+                    let number = this.myDocument.number;
+                    let numberWithoutSerie = number.replace(this.myDocument.serie.serie, '');
+
+                    this.myDocument.serie.number = numberWithoutSerie;
+
+                    if (this.myDocument.paid === 0 ) {
+                        this.myDocument.datePaid = Datejs.getDate();
+                        this.myDocument.paid = false
+                    } else {
+                        this.myDocument.datePaid = this.myDocument.datePaid;
+                        this.myDocument.paid = true
+                    }
+
+                    // Company
+                    this.myDocument.company = response.company;
+
+                    // Customer
+                    this.myDocument.customer = response.customer;
+
+
+                    await this.parseTaxToFloat(response.concepts)
+
+                    // Payment
+                    this.selectedPaymentMethod = [];
+                    this.selectedPaymentMethod.id = this.myDocument.payment_methods_id;
+                    //this.handlePaymentMethodChange(this.selectedPaymentMethod)
+
+                } else { 
+                    this.$toast(this.$t('Error connecting to the server'), 'error');
+                };   
+        },
+
+        // Convierte el IVA de DB a float para representarlo en la vista
+        async parseTaxToFloat(concepts) {
+            this.conceptsTax = concepts;
+            this.products = concepts;
+
+            for (let i = 0; i < this.conceptsTax.length; i++) {
+                this.products[i].taxes = parseFloat(this.conceptsTax[i].tax);
+            }
+
+        },
+
     },
 
 }
