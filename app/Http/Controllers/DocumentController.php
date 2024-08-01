@@ -52,7 +52,7 @@ class DocumentController extends Controller
     public function store(DocumentRequest $request)
     {
 
-        dd($request);
+        
         DB::beginTransaction();
         
         try {
@@ -62,9 +62,9 @@ class DocumentController extends Controller
             // Buscamos si un documento coincide en tipo y numero con uno ya existente para la misma empresa
             $repeatedInvoice = DB::table('documents')
             ->select('id')
-            ->where('number', $request->documentData['number'])
-            ->where('documents_type_id', $request->documentData['documents_type_id'])
-            ->where('company_id_company', $request->documentData['company_id_company'])
+            ->where('number', $request->number)
+            ->where('documents_type_id', $request->type['id'])
+            ->where('company_id_company', $request->company['id'])
             ->whereNull('dt_end')
             ->first();
 
@@ -87,24 +87,24 @@ class DocumentController extends Controller
 
             // Guarda la nueva factura
             $documentsId = DB::table('documents')->insertGetId([
-                'number' => $request->documentData['number'],
-                'document_counter' => $request->documentData['document_counter'],
-                'company_id_company' => $request->documentData['company_id_company'],
-                'company_id_customer' => $request->documentData['company_id_customer'],
-                'documents_series_id' => $request->documentData['documents_series_id'],
-                'payment_methods_id' => $request->documentData['payment_methods_id'],
-                'documents_type_id' => $request->documentData['documents_type_id'],
-                'date' => $request->documentData['date'],
-                'date_paid' => $request->documentData['date_paid'],
-                'isReceived' => $request->documentData['isReceived'],
-                'expiration' => $request->documentData['expiration'],
-                'amount' => $request->documentData['amount'],
-                'paid' => $request->documentData['paid'],
-                'invoiced' => $request->documentData['invoiced'],
+                'number' => $request->number,
+                'document_counter' => $request->documentCounter,
+                'company_id_company' => $request->company['id'],
+                'company_id_customer' => $request->customer['id'],
+                'documents_series_id' => $request->serie['id'],
+                'payment_methods_id' => $request->paymentMethod['id'],
+                'documents_type_id' => $request->type['id'],
+                'date' => $request->date,
+                'date_paid' => $request->datePaid,
+                'isReceived' => $request->isReceived,
+                'expiration' => $request->expirationDate,
+                'amount' => $request->amount,
+                'paid' => $request->paid,
+                'invoiced' => $request->invoiced,
                 'active' => true,
-                'tax' => $request->documentData['totalTax'],
-                'subtotal' => $request->documentData['subTotal'],
-                'payment_system_id' => $request->documentData['payment_system_id'],
+                'tax' => $request->totalTax,
+                'subtotal' => $request->subTotal,
+                'payment_system_id' => $request->paymentSystem,
                 'user_who_modified' => $userId,
                 'dt_updated' => now(),
                 'dt_start' => now(),
@@ -112,7 +112,7 @@ class DocumentController extends Controller
         
             
             // Asigna los conceptos en el detalle de factura
-            foreach ($request->documentData['concept'] as $item) {
+            foreach ($request->concept as $item) {
                 DB::table('documents_details')->insert([
                     'reference' => $item['reference'],
                     'description' => $item['description'],
@@ -130,10 +130,9 @@ class DocumentController extends Controller
             if(!$repeatedInvoice) {
                 // Incrementa el contador de documentos en su respectivo tipo
                 DB::table('documents_series')
-                ->where('company_id', $request->documentData['company_id_company'])
-                ->where('documents_type_id', $request->documentData['documents_type_id'])
-                ->increment('number');
-                
+                ->where('documents_type_id', $request->type['id'])
+                ->where('company_id', $request->company['id'])
+                ->increment('number');    
             }
             
             DB::commit();

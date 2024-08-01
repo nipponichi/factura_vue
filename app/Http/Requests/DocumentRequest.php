@@ -33,13 +33,7 @@ class DocumentRequest extends FormRequest
             'invoiced' => 'boolean',
             'isReceived' => 'boolean',
             //'active' => 'boolean'
-            // 'concept' => 'array',
-            // 'customer' => 'array',
-            // 'company' => 'array',
-            // 'type' => 'array',
-            // 'serie' => 'array',
-            // 'paymentMethod' => 'array',
-            // 'paymentSystem' => 'array',
+            //'concept' => 'array',
         ];
     }
 }
