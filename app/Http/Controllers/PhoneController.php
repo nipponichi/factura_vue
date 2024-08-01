@@ -26,7 +26,7 @@ class PhoneController extends Controller
                 ->whereNull('dt_end')
                 ->orderByDesc('favourite')
                 ->get();
-            return response()->json(['message' => 'phones', 'phones' => $phones]);
+            return response()->json(['message' => 'emails', 'type'=>'success', 'result' => $phones]);
         } catch (Exception $e) {
             return response()->json(['message' => 'Error loading data' ,'type' => 'error']);
         }

@@ -438,7 +438,7 @@
     "Status":"Estado",
     "Error when loading role.":"Error cargando el rol",
     
-
+    
     "To create roles": "Permite crear roles",
     "To see roles": "Permite ver la lista de roles",
     "To update roles": "Permite actualizar los roles existentes",
@@ -579,7 +579,9 @@
     "read bank account": "Ver cuenta bancaria",
     "update bank account": "Actualizar cuenta bancaria",
     "delete bank account": "Eliminar cuenta bancaria",
-    "Role not updated":"Rol no actualizado"
+    "Role not updated":"Rol no actualizado",
+    "About of":"Acerca de",
+    "Version info": "Información de la version"
 
     
     

@@ -545,7 +545,7 @@ const showingNavigationDropdown = ref(false);
             <!-- MODAL DOCUMENT -->
             <Dialog v-model:visible="documentDialog" :style="{width: '450px'}" :header="$t('Select document')" :modal="true" @change="handleTypeSelection">
                 <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select document type') }}</label>
-                <Dropdown v-model="selectedType" :options="types" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="handleTypeSelection">
+                <Dropdown v-model="selectedType" :options="types" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="fetchDocumentsSerie">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class="flex align-items-center">
                             <div>{{ slotProps.value.name }}</div>
@@ -601,7 +601,6 @@ const showingNavigationDropdown = ref(false);
                 </template>
             </Dialog>
         
-
             <!-- SELECT A CUSTOMER -->
             <Dialog v-model:visible="selectACustomerDialog" :header="isChecked ? $t('Select a provider') : $t('Select a customer')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
                 <Dropdown v-model="selectedCustomer" :options="customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
@@ -833,7 +832,10 @@ const showingNavigationDropdown = ref(false);
 import { FilterMatchMode } from 'primevue/api';
 import '../../../css/document.css';
 import { AutoScript } from '@/Libcustom/autoscript.js';
+import { GenerateXML } from '@/Pages/Documents/js/GenerateXML.js';
 import TableDocumentSelector from '@/Pages/Companies/Partials/TableDocumentSelector.vue';
+import { DataAccess } from '@/Pages/Utils/DataAccess/DataAccess.js';
+import { FetchsDocument } from '@/Pages/Documents/js/FetchsDocument.js';
 
 export default {
     components: {
@@ -872,7 +874,7 @@ export default {
                 {
                     label: this.$t('XML Firmado'),
                     icon: 'pi pi-file-check',
-                    command: () => this.downloadSignedXml(),
+                    command: () => GenerateXML.downloadSignedXml(),
                 },
             ],
             taxMap: new Map(),
@@ -884,13 +886,9 @@ export default {
             loading: true,
             isSaving: false,
             isChecked: false,
-            isMobileMenuOpen: false,
             showTable: false,
-            isDropdownOpen: false,
             selectedOption: null,
             saveRestart: false,
-            taxTypes: [],
-            taxValues: [],
             taxOptions: [
                 { label: '0', value: 0 },
                 { label: '4', value: 4 },
@@ -902,7 +900,6 @@ export default {
                 { label: '18', value: 18},
                 { label: '21', value: 21 },
             ],
-
             paymentMethods: [
                 { id: 1 },
                 { id: 2 },
@@ -978,7 +975,8 @@ export default {
                 post_code: '',
                 town: '',
                 province: '',
-                country: ''
+                country: '',
+                
             },
             company: {
                 id:'',
@@ -1045,8 +1043,6 @@ export default {
 
         this.myDocument.isReceived = this.$page.props.isChecked
 
-        console.log("isChecked Create " + this.isChecked)
-
         this.fecha = await this.getDate()
         this.fechaPaid = await this.getDate()
         this.expiration = await this.getExpirationDate()
@@ -1054,15 +1050,14 @@ export default {
 
     async mounted() {
 
-        await this.fetchCompanies();
-        await this.fetchCustomers();
-
-        await this.fetchPayments();
-
-
+        await FetchsDocument.fetchCompanies();
+        await FetchsDocument.fetchCustomers();
+        await FetchsDocument.fetchPayments();
 
         if (!this.isChecked) {
-                await this.fetchDocuments()
+                await FetchsDocument.fetchDocumentsType()
+                await FetchsDocument.fetchDocumentsSerie () 
+    
             } else {
                 this.selectedType.id = 1
                 this.selectedType.name = "Factura"
@@ -1078,13 +1073,10 @@ export default {
         },
 
         selectedPaymentMethod(newMethod) {
-            console.log("PaymentId " + newMethod.id)
             this.handlePaymentMethodChange(newMethod);
         },
 
         selectedOption(newValue) {
-            console.log("NewValue")
-            console.log(newValue)
             
             if (newValue) {
                 switch (this.selectedPaymentMethod.id) {
@@ -1113,22 +1105,60 @@ export default {
     
     methods: {
 
-        saveAndSign() {
-
-            this.myDocumentSave()
-            this.calculateTaxes().then(() => {
-                this.myDocument.document_counter = 1
-                console.log("contador: " + this.myDocument.document_counter)
-                const xmlContent = this.convertToFacturaeXML();
-                this.addsign(xmlContent);
-            });
-            
+        async handlePaymentMethodChange(paymentMethod) {
+            switch (paymentMethod.id) {
+                case 1:
+                    this.selectedPaymentMethod.name = "Transferencia"
+                    this.banks = await this.fetchData(this.mountUrl('banks'));
+                    this.selectedBankAccount = await this.changePaymentMethodSystemId(this.banks);
+                    this.options = this.banks
+                    break;
+                case 2:
+                    this.selectedPaymentMethod.name = "Efectivo"
+                    break;
+                case 3:
+                    this.selectedPaymentMethod.name = "Bizum"
+                    this.phones = await this.fetchData(this.mountUrl('phones'));
+                    this.selectedPhone = await this.changePaymentMethodSystemId(this.phones);
+                    this.options = this.phones       
+                    break;
+                case 4:
+                    this.selectedPaymentMethod.name = "Paypal" 
+                    this.emails = await this.fetchData(this.mountUrl('emails'));
+                    this.selectedEmail = await this.changePaymentMethodSystemId(this.emails);
+                    this.options = this.emails
+                    break;
+                case 5:
+                    this.selectedPaymentMethod.name = "Tarjeta"
+                    break;
+                case 6:
+                    this.selectedPaymentMethod.name = "Cheque"
+                    break;
+                case 7:
+                    this.selectedPaymentMethod.name = "Domiciliación"
+                    this.banks = await this.fetchData(this.mountUrl('banks'));
+                    this.selectedBankAccount = await this.changePaymentMethodSystemId(this.banks);
+                    this.options = this.banks
+                    break;    
+                default:
+                    break; 
+            }
         },
 
-        addsign(data){
+        //Construye una url para diferenciar si estamos en la parte de facturas ingresos / gastos
+        
+        mountUrl (url) {
+            url = this.isChecked 
+                ? `/${url}/${this.selectedCustomer.id}` 
+                : `/${url}/${this.selectedCompany.id}`;
 
+            return url;
+        },
+
+        
+        addsign(data){
             if (this.myDocument.id == null) {
-                alert("Guarda el documeno");
+                alert("Guarda el documento");
             } else {
                 
                 AutoScript.setForceWSMode(true);
@@ -1164,49 +1194,6 @@ export default {
             }
         },
 
-      /*  addsign(data){
-            console.log("aqui")
-            if (this.myDocument.id == null) {
-                alert("Guarda el documeno");
-            } else {
-                
-            
-            AutoScript.setForceWSMode(true);
-            AutoScript.cargarAppAfirma();
-            AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
-            window.location.origin + "/afirma-signature-retriever/RetrieveService");
-            
-            const myDocumentData = {
-                'company_id': this.selectedCompany.id,
-                'document_id': this.myDocument.id,
-                'document_data': data,
-            }
-      
-            const successCallback = (dataB64, cert) => {
-                axios.post('/documents-sign', {datasing: myDocumentData})
-                .then(response => {
-                    this.$toast(this.$t('Document signed successfully.'), 'success');
-                })
-                .catch(error => {
-                    this.$toast(this.$t('Error signing document: ') + error.message, 'error');
-                });
-            }
-
-            successCallback(AutoScript.getBase64FromText(data), null)
-           /* const errorCallback = (type, message) => { 
-                this.$toast(message, 'error');
-            }
-
-            
-            let dataB64 = AutoScript.getBase64FromText(data);
-            AutoScript.signAndSaveToFile('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "XAdES", "", null, successCallback, errorCallback);
-            }
-
-        }
-
-        },*/
-
-
 
         validateDate() {
             if (new Date(this.fecha) > new Date(this.expiration)) {
@@ -1236,53 +1223,6 @@ export default {
                 this.$toast(this.$t('Too many characters, need to be 255 at maximum'), 'error');
             }
         },
-        
-        async handlePaymentMethodChange(paymentMethod) {
-            switch (paymentMethod.id) {
-                case 1:
-                    // Pago bancario
-                    console.log("handlePaymentMethodChange 1")
-                    this.selectedPaymentMethod.name = "Transferencia"
-                    await this.fetchBanks();
-                    console.log("handlePayment " + this.selectedBankAccount.id)
-                    break;
-                case 2:
-                    //Efectivo
-                    console.log("handlePaymentMethodChange 2")
-                    this.selectedPaymentMethod.name = "Efectivo"
-                    break;
-                case 3:
-                    // Bizum
-                    console.log("handlePaymentMethodChange 3")
-                    this.selectedPaymentMethod.name = "Bizum"
-                    await this.fetchPhones();
-                    break;
-                case 4:
-                    /// Paypal
-                    console.log("handlePaymentMethodChange 4")
-                    this.selectedPaymentMethod.name = "Paypal"
-                    await this.fetchEmails();
-                    break;
-                case 5:
-                    /// Credit Card
-                    console.log("handlePaymentMethodChange 5")
-                    this.selectedPaymentMethod.name = "Tarjeta"
-                    break;
-                case 6:
-                    /// Cheque
-                    console.log("handlePaymentMethodChange 6")
-                    this.selectedPaymentMethod.name = "Cheque"
-                    break;
-                case 7:
-                    /// Domiciliación
-                    console.log("handlePaymentMethodChange 7")
-                    this.selectedPaymentMethod.name = "Domiciliación"
-                    await this.fetchBanks();
-                    break;    
-                default:
-                    break; 
-            }
-        },
 
         async handleDocumentSelected(documentId) {
             if (documentId) {
@@ -1291,11 +1231,10 @@ export default {
             this.company = this.selectedCompany;
             this.company.documentId = documentId
 
-            const response = await axios.get('/documents-show/' + this.company.id + '/' + this.company.documentId)
-                if(response) {
 
-                    // Document
-                    this.myDocument = response.data.documents;
+            const response = await this.fetchData('/documents-show/' + this.company.id + '/' + this.company.documentId)
+                if(response) {
+                    this.myDocument = response.documents;
                     this.fecha = this.myDocument.date;
                     
                     this.expiration = this.myDocument.expiration;
@@ -1320,14 +1259,14 @@ export default {
                     }
 
                     // Company
-                    this.selectedCompany = response.data.company;
+                    this.selectedCompany = response.company;
 
                     // Customer
-                    this.selectedCustomer = response.data.customer;
+                    this.selectedCustomer = response.customer;
 
                     // Concepts
-                    this.concepts = response.data.concepts;
-                    this.products = response.data.concepts;
+                    this.concepts = response.concepts;
+                    this.products = response.concepts;
 
                     for (let i = 0; i < this.concepts.length; i++) {
                         this.products[i].taxes = parseFloat(this.concepts[i].tax);
@@ -1343,148 +1282,40 @@ export default {
                 };   
         },
 
-
-        async fetchBanks() {
-            try {
-                const response = await axios.get('/banks/' + this.selectedCompany.id);
-                this.banks = response.data.accounts;
-                console.log("this.banks")
-                console.log(this.banks)
-                this.selectedBankAccount = await this.changePaymentMethodSystemId(this.banks);
-                this.selectedPaymentSystemId = this.selectedBankAccount.id
-                console.log("selectedBankaccount")
-                console.log(this.selectedBankAccount)
-                this.options = this.banks;
-            } catch (error) {
-                this.$toast(this.$t('Error connecting to the server'), 'error');
-                console.log("banks error");
-                console.log(error);
-            }
-        },
-
-        async fetchEmails() {
-            try {
-                const url = this.isChecked 
-                        ? `/emails/${this.selectedCustomer.id}` 
-                        : `/emails/${this.selectedCompany.id}`;
-                    
-                const emailResponse = await axios.get(url);
-
-                this.emails = emailResponse.data.emails;
-                this.selectedEmail = await this.changePaymentMethodSystemId(this.emails);
-                this.options = this.emails;
-            } catch (error) {
-                this.$toast(this.$t('Error connecting to the server'), 'error');
-            }
-        },
-
-        async fetchPhones() {
-            
-            try {
-                const url = this.isChecked 
-                        ? `/phones/${this.selectedCustomer.id}` 
-                        : `/phones/${this.selectedCompany.id}`;
-                    
-                const phonesResponse = await axios.get(url);
-
-                this.phones = phonesResponse.data.phones;
-
-                this.selectedPhone = await this.changePaymentMethodSystemId(this.phones);
-                this.options = this.phones;
-            } catch (error) {
-                this.$toast(this.$t('Error connecting to the server'), 'error');
-            }
-        },
-
-        async changePaymentMethodSystemId(systemValues) {
+        changePaymentMethodSystemId(systemValues) {
             let selectedMethod;
-            console.log("Entra al methodSystem1");
             if (this.selectedPaymentSystemId != null) {
-                console.log("Entra al methodSystem2");
                 let value = systemValues.find(value => value.id === this.selectedPaymentSystemId);
-                console.log(this.selectedPaymentSystemId)
-                console.log(systemValues)
-                console.log("Value ")
-                console.log(value)
                 if (value) {
-                    console.log("if value")
                     selectedMethod = value;
-                    console.log(selectedMethod);
                 } else {
                     selectedMethod = systemValues.length > 0 ? systemValues[0] : null;
-                    console.log(selectedMethod);
                 }
             } else {
                 selectedMethod = systemValues.length > 0 ? systemValues[0] : null;
-                console.log(selectedMethod);
             }
 
             return selectedMethod;
         },
 
 
-        async fetchPayments () {
+        exportToXML() {
+            this.myDocumentSave()
+            this.calculateTaxes().then(() => {  
+            this.myDocument.document_counter = 1
+            const xmlContent = GenerateXML.convertToFacturaeXML(this.selectedCompany, this.selectedSerie, this.myDocument, 
+            this.selectedCustomer, this.taxMap, this.products, this.subtotal, this.totalIVA);
+            
+            console.log("contador: " + this.myDocument.document_counter)
+            this.$toast(this.$t('XML document generated correctly.'), 'success');
+            GenerateXML.downloadXML(xmlContent, 'factura.xml')
+            }).catch(error => {
+                console.log(error);
+                this.$toast(this.$t('Could not generate the XML.'), 'error');
+            });
+        },
 
-            const url = this.isChecked 
-                    ? `/payment/${this.selectedCustomer.id}` 
-                    : `/payment/${this.selectedCompany.id}`;
-                
-            const paymentResponse = await axios.get(url);
-
-            this.payment_methods = paymentResponse.data.methods;
-
-            this.selectedPaymentMethod = this.payment_methods[0]
-            console.log(this.selectedPaymentMethod)
         
-        },
-
-        async fetchCompanies() {
-            try {
-                const response = await axios.get('/companies-invoice');
-                this.companies = response.data.companies;
-
-                if (this.companies.length === 1) {
-                    this.selectedCompany = this.companies[0];
-                    this.companyId = this.selectedCompany.id;
-                } else {
-                    this.selectedCompany = this.companies[0];
-                }
-
-                this.loading = false;
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                this.loading = false;
-            }
-        },
-
-        async fetchCustomers() {
-
-            try {
-                
-                const url = this.isChecked 
-                    ? `/providers/${this.selectedCompany.id}` 
-                    : `/customers/${this.selectedCompany.id}`;
-                
-                
-                const customersResponse = await axios.get(url);
-
-                if (this.isChecked) {
-                    this.customers = customersResponse.data.providers;
-                } else {
-                    this.customers = customersResponse.data.customers;
-                }
-
-                if (this.customers.length === 1) {
-                    this.selectedCustomer = this.customers[0];
-                }
-
-                this.loading = false;
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                this.loading = false;
-            }
-        },
-
         hideDialog() {
             this.selectACustomerDialog = false
             this.selectAPaymentMethodDialog = false
@@ -1513,61 +1344,52 @@ export default {
             this.selectAPaymentMethodDialog = true;
         },
 
-        saveCustomer() {
+        confirmDeleteProduct(product) {
+            this.product = product;
+            this.deleteProductDialog = true;
+        },
 
-            let customersResponse
-            if (this.isChecked) {
-                customersResponse = axios.post('/provider', this.customer)
-            } else {
-                customersResponse = axios.post('/customer', this.customer)
-            }
-    
-            customersResponse.then(result => {
-                this.customer.id = result.data.companyId;
-                this.selectedCustomer = this.customer;
-            }).catch(error => {
-                console.error("Error:", error);
-                this.customerDialog = false;
+        deleteProduct() {
+            this.products = this.products.filter(val => val.id !== this.product.id);
+            this.product = null;
+            this.deleteProductDialog = false;
+        },
+
+        confirmDeleteSelected() {
+            this.deleteProductsDialog = true;
+        },
+
+        deleteSelectedProducts() {
+            this.selectedProducts.forEach(product => {
+                this.products = this.products.filter(val => val.id !== product.id);
             });
+            this.selectedProducts = [];
+            this.deleteProductsDialog = false;
+            
+        },
+        
+        async saveCustomer() {
+
+            const url = this.isChecked 
+                    ? `/provider/` 
+                    : `/customer/`;
+
+            let customersResponse = await this.saveData(url, this.customer);
+
+            this.customer.id = customersResponse
+            this.selectedCustomer = this.customer;
 
             this.customerDialog = false;
         },
 
-        async downloadSignedXml() {
-            window.open('/documents-signed/'+ this.myDocument.id)
-            /*if (!this.isChecked) {
-                const documentId = this.myDocument.id;
-                const url = `/documents-signed/${documentId}`;
-
-                // Hacer la solicitud al servidor
-                fetch(url)
-                    .then(response => {
-                        if (!response.ok) {
-                            // La respuesta no es exitosa
-                            return response.json().then(error => {
-                                throw new Error(error.message || 'Error al cargar la factura');
-                            });
-                        }
-                        // La respuesta es exitosa
-                        return response.blob(); // O el tipo de respuesta que esperes del servidor
-                    })
-                    .then(data => {
-                        // Crear una URL de objeto para el blob y abrir una nueva ventana
-                        const objectUrl = URL.createObjectURL(data);
-                        window.open(objectUrl);
-                    })
-                    .catch(error => {
-                        this.$toast(this.$t('To download you must save and sign it'), 'error');
-                    });
-
-            }*/
-        },
+        
 
         async handleCompanySelection() {
             this.selectedCustomer = [];
             try {
-                const response = await axios.get('/customers/' + this.selectedCompany.id);
-                await this.fetchDocuments();
+                await this.fetchCustomers();
+                await this.fetchDocumentsType();
+                await this.fetchDocumentsSerie();
                 await this.fetchPayments();
                 this.customers = response.data.customers;   
                 
@@ -1579,43 +1401,10 @@ export default {
             }
         },
 
-        async fetchDocuments() {
-            await axios.get('/documents-type')
-                .then(response => {
-                    this.types = response.data.types;     
-                    this.selectedType = this.types[0];
-                    return axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id)
-                })
-                .catch(error => {
-                    console.error('Error fetching phone data:', error);
-                })
-                .then(response => {
-                    if (response) {
-                        this.series = response.data.series;
-                        this.selectedSerie = this.series[0];
-                    }
-                })
-                .catch(error => {
-                console.error('Error fetching data:', error);
-                this.loading = false;
-                });
-        },
+
 
         handleListDocument() {
             this.documentListDialog = true
-        },
-
-        handleTypeSelection() {
-            this.selectedSerie = [];
-            axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id)
-                .then(response => {
-            
-                    this.series = response.data.series; 
-                
-                })
-                .catch(error => {
-                    console.error('Error fetching phone data:', error);
-                });
         },
         
         selectCompany() {
@@ -1680,12 +1469,13 @@ export default {
         },
 
 
-        checkDocument() {
+        async checkDocument() {
             if (!this.isChecked) {
-                axios.get('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
-                .then(response => {             
-                    this.date = response.data.date.date
-                    this.serie = response.data.serie.number;
+                let response = await this.fetchData('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
+
+                    this.date = response.date.date
+                    this.serie = response.number.number;
+
 
                     if (this.selectedSerie.number <= this.serie) {
                     
@@ -1752,11 +1542,7 @@ export default {
                     }else{
                         this.saveDocument();
                     }
-                })
-                .catch(error => {
-                    this.$toast(this.$t('Error saving document data.'), 'error');
-                    console.log(error)
-                });
+                
             }else{
                 this.saveDocument();
             } 
@@ -1796,8 +1582,6 @@ export default {
 
             this.updateDate = false;
             this.myDocument.payment_methods_id = this.selectedPaymentMethod.id
-            console.log("selectedPaymentSystemId")
-            console.log(this.selectedPaymentSystemId)
             this.myDocument.payment_system_id = this.selectedPaymentSystemId
 
             this.myDocument.document_counter = 1
@@ -1808,15 +1592,13 @@ export default {
             
         },
 
-        saveDocument(){
+        async saveDocument(){
             
             this.myDocumentSave()
 
             if(this.selectedType.id == 1 ) {
                 this.myDocument.invoiced = true
             }
-            console.log(this.fecha);
-            console.log(this.expiration);
             this.myDocument.concept = []
             this.products.forEach(product => {
                 
@@ -1841,24 +1623,15 @@ export default {
                 
                 
             });
-            axios.post('/documents', {documentData: this.myDocument})
-            .then(response => {
-                this.myDocument.id = response.data.documentId; 
-                console.log("saveDocument id" + this.myDocument.id)
-                this.$toast(this.$t('Invoice saved correctly.'), 'success');
-                
-                this.myDocument.concept = []
-                if (this.saveRestart) {
-                    this.resetData();
-                }
-            })
-            .catch(error => {
-                this.$toast(this.$t('Error saving invoice.'), 'error');
-                console.log(error)
-                this.myDocument.concept = []
-                
-
-            });
+            let response = await this.saveData('/documents', {documentData: this.myDocument})
+            
+            this.myDocument.id = response
+            
+            this.myDocument.concept = []
+            if (this.saveRestart) {
+                this.resetData();
+            }
+            
         },
 
         getDate() {    
@@ -1910,29 +1683,6 @@ export default {
             return product.subTotal
         },
 
-        confirmDeleteProduct(product) {
-            this.product = product;
-            this.deleteProductDialog = true;
-        },
-
-        deleteProduct() {
-            this.products = this.products.filter(val => val.id !== this.product.id);
-            this.product = null;
-            this.deleteProductDialog = false;
-        },
-
-        confirmDeleteSelected() {
-            this.deleteProductsDialog = true;
-        },
-
-        deleteSelectedProducts() {
-            this.selectedProducts.forEach(product => {
-                this.products = this.products.filter(val => val.id !== product.id);
-            });
-            this.selectedProducts = [];
-            this.deleteProductsDialog = false;
-            
-        },
 
 
         dateFormat(fecha) {
@@ -1978,12 +1728,6 @@ export default {
             }
         },
 
-        calcularImporteBase(porcentajeIva, totalIvaRepercutido) {
-            if (porcentajeIva <= 0) {
-                return 0
-            }
-            return totalIvaRepercutido / (porcentajeIva / 100);
-        },
         
         exportToPDF() {
             this.myDocumentSave()
@@ -1995,217 +1739,6 @@ export default {
             });
 
         },
-/*
-        exportToXML() {
-            try {
-                this.myDocumentSave();
-                this.calculateTaxes()
-                    .then(() => {
-                        this.myDocument.document_counter = 1;
-                        const xmlContent = this.convertToFacturaeXML();
-                        this.$toast(this.$t('XML document generated correctly.'), 'success');
-                        this.addsign(xmlContent);
-                        this.downloadXML(xmlContent, 'facturae.xml');
-                    })
-                    .catch(error => {
-                        this.$toast(this.$t('Could not generate the XML.'), 'error');
-                    });
-            } catch (error) {
-                this.$toast(this.$t('An unexpected error occurred.'), 'error');
-            }
-        },*/
-
-        /* addsign(data){
-            AutoScript.setForceWSMode(true);
-            AutoScript.cargarAppAfirma();
-            AutoScript.setServlets(window.location.origin + "/afirma-signature-storage/StorageService",
-            window.location.origin + "/afirma-signature-retriever/RetrieveService");
-            function successCallback() { console.log("OK"); }
-            function errorCallback() { console.log("ERR"); }
-            var dataB64 = AutoScript.getBase64FromText(data);
-            AutoScript.signAndSaveToFile('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "AUTO", "", null, successCallback, errorCallback);
-        },  */
-
-
-        exportToXML() {
-            this.myDocumentSave()
-            this.calculateTaxes().then(() => {  
-            this.myDocument.document_counter = 1
-            const xmlContent = this.convertToFacturaeXML();
-            console.log("contador: " + this.myDocument.document_counter)
-            this.$toast(this.$t('XML document generated correctly.'), 'success');
-            this.downloadXML(xmlContent, 'factura.xml')
-            }).catch(error => {
-                this.$toast(this.$t('Could not generate the XML.'), 'error');
-            });
-        },
-    
-        convertToFacturaeXML() {
-            
-            let xml = `<?xml version="1.0" encoding="UTF-8"?>
-            <fe:Facturae xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:fe="http://www.facturae.es/Facturae/2014/v3.2.1/Facturae">
-                <FileHeader>
-                    <SchemaVersion>3.2.1</SchemaVersion>
-                    <Modality>I</Modality>
-                    <InvoiceIssuerType>EM</InvoiceIssuerType>
-                    <Batch>
-                        <BatchIdentifier>${this.selectedCompany.tax_number}${this.selectedSerie.number}${this.selectedSerie.serie}</BatchIdentifier>
-                        <InvoicesCount>${this.myDocument.document_counter}</InvoicesCount>
-                        <TotalInvoicesAmount>
-                            <TotalAmount>${this.myDocument.amount}</TotalAmount>
-                        </TotalInvoicesAmount>
-                        <TotalOutstandingAmount>
-                            <TotalAmount>${this.myDocument.amount}</TotalAmount>
-                        </TotalOutstandingAmount>
-                        <TotalExecutableAmount>
-                            <TotalAmount>${this.myDocument.amount}</TotalAmount>
-                        </TotalExecutableAmount>
-                        <InvoiceCurrencyCode>EUR</InvoiceCurrencyCode>
-                    </Batch>
-                </FileHeader> 
-                
-                <Parties>
-                    <SellerParty>
-                        <TaxIdentification>
-                            <PersonTypeCode>J</PersonTypeCode>
-                            <ResidenceTypeCode>R</ResidenceTypeCode>
-                            <TaxIdentificationNumber>${this.selectedCompany.tax_number}</TaxIdentificationNumber>
-                        </TaxIdentification>
-                        <LegalEntity>
-                            <CorporateName>${this.selectedCompany.name}</CorporateName>
-                            <AddressInSpain>
-                                <Address>${this.selectedCompany.address}</Address>
-                                <PostCode>${this.selectedCompany.post_code}</PostCode>
-                                <Town>${this.selectedCompany.town}</Town>
-                                <Province>${this.selectedCompany.province}</Province>
-                                <CountryCode>ESP</CountryCode>
-                            </AddressInSpain>
-                            <ContactDetails>
-                                <Telephone>${this.selectedCompany.phone}</Telephone>
-                                <ElectronicMail>${this.selectedCompany.email}</ElectronicMail>
-                            </ContactDetails>
-                        </LegalEntity>
-                    </SellerParty>
-                    
-                    <BuyerParty>
-                        <TaxIdentification>
-                            <PersonTypeCode>J</PersonTypeCode>
-                            <ResidenceTypeCode>R</ResidenceTypeCode>
-                            <TaxIdentificationNumber>${this.selectedCustomer.tax_number}</TaxIdentificationNumber>
-                        </TaxIdentification>
-                        <LegalEntity>
-                            <CorporateName>${this.selectedCustomer.name}</CorporateName>
-                            <AddressInSpain>
-                                <Address>${this.selectedCustomer.address}</Address>
-                                <PostCode>${this.selectedCustomer.post_code}</PostCode>
-                                <Town>${this.selectedCustomer.town}</Town>
-                                <Province>${this.selectedCustomer.province}</Province>
-                                <CountryCode>ESP</CountryCode>
-                            </AddressInSpain>
-                            <ContactDetails>
-                                <Telephone>${this.selectedCustomer.phone}</Telephone>
-                                <ElectronicMail>${this.selectedCustomer.email}</ElectronicMail>
-                            </ContactDetails>
-                        </LegalEntity>
-                    </BuyerParty> 
-                </Parties>
-                <Invoices>
-                    <Invoice>
-                        <InvoiceHeader>
-                            <InvoiceNumber>${this.selectedSerie.number}</InvoiceNumber>
-                            <InvoiceSeriesCode>${this.selectedSerie.serie}</InvoiceSeriesCode>
-                            <InvoiceDocumentType>FC</InvoiceDocumentType>
-                            <InvoiceClass>OO</InvoiceClass>
-                        </InvoiceHeader>
-                        <InvoiceIssueData>
-                            <IssueDate>${this.myDocument.date}</IssueDate>
-                            <InvoiceCurrencyCode>EUR</InvoiceCurrencyCode>
-                            <TaxCurrencyCode>EUR</TaxCurrencyCode>
-                            <LanguageName>es</LanguageName>
-                        </InvoiceIssueData>
-                        <TaxesOutputs>\n`;
-                        // No Tocar
-                        this.taxMap.forEach((value, tax) => {
-                            
-                            xml += '  <Tax>\n';
-                            xml += `    <TaxTypeCode>01</TaxTypeCode>\n`;  
-                            xml += `    <TaxRate>${parseFloat(tax).toFixed(2)}</TaxRate>\n`;
-                            xml += '    <TaxableBase>\n';
-                            xml += `      <TotalAmount>${ this.calcularImporteBase(tax,value).toFixed(2) }</TotalAmount>\n`;
-                            xml += '    </TaxableBase>\n';   
-                            xml += '    <TaxAmount>\n';
-                            xml += `      <TotalAmount>${value.toFixed(2)}</TotalAmount>\n`;
-                            xml += '    </TaxAmount>\n';
-                            xml += '  </Tax>\n';
-                        
-                        });
-                        
-                        xml += `</TaxesOutputs>
-                        <InvoiceTotals>
-                            <TotalGrossAmount>${ this.subtotal.toFixed(2) }</TotalGrossAmount>
-                            <TotalGeneralDiscounts>0.0</TotalGeneralDiscounts>
-                            <TotalGeneralSurcharges>0.0</TotalGeneralSurcharges>
-                            <TotalGrossAmountBeforeTaxes>${ this.subtotal.toFixed(2) }</TotalGrossAmountBeforeTaxes>
-                            <TotalTaxOutputs>${this.totalIVA.toFixed(2)}</TotalTaxOutputs>
-                            <TotalTaxesWithheld>0.0</TotalTaxesWithheld>
-                            <InvoiceTotal>${ this.myDocument.amount }</InvoiceTotal>
-                            <TotalOutstandingAmount>${ this.myDocument.amount }</TotalOutstandingAmount>
-                            <TotalExecutableAmount>${ this.myDocument.amount }</TotalExecutableAmount>
-                        </InvoiceTotals>
-                        <Items>`;
-                        
-            
-            this.products.forEach(product => {
-
-                xml += `
-                    <InvoiceLine>
-                        <ItemDescription>${product.description}</ItemDescription>
-                        <Quantity>${product.quantity}</Quantity>
-                        <UnitOfMeasure>01</UnitOfMeasure>
-                        <UnitPriceWithoutTax>${product.price}</UnitPriceWithoutTax>
-                        <TotalCost>${product.quantity * product.price}</TotalCost>
-                        <DiscountsAndRebates>
-                            <Discount>
-                                <DiscountReason>${product.discount_reason}</DiscountReason>
-                                <DiscountRate>${parseFloat(product.discount).toFixed(1)}</DiscountRate>
-                                <DiscountAmount>${((product.quantity * product.price) * (product.discount/ 100)).toFixed(1) }</DiscountAmount>
-                            </Discount>
-                        </DiscountsAndRebates>
-                        <GrossAmount>${ product.subTotal }</GrossAmount>
-                        <TaxesOutputs>
-                            <Tax>
-                                <TaxTypeCode>01</TaxTypeCode>
-                                <TaxRate>${product.taxes}</TaxRate>
-                                <TaxableBase>
-                                    <TotalAmount>${product.subTotal}</TotalAmount>
-                                </TaxableBase>
-                                <TaxAmount>
-                                    <TotalAmount>${product.priceTax.toFixed(2)}</TotalAmount>
-                                </TaxAmount>
-                            </Tax>
-                        </TaxesOutputs>
-                    </InvoiceLine>`;
-                    
-            });
-            xml += `
-                        </Items>
-                    </Invoice>
-                </Invoices>
-            </fe:Facturae>`;
-            return xml;
-        },
-
-        downloadXML(content, filename) {
-
-            const blob = new Blob([content], { type: 'application/xml' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            link.click();
-            URL.revokeObjectURL(link.href);
-        
-        },
-    
 
         cancelInvoice() {
             let respuesta = confirm("Los cambios no serán guardados");
@@ -2240,6 +1773,7 @@ export default {
             });
                 }
             },
+    
 }
 </script>
 

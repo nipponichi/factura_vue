@@ -71,8 +71,7 @@ class CustomerController extends Controller
             })
             ->get();
 
-
-            return response()->json(['customers' => $companies]);
+            return response()->json(['message' => 'Customers', 'type'=>'success', 'result' => $companies]);
         } catch (Exception $e) {
             return response()->json(['message' => 'Error loading data' ,'type' => 'error']);
         }
@@ -148,7 +147,7 @@ class CustomerController extends Controller
 
             DB::commit();
 
-            return response()->json(['message' => 'It has been created correctly.','type' => 'success', 'companyId' => $companyId]);
+            return response()->json(['message' => 'It has been created correctly.','type' => 'success', 'result' => $companyId]);
             
         } catch (Exception $e) {
             DB::rollback();

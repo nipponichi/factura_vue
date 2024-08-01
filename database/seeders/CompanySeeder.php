@@ -34,6 +34,10 @@ class CompanySeeder extends Seeder
         'name' => 'Pedido',
     ]);
 
+    DB::table('documents_type')->insert([
+        'name' => 'Fra. Rectificativa',
+    ]);
+
     // METODOS DE PAGO
 
     DB::table('payment_method')->insert([
@@ -177,6 +181,30 @@ class CompanySeeder extends Seeder
         'dt_start' => now(),
     ]);
 
+    DB::table('documents_series')->insert([
+        'serie' => 'F',
+        'number' => 0,
+        'company_id' => 1,
+        'documents_type_id' => 3,
+        'dt_start' => now(),
+    ]);
+
+    DB::table('documents_series')->insert([
+        'serie' => 'F',
+        'number' => 0,
+        'company_id' => 1,
+        'documents_type_id' => 4,
+        'dt_start' => now(),
+    ]);
+
+    DB::table('documents_series')->insert([
+        'serie' => 'AB',
+        'number' => 0,
+        'company_id' => 1,
+        'documents_type_id' => 5,
+        'dt_start' => now(),
+    ]);
+
     
     //SEGUNDA COMPAÑIA
 
@@ -256,19 +284,34 @@ class CompanySeeder extends Seeder
 
 
     DB::table('documents_series')->insert([
-        'serie' => 'F24',
-        'number' => 44,
+        'serie' => 'F',
+        'number' => 0,
         'company_id' => 2,
-        'documents_type_id' => 1,
+        'documents_type_id' => 2,
         'dt_start' => now(),
     ]);
 
-    
     DB::table('documents_series')->insert([
-        'serie' => 'F24',
-        'number' => 1,
+        'serie' => 'F',
+        'number' => 0,
         'company_id' => 2,
-        'documents_type_id' => 2,
+        'documents_type_id' => 3,
+        'dt_start' => now(),
+    ]);
+
+    DB::table('documents_series')->insert([
+        'serie' => 'F',
+        'number' => 0,
+        'company_id' => 2,
+        'documents_type_id' => 4,
+        'dt_start' => now(),
+    ]);
+
+    DB::table('documents_series')->insert([
+        'serie' => 'AB',
+        'number' => 0,
+        'company_id' => 2,
+        'documents_type_id' => 5,
         'dt_start' => now(),
     ]);
 
@@ -375,6 +418,14 @@ class CompanySeeder extends Seeder
         'dt_start' => now(),
     ]);
 
+    DB::table('documents_series')->insert([
+        'serie' => 'AB',
+        'number' => 0,
+        'company_id' => 3,
+        'documents_type_id' => 5,
+        'dt_start' => now(),
+    ]);
+
     // ALBERTO EMILIO
     
     DB::table('companies')->insert([
@@ -475,6 +526,14 @@ class CompanySeeder extends Seeder
         'number' => 0,
         'company_id' => 4,
         'documents_type_id' => 4,
+        'dt_start' => now(),
+    ]);
+    
+    DB::table('documents_series')->insert([
+        'serie' => 'AB',
+        'number' => 0,
+        'company_id' => 4,
+        'documents_type_id' => 5,
         'dt_start' => now(),
     ]);
 
@@ -581,6 +640,13 @@ class CompanySeeder extends Seeder
         'dt_start' => now(),
     ]);
     
+    DB::table('documents_series')->insert([
+        'serie' => 'AB',
+        'number' => 0,
+        'company_id' => 5,
+        'documents_type_id' => 5,
+        'dt_start' => now(),
+    ]);
 
 }
 

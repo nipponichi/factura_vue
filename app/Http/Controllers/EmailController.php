@@ -17,7 +17,7 @@ class EmailController extends Controller
         $this->middleware(['can:delete email'])->only('destroy');
     }
 
-    public static function index($companyId)
+    public function index($companyId)
     {
         try {
             $emails = DB::table('emails')
@@ -27,8 +27,7 @@ class EmailController extends Controller
                 ->orderByDesc('favourite')
                 ->get();
 
-
-            return response()->json(['message' => 'emails', 'emails' => $emails]);
+            return response()->json(['message' => 'emails', 'type'=>'success', 'result' => $emails]);
         } catch (Exception $e) {
             return response()->json(['message' => 'Error loading data' ,'type' => 'error']);
         }

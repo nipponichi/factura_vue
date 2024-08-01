@@ -2,6 +2,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 //import DeleteUserForm from '@/Pages/Profile/Partials/DeleteUserForm.vue';
 import AccessToLogRegistry from '@/Pages/Profile/Partials/AccessToLogRegistry.vue';
+import About from '@/Pages/Profile/Partials/About.vue';
 import LogoutOtherBrowserSessionsForm from '@/Pages/Profile/Partials/LogoutOtherBrowserSessionsForm.vue';
 import SectionBorder from '@/Components/SectionBorder.vue';
 //import TwoFactorAuthenticationForm from '@/Pages/Profile/Partials/TwoFactorAuthenticationForm.vue';
@@ -50,6 +51,13 @@ defineProps({
                 <SectionBorder />
                 
                 <AccessToLogRegistry class="w-full mt-10 sm:mt-0" />
+
+                <SectionBorder />
+
+                <About class="w-full mt-10 sm:mt-0" />
+
+
+                
                 
                 <template v-if="$page.props.jetstream.hasAccountDeletionFeatures">
                     <!--<SectionBorder />

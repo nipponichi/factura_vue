@@ -24,8 +24,6 @@ class DocumentController extends Controller
         // Middlewares para 'document expense'
         $this->middleware(['can:read document expense'])->only(['indexExpense']);
 
-
-
     }
     /**
      * Display a listing of the resource.
@@ -136,14 +134,14 @@ class DocumentController extends Controller
                 ->increment('number');
                 
             }
-
+            
             DB::commit();
-
-            return response()->json(['message' => 'La factura se ha creado correctamente', 'documentId' => $documentsId]);
-
+            
+            return response()->json(['message' => 'Invoice saved correctly.', 'type'=>'success', 'result' => $documentsId]);
+        
         } catch (Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Error al crear la factura ', $e->getMessage()], 500);
+            return response()->json(['message' => 'Error al guardar la factura', 'type'=>'error', $e->getMessage()], 500);
         }
         
     }
@@ -353,7 +351,16 @@ class DocumentController extends Controller
         if ($customer == null) {
             return Redirect::to('companies/' . $companyId)->with('error', 'No se encontró la factura');
         }
-        return response()->json(['message' => 'Datos de las facturas cargadas correctamente', 'documents' => $documents, 'concepts' => $concepts, 'company'=>$company, 'customer'=>$customer, 'payment_system'=>$payment_system]);
+        
+        $data = [
+            'documents' => $documents,
+            'concepts' => $concepts,
+            'company' => $company,
+            'customer' => $customer,
+            'payment_system' => $payment_system
+        ];
+
+        return response()->json(['message' => 'Datos de las facturas cargadas correctamente', 'type'=>'success', 'result' => $data]);
     }
     
 
@@ -511,8 +518,7 @@ class DocumentController extends Controller
         $types = DB::table('documents_type')
         ->select('id','name')
         ->get();
-
-        return response()->json(['message' => 'Document types', 'types' => $types]);
+        return response()->json(['message' => 'Types', 'type'=>'success', 'result' => $types]);
     }
 
     public function documentDateCheck($company_id, $type_id)
@@ -549,8 +555,9 @@ class DocumentController extends Controller
         foreach ($series as $serie) {
             $serie->number += 1;
         }
-        
-        return response()->json(['message' => 'Document series1', 'series' => $series]);
+
+        return response()->json(['message' => 'Types', 'type'=>'success', 'result' => $series]);
+    
     }
 
     // Trae fecha y numero de documento para comprobar si existe uno posterior al que se quiere guardar
@@ -586,7 +593,13 @@ class DocumentController extends Controller
         }
         
     
-        return response()->json(['message' => 'Document series check', 'serie' => $serie, 'date' => $date, 'counter' => $counter]);
+        $data = [
+            'number' => $serie,
+            'date' => $date,
+            'counter' => $counter,
+        ];
+
+        return response()->json(['message' => 'Datos de las facturas cargadas correctamente', 'type'=>'success', 'result' => $data]);
 
     }
 

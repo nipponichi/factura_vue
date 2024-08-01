@@ -43,8 +43,7 @@ class PaymentMethodController extends Controller
             }
 
 
-        
-            return response()->json(['message' => 'bank accounts', 'methods' => $methods], 200);
+            return response()->json(['message' => 'Payment methods', 'type'=>'success', 'result' => $methods]);
         } catch (Exception $e) {
             return response()->json(['message' => 'Error index bank accounts: ' . $e->getMessage()], 500);
         }

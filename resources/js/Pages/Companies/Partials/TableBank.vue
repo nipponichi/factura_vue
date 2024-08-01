@@ -172,12 +172,11 @@ export default {
             axios.get('/banks/' + myCompanyId)
             .then(response => {
                 this.banks = response.data.accounts;
-
             })
             .catch(error => {
                 this.$toast(this.$t('Error connecting to the server'), 'error');
             });
-    },
+        },
         openNew() {
             this.myBank = {
                 bank: '',
@@ -304,6 +303,7 @@ export default {
             this.myBank = bank;
             this.deleteBankDialog = true;       
         },
+
         deleteMyBank() {
             const bankId = this.myBank.id;
 

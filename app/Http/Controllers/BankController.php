@@ -28,7 +28,7 @@ class BankController extends Controller
                 ->orderByDesc('favourite')
                 ->get();
         
-            return response()->json(['message' => 'bank accounts', 'accounts' => $accounts], 200);
+            return response()->json(['message' => 'Bank accounts', 'type'=>'success', 'result' => $accounts]);
         } catch (Exception $e) {
             return response()->json(['message' => 'Error loading data' ,'type' => 'error']);
         }
