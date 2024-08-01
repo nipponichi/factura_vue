@@ -46,7 +46,7 @@ const showingNavigationDropdown = ref(false);
                             <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}" class="sm:hidden bg-white">
                                 <div class="text-center pt-2 pb-3 space-y-1">
                                     <ResponsiveNavLink @click="selectCompany()" >
-                                        {{ selectedCompany.name }}
+                                        {{ myDocument.company.name }}
                                     </ResponsiveNavLink>
                                 </div>
                                 <div class="text-center pt-2 pb-3 space-y-1">
@@ -107,7 +107,7 @@ const showingNavigationDropdown = ref(false);
                                                 :disabled="companies.length === 1">
                                                 <span class="font-bold text-lg">
                                                     <i v-if="companies.length > 1" class="pi pi-plus mr-2"></i>
-                                                    {{ selectedCompany.name }}
+                                                    {{ myDocument.company.name }}
                                                 </span>
                                             </button>
                 
@@ -115,8 +115,8 @@ const showingNavigationDropdown = ref(false);
                                                 type="button"
                                                 class="ml-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-white rounded flex items-center justify-between"
                                                 @click="handleListDocument()"
-                                                :class="{ 'opacity-50': !selectedCompany.id }"
-                                                :disabled="!selectedCompany.id">
+                                                :class="{ 'opacity-50': !myDocument.company.id }"
+                                                :disabled="!myDocument.company.id">
                                                 <span>
                                                     <i class="pi pi-eye mr-2"></i>
                                                     {{ $t('Document check') }}
@@ -134,8 +134,8 @@ const showingNavigationDropdown = ref(false);
                                                 type="button"
                                                 class="px-4 ml-2 py-2 bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white text-white rounded flex items-center justify-between"
                                                 @click="resetData()"
-                                                :class="{ 'opacity-50': !selectedCompany.id }"
-                                                :disabled="!selectedCompany.id">
+                                                :class="{ 'opacity-50': !myDocument.company.id }"
+                                                :disabled="!myDocument.company.id">
                                                 <span>
                                                     <i class="pi pi-plus mr-2"></i>
                                                     {{ $t('New invoice') }}
@@ -151,8 +151,8 @@ const showingNavigationDropdown = ref(false);
                                             :label="$t('Download')"
                                             @click="handleClick"
                                             :model="itemsExport"
-                                            :disabled="totalConIVA === 0 || isSaving || !selectedCustomer.id || !selectedSerie.number"
-                                            :class="{ 'opacity-50': totalConIVA === 0 || isSaving || !selectedCustomer.id || !selectedSerie.number}">
+                                            :disabled="totalConIVA === 0 || isSaving || !myDocument.customer.id || !myDocument.serie.number"
+                                            :class="{ 'opacity-50': totalConIVA === 0 || isSaving || !myDocument.customer.id || !myDocument.serie.number}">
                                             <template v-slot:icon>
                                                 <i class="pi pi-download mr-2" :class="{ 'opacity-50': totalConIVA === 0 }"></i>
                                             </template>
@@ -165,8 +165,8 @@ const showingNavigationDropdown = ref(false);
                                             :label="$t('Save')"
                                             @click="checkDocument"
                                             :model="itemsSave"
-                                            :disabled="totalConIVA === 0 || isSaving || !selectedCustomer.id || !selectedSerie.number"
-                                            :class="{ 'opacity-50': totalConIVA === 0 || isSaving || !selectedCustomer.id || !selectedSerie.number}">
+                                            :disabled="totalConIVA === 0 || isSaving || !myDocument.customer.id || !myDocument.serie.number"
+                                            :class="{ 'opacity-50': totalConIVA === 0 || isSaving || !myDocument.customer.id || !myDocument.serie.number}">
                                             <template v-slot:icon>
                                                 <i class="pi pi-save mr-2" :class="{ 'opacity-50': totalConIVA === 0 }"></i>
                                             </template>
@@ -185,14 +185,14 @@ const showingNavigationDropdown = ref(false);
                                     <div class="grid md:grid-cols-1 text-m gap-y-1">
                                         <div class="flex items-center justify-between w-full">
                                             <div>
-                                                <div v-if="!selectedCustomer.name" class="font-semibold whitespace-nowrap mr-3">
+                                                <div v-if="!myDocument.customer.name" class="font-semibold whitespace-nowrap mr-3">
                                                     {{ isChecked ? $t('Select a provider') : $t('Select a customer') }}
                                                 </div>
                                                 <div v-else class="font-semibold mr-3 flex-shrink-0 w-32">
                                                     {{ isChecked ? $t('Provider') : $t('Customer') }}:
                                                 </div>
                                             </div>
-                                            <div class="text-gray-700 w-full font-bold text-lg">{{ selectedCustomer.name }}</div>
+                                            <div class="text-gray-700 w-full font-bold text-lg">{{ myDocument.customer.name }}</div>
                                             <div class="relative w-full mr-20">
                                                 <Button type="button" icon="pi pi-search" id="voice-search" @click="selectACustomer" class="bg-gray-100 p-2 rounded-md text-gray-900 text-sm hover:bg-gray-300"/>
                                             </div>
@@ -200,20 +200,20 @@ const showingNavigationDropdown = ref(false);
                                         <div> 
                                             <div class="flex items-center justify-between w-full">
                                                 <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Tax number') }}:</div>
-                                                <div class="text-gray-700 w-full uppercase">{{ selectedCustomer.tax_number }}</div>
+                                                <div class="text-gray-700 w-full uppercase">{{ myDocument.customer.tax_number }}</div>
                                             </div>
                                             <div class="flex items-center justify-between w-full">
                                                 <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Phone') }}:</div>
-                                                <div class="text-gray-700 w-full">{{ selectedCustomer.phone }}</div>
+                                                <div class="text-gray-700 w-full">{{ myDocument.customer.phone }}</div>
                                             </div>
                                             <div class="flex items-center justify-between w-full">
                                                 <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Email') }}:</div>
-                                                <div class="text-gray-700 w-full">{{ selectedCustomer.email }}</div>
+                                                <div class="text-gray-700 w-full">{{ myDocument.customer.email }}</div>
                                             </div>
                                             <div class="flex items-center justify-between w-full">
                                                 <div class="font-semibold mr-3 flex-shrink-0 w-32">{{ $t('Address') }}:</div>
-                                                <div class="text-gray-700 w-full" v-if="selectedCustomer.name">
-                                                    {{ selectedCustomer.address }}, {{ selectedCustomer.post_code }}, {{ selectedCustomer.town }}, {{ selectedCustomer.province }} ( {{ selectedCustomer.country }} )
+                                                <div class="text-gray-700 w-full" v-if="myDocument.customer.name">
+                                                    {{ myDocument.customer.address }}, {{ myDocument.customer.post_code }}, {{ myDocument.customer.town }}, {{ myDocument.customer.province }} ( {{ myDocument.customer.country }} )
                                                 </div>
                                             </div>
                                         </div>
@@ -247,17 +247,17 @@ const showingNavigationDropdown = ref(false);
                                     
         
                                     <form class="flex items-center">   
-                                        <div class="font-semibold mr-8 min-w-20 flex-shrink-0">Nº {{ selectedType.name }}:</div>
+                                        <div class="font-semibold mr-8 min-w-20 flex-shrink-0">Nº {{ myDocument.type.name }}:</div>
                                         <div class="relative w-full">
                                             
                                             <div v-if="!isChecked" class="input-wrapper">
                                                 <div class=" font-bold flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-                                                    {{ selectedSerie.serie }} /
+                                                    {{ myDocument.serie.serie }} /
                                                 </div>    
-                                                <input type="text" id="voice-search" class="border-gray-300 rounded-md text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="selectedSerie.number" required="">
+                                                <input type="text" id="voice-search" class="border-gray-300 rounded-md text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="myDocument.serie.number" required="">
                                                 <Button type="button" icon="pi pi-search" @click="selectDocument()" class=" button-search font-bold flex absolute inset-y-0 right-0 items-center border-gray-300 pr-1"/>
                                             </div>
-                                            <input v-else type="text" id="voice-search" class="border-gray-300 rounded-md text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-[161px] pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="selectedSerie.number" required="">
+                                            <input v-else type="text" id="voice-search" class="border-gray-300 rounded-md text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-[161px] pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" v-model="myDocument.serie.number" required="">
                                         </div>
                                     </form>
                                     
@@ -334,7 +334,7 @@ const showingNavigationDropdown = ref(false);
                                 </Column>
                                 <Column field="subTotal" :header="$t('Subtotal')" sortable class="dateTable w-1/12">
                                     <template #body="slotProps">
-                                        <InputText class="input input-short w-1/12" :value="calculateSubtotal(slotProps.data)" readonly />
+                                        <InputText class="input input-short w-1/12" :value="Calculator.calculateSubtotal(slotProps.data)" readonly />
                                     </template>
                                 </Column>
                                 <Column field="taxes" :header="$t('Tax (%)')" sortable class="dateTable w-1/4">
@@ -344,7 +344,7 @@ const showingNavigationDropdown = ref(false);
                                 </Column>
                                 <Column field="total" :header="$t('Total')" sortable class="dateTable w-1/12">
                                     <template #body="slotProps">
-                                        <InputText class="input input-short w-1/12" :value="calculateTotal(slotProps.data)" readonly />
+                                        <InputText class="input input-short w-1/12" :value="Calculator.calculateTotal(slotProps.data)" readonly />
                                     </template>
                                 </Column>
                                 <Column :exportable="false" :header="$t('Utility')" class="dateTable w-1/12">
@@ -358,7 +358,7 @@ const showingNavigationDropdown = ref(false);
                             <div class="flex justify-end mt-4 pr-4" v-if="showButton">
                                 <Button :label="$t('Concept')" icon="pi pi-plus" severity="success" class="bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-white" @click="addRow()" />
                             </div>
-                                                    <!-- Totals section for large screens -->
+                            <!-- Totals section for large screens -->
                             <div class="hidden md:flex justify-between mt-4 pr-4 mb-4">
                                 <!-- Columna izquierda -->
                                 <div class="totals-container w-1/3"> <div class="ml-4 totals p-4 rounded-md">
@@ -528,7 +528,7 @@ const showingNavigationDropdown = ref(false);
             <!-- MODAL COMPANY -->
             <Dialog v-model:visible="productDialog" :header="$t('Select companies')" :modal="true" @change="handleCompanySelection" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
                 <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select your company') }}:</label>
-                <Dropdown v-model="selectedCompany" :options="companies" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="handleCompanySelection">
+                <Dropdown v-model="myDocument.company" :options="companies" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="handleCompanySelection">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class="flex align-items-center">
                             <div>{{ slotProps.value.name }}</div>
@@ -545,7 +545,7 @@ const showingNavigationDropdown = ref(false);
             <!-- MODAL DOCUMENT -->
             <Dialog v-model:visible="documentDialog" :style="{width: '450px'}" :header="$t('Select document')" :modal="true" @change="handleTypeSelection">
                 <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select document type') }}</label>
-                <Dropdown v-model="selectedType" :options="types" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="fetchDocumentsSerie">
+                <Dropdown v-model="myDocument.type" :options="types" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500" @change="fetchDocumentsSerie">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class="flex align-items-center">
                             <div>{{ slotProps.value.name }}</div>
@@ -558,7 +558,7 @@ const showingNavigationDropdown = ref(false);
                     </template>
                 </Dropdown>
                 <label for="name" class="block text-sm font-medium text-gray-900 dark:text-white">{{ $t('Select document serie') }}</label>
-                <Dropdown v-model="selectedSerie" :options="series" filter optionLabel="serie" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                <Dropdown v-model="myDocument.serie" :options="series" filter optionLabel="serie" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class=" flex align-items-center ">
                             <div>{{ slotProps.value.serie }}</div>
@@ -574,7 +574,7 @@ const showingNavigationDropdown = ref(false);
 
             <!-- MODAL DOCUMENT LIST -->
             <Dialog v-model:visible="documentListDialog" class="w-3/4" :header="isChecked ? $t('Received invoices') : $t('Emitted invoices')" :modal="true">
-                <TableDocumentSelector :companyId="selectedCompany.id" :isChecked="isChecked" @document-selected="handleDocumentSelected"  />
+                <TableDocumentSelector :companyId="myDocument.company.id" :isChecked="isChecked" @document-selected="handleDocumentSelected"  />
             </Dialog>
 
             <!-- MODAL DELETE SIMPLE -->
@@ -603,7 +603,7 @@ const showingNavigationDropdown = ref(false);
         
             <!-- SELECT A CUSTOMER -->
             <Dialog v-model:visible="selectACustomerDialog" :header="isChecked ? $t('Select a provider') : $t('Select a customer')" id="titleCompany" :modal="true" class="p-fluid w-full sm:w-3/4 md:w-2/3 lg:w-1/2 max-w-4xl">
-                <Dropdown v-model="selectedCustomer" :options="customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
+                <Dropdown v-model="myDocument.customer" :options="customers" filter optionLabel="name" class="w-full h-11 md:w-64rem mb-4 bg-gray-50 border border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-500 dark:focus:ring-blue-500">
                     <template #value="slotProps">
                         <div v-if="slotProps.value" class=" flex align-items-center ">
                             <div>{{ slotProps.value.name }}</div>
@@ -719,36 +719,36 @@ const showingNavigationDropdown = ref(false);
     
     <!-- PDF -->
 
-    <div class="imprimir">
+    <!-- <div class="imprimir">
         <div class="invoice">
             <div class="invoice-header">
                 <div class="logo">
                     <img src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/company-logo-design-template-e089327a5c476ce5c70c74f7359c5898_screen.jpg?ts=1672291305" alt="Logo de la empresa" />
                 </div>
                 <div class="invoice_details">
-                    <h3>{{ selectedType.name }}</h3>
+                    <h3>{{ myDocument.type.name }}</h3>
                     <p><strong>{{ $t('Date') }}: </strong>{{ fecha }}</p>
                     <p><strong>{{ $t('Expiration') }}: </strong>{{ expiration }}</p>
-                    <p><strong>{{ $t('Number of') }} {{ selectedType.name }}:</strong> {{ selectedSerie.serie }} {{ selectedSerie.number }}</p>
+                    <p><strong>{{ $t('Number of') }} {{ myDocument.type.name }}:</strong> {{ myDocument.serie.serie }} {{ myDocument.serie.number }}</p>
                 </div>
             </div>
             
             <div class="invoice-info">
                 <div class="company-details">
                     <h3><strong>{{ $t('Company') }}</strong></h3>
-                    <p class="name">{{ selectedCompany.name }}</p>
-                    <p>{{ selectedCompany.tax_number }}</p>
-                    <p> {{ selectedCompany.address }}<br> {{ selectedCompany.post_code }}, {{ selectedCompany.town}}, {{ selectedCompany.province }}, {{'(' }} {{ selectedCompany.country }} {{ ')' }}</p>
-                    <p> {{ selectedCompany.email }}</p>   
-                    <p> {{ selectedCompany.phone }}</p>
+                    <p class="name">{{ mydocument.company.name }}</p>
+                    <p>{{ mydocument.company.tax_number }}</p>
+                    <p> {{ myDocument.company.address }}<br> {{ myDocument.company.post_code }}, {{ myDocument.company.town}}, {{ myDocument.company.province }}, {{'(' }} {{ myDocument.company.country }} {{ ')' }}</p>
+                    <p> {{ myDocument.company.email }}</p>   
+                    <p> {{ myDocument.company.phone }}</p>
                 </div>
                 <div class="customer-details">
                     <h3><strong>{{ $t('Customer') }}</strong></h3>
-                    <p class="name">{{ selectedCustomer.name }}</p>
-                    <p>{{ selectedCustomer.tax_number }}</p>
-                    <p> {{ selectedCustomer.address }}<br> {{ selectedCustomer.post_code }}, {{ selectedCustomer.town}}, {{ selectedCustomer.province }}, {{'(' }} {{ selectedCustomer.country }} {{ ')' }}</p>
-                    <p> {{ selectedCustomer.email }}</p>   
-                    <p> {{ selectedCustomer.phone }}</p>
+                    <p class="name">{{ myDocument.customer.name }}</p>
+                    <p>{{ myDocument.customer.tax_number }}</p>
+                    <p> {{ myDocument.customer.address }}<br> {{ myDocument.customer.post_code }}, {{ myDocument.customer.town}}, {{ myDocument.customer.province }}, {{'(' }} {{ myDocument.customer.country }} {{ ')' }}</p>
+                    <p> {{ myDocument.customer.email }}</p>   
+                    <p> {{ myDocument.customer.phone }}</p>
                 </div>
             </div>
 
@@ -774,7 +774,7 @@ const showingNavigationDropdown = ref(false);
                         <td>{{ product.discount }}</td>
                         <td>{{ product.subTotal }}</td>
                         <td>{{ product.taxes }}</td>
-                        <td>{{ calculateTotal(product) }}</td>
+                        <td>{{ Calculator.calculateTotal(product) }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -823,7 +823,7 @@ const showingNavigationDropdown = ref(false);
                 </table>
             </div>
         </div>   
-    </div>
+    </div> -->
 </template>
 
 
@@ -833,9 +833,10 @@ import { FilterMatchMode } from 'primevue/api';
 import '../../../css/document.css';
 import { AutoScript } from '@/Libcustom/autoscript.js';
 import { GenerateXML } from '@/Pages/Documents/js/GenerateXML.js';
+import { Calculator } from '@/Pages/Documents/js/Calculator.js';
 import TableDocumentSelector from '@/Pages/Companies/Partials/TableDocumentSelector.vue';
 import { DataAccess } from '@/Pages/Utils/DataAccess/DataAccess.js';
-import { FetchsDocument } from '@/Pages/Documents/js/FetchsDocument.js';
+import { Datejs } from '@/Pages/Utils/Date/Date.js';
 
 export default {
     components: {
@@ -878,7 +879,6 @@ export default {
                 },
             ],
             taxMap: new Map(),
-            today: new Date(),
             fecha: '',
             fechaPaid: '',
             expiration: '',
@@ -913,7 +913,6 @@ export default {
             series: [],
             serie: '',
             counter: '',
-            updateDate: false,
             showButton: false,
             productDialog: false,
             documentDialog: false,
@@ -932,10 +931,6 @@ export default {
             selectedEmail: [],
             selectedPhone: [],
             products: [],
-            selectedCompany: [],
-            selectedCustomer: [],
-            selectedType: [],
-            selectedSerie: [],
             emails:[],
             phones:[],
             selectedProducts: [],
@@ -963,33 +958,11 @@ export default {
                 invoiced: false,  
                 isReceived: false,             
                 concept: [],
-            },
-            
-            customer: {
-                id:'',
-                name: '',
-                tax_number: '',
-                email: '',
-                phone: '',
-                address: '',
-                post_code: '',
-                town: '',
-                province: '',
-                country: '',
-                
-            },
-            company: {
-                id:'',
-                name: '',
-                tax_number: '',
-                email: '',
-                phone: '',
-                address: '',
-                post_code: '',
-                town: '',
-                province: '',
-                country: '',
-                documentId: ''
+                customer: {},
+                company: {},
+                type: {},
+                serie: {}
+
             },
         };
     },
@@ -1034,7 +1007,7 @@ export default {
 
     },
 
-    async created() {
+    created() {
         this.filters = {
             'global': { value: null, matchMode: FilterMatchMode.CONTAINS },
         };
@@ -1043,35 +1016,30 @@ export default {
 
         this.myDocument.isReceived = this.$page.props.isChecked
 
-        this.fecha = await this.getDate()
-        this.fechaPaid = await this.getDate()
-        this.expiration = await this.getExpirationDate()
+        this.fecha = Datejs.getDate()
+        this.fechaPaid = Datejs.getDate()
+        this.expiration = Datejs.getExpirationDate()
     },
 
     async mounted() {
 
-        await FetchsDocument.fetchCompanies();
-        await FetchsDocument.fetchCustomers();
-        await FetchsDocument.fetchPayments();
+        await this.fetchCompanies();
+        await this.fetchCustomers();
+        await this.fetchPayments();
 
         if (!this.isChecked) {
-                await FetchsDocument.fetchDocumentsType()
-                await FetchsDocument.fetchDocumentsSerie () 
+                await this.fetchDocumentsType()
+                await this.fetchDocumentsSerie () 
     
             } else {
-                this.selectedType.id = 1
-                this.selectedType.name = "Factura"
-                this.selectedSerie = []
+                this.myDocument.type.id = 1
+                this.myDocument.type.name = "Factura"
+                this.myDocument.serie = []
         }
 
     },
 
     watch: {
-
-        fecha(date) {
-            this.validateDate()
-        },
-
         selectedPaymentMethod(newMethod) {
             this.handlePaymentMethodChange(newMethod);
         },
@@ -1104,6 +1072,85 @@ export default {
     },
     
     methods: {
+
+        //Trae un array de valores para la seleccion dependiendo de la url que se mande 
+        async fetchData (url) {
+            
+            const response = await DataAccess.fetchData(url)
+            if (response.type === 'success') {
+                return response.result
+            }else{
+                this.$toast(this.$t('Error connecting to the server'), 'error');
+            }
+        },
+
+        //Guarda un objeto en DB según la url que se mande 
+        async saveData (url, object) {  
+            const response = await DataAccess.saveData(url, object)
+            if (response.type === 'success') {
+                this.$toast(this.$t(response.message), 'success');
+                return response.result
+            }else{
+                this.$toast(this.$t('Error connecting to the server'), 'error');
+            }
+        },
+
+        // Prepara la llamada para traer metodos de pago
+        async fetchPayments () {
+            
+            this.payment_methods = await this.fetchData(this.mountUrl('payment'));
+            this.selectedPaymentMethod =  this.payment_methods[0]
+
+        },
+
+        // Prepara la llamada para traer las compañias
+        async fetchCompanies() {
+            try {
+                this.companies = await this.fetchData('/companies-invoice');
+
+                if (this.companies.length === 1) {
+                    this.myDocument.company = this.companies[0];
+                    
+                    this.companyId = this.myDocument.company.id;
+                } else {
+                    this.myDocument.company = this.companies[0];
+                }
+                this.loading = false;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                this.loading = false;
+            }
+        },
+
+        //Trae todos las empresas de la base de datos dependiendo si estas en facturas ingresos / gastos pasa a provider o a cliente       
+        async fetchCustomers() {
+
+            const url = this.isChecked 
+                    ? `/providers/${this.myDocument.company.id}` 
+                    : `/customers/${this.myDocument.company.id}`;
+
+            this.customers = await this.fetchData(url);
+
+            if (this.customers.length === 1) {
+                this.myDocument.customer = this.customers[0];
+            }
+
+            this.loading = false;     
+        },
+
+        //Trae de la base de datos el tipo de documento
+        async fetchDocumentsType() {
+            this.types = await this.fetchData('/documents-type')   
+            this.myDocument.type = this.types[0];
+            this.fetchDocumentsSerie()
+        },
+
+        //Trae de la base de datos el numero de serie de documento
+        async fetchDocumentsSerie () {
+            this.series = await this.fetchData('/documents-serie/'+this.myDocument.type.id+'/'+this.myDocument.company.id)  
+            this.myDocument.serie = this.series[0]; 
+            this.loading = false;     
+        },
 
         async handlePaymentMethodChange(paymentMethod) {
             switch (paymentMethod.id) {
@@ -1149,8 +1196,8 @@ export default {
         
         mountUrl (url) {
             url = this.isChecked 
-                ? `/${url}/${this.selectedCustomer.id}` 
-                : `/${url}/${this.selectedCompany.id}`;
+                ? `/${url}/${this.myDocument.customer.id}` 
+                : `/${url}/${this.myDocument.company.id}`;
 
             return url;
         },
@@ -1195,14 +1242,6 @@ export default {
         },
 
 
-        validateDate() {
-            if (new Date(this.fecha) > new Date(this.expiration)) {
-                alert('La fecha seleccionada no puede ser mayor que la fecha de vencimiento.');
-                this.fecha = this.getDate();
-                this.expiration = this.getExpirationDate();
-                this.fechaPaid = this.fecha;            }
-        },
-
         openDescriptionDialog(data) {
             this.productDescription = data
             this.selectedDescription = data.description;
@@ -1228,7 +1267,7 @@ export default {
             if (documentId) {
                 this.documentListDialog = false
             }
-            this.company = this.selectedCompany;
+            this.company = this.myDocument.company;
             this.company.documentId = documentId
 
 
@@ -1238,20 +1277,20 @@ export default {
                     this.fecha = this.myDocument.date;
                     
                     this.expiration = this.myDocument.expiration;
-                    this.selectedType.name = this.myDocument.document_type_name;
-                    this.selectedType.id = this.myDocument.documents_type_id;
-                    this.selectedSerie.id = this.myDocument.documents_series_id;
-                    this.selectedSerie.serie = this.myDocument.document_series_serie;
+                    this.myDocument.type.name = this.myDocument.document_type_name;
+                    this.myDocument.type.id = this.myDocument.documents_type_id;
+                    this.myDocument.serie.id = this.myDocument.documents_series_id;
+                    this.myDocument.serie.serie = this.myDocument.document_series_serie;
                     this.selectedPaymentSystemId = this.myDocument.payment_system_id
                     this.selectedPaymentMethod.id = this.myDocument.payment_methods_id
 
                     let number = this.myDocument.number;
-                    let numberWithoutSerie = number.replace(this.selectedSerie.serie, '');
+                    let numberWithoutSerie = number.replace(this.myDocument.serie.serie, '');
 
-                    this.selectedSerie.number = numberWithoutSerie;
+                    this.myDocument.serie.number = numberWithoutSerie;
 
                     if (this.myDocument.paid === 0 ) {
-                        this.fechaPaid = await this.getDate();
+                        this.fechaPaid = await Datejs.getDate();
                         this.myDocument.paid = false
                     } else {
                         this.fechaPaid = this.myDocument.date_paid;
@@ -1259,10 +1298,10 @@ export default {
                     }
 
                     // Company
-                    this.selectedCompany = response.company;
+                    this.myDocument.company = response.company;
 
                     // Customer
-                    this.selectedCustomer = response.customer;
+                    this.myDocument.customer = response.customer;
 
                     // Concepts
                     this.concepts = response.concepts;
@@ -1303,8 +1342,8 @@ export default {
             this.myDocumentSave()
             this.calculateTaxes().then(() => {  
             this.myDocument.document_counter = 1
-            const xmlContent = GenerateXML.convertToFacturaeXML(this.selectedCompany, this.selectedSerie, this.myDocument, 
-            this.selectedCustomer, this.taxMap, this.products, this.subtotal, this.totalIVA);
+            const xmlContent = GenerateXML.convertToFacturaeXML(this.myDocument.company, this.myDocument.serie, this.myDocument, 
+            this.myDocument.customer, this.taxMap, this.products, this.subtotal, this.totalIVA);
             
             console.log("contador: " + this.myDocument.document_counter)
             this.$toast(this.$t('XML document generated correctly.'), 'success');
@@ -1326,7 +1365,7 @@ export default {
         openNew() {
             this.selectACustomerDialog = false;
             this.customer = {
-                companyID: this.selectedCompany.id,
+                companyID: this.myDocument.company.id,
             };
             this.submitted = false;
             this.customerDialog = true;
@@ -1377,7 +1416,7 @@ export default {
             let customersResponse = await this.saveData(url, this.customer);
 
             this.customer.id = customersResponse
-            this.selectedCustomer = this.customer;
+            this.myDocument.customer = this.customer;
 
             this.customerDialog = false;
         },
@@ -1385,7 +1424,7 @@ export default {
         
 
         async handleCompanySelection() {
-            this.selectedCustomer = [];
+            this.myDocument.customer = [];
             try {
                 await this.fetchCustomers();
                 await this.fetchDocumentsType();
@@ -1394,14 +1433,12 @@ export default {
                 this.customers = response.data.customers;   
                 
                 if (this.customers.length === 1) {
-                    this.selectedCustomer = this.customers[0];
+                    this.myDocument.customer = this.customers[0];
                 }
             } catch (error) {
                 console.error('Error fetching phone data:', error);
             }
         },
-
-
 
         handleListDocument() {
             this.documentListDialog = true
@@ -1471,15 +1508,15 @@ export default {
 
         async checkDocument() {
             if (!this.isChecked) {
-                let response = await this.fetchData('/documents-serie/'+this.selectedType.id+'/'+this.selectedCompany.id+'/'+this.selectedSerie.serie)
+                let response = await this.fetchData('/documents-serie/'+this.myDocument.type.id+'/'+this.myDocument.company.id+'/'+this.myDocument.serie.serie)
 
                     this.date = response.date.date
                     this.serie = response.number.number;
 
 
-                    if (this.selectedSerie.number <= this.serie) {
+                    if (this.myDocument.serie.number <= this.serie) {
                     
-                        let respuesta = prompt(`El número de documento ya existe. ¿Qué deseas hacer?\n1. Conservar el número ingresado: ${(this.selectedSerie.serie)}${this.selectedSerie.number} \n2. Asignar el siguiente valor disponible: ${(this.selectedSerie.serie)}${++this.serie}`);
+                        let respuesta = prompt(`El número de documento ya existe. ¿Qué deseas hacer?\n1. Conservar el número ingresado: ${(this.myDocument.serie.serie)}${this.myDocument.serie.number} \n2. Asignar el siguiente valor disponible: ${(this.myDocument.serie.serie)}${++this.serie}`);
 
                         switch (respuesta) {
                             case null:
@@ -1488,15 +1525,15 @@ export default {
                                 break;
                             case '1':
                                 // Conservar el número ingresado por el cliente
-                                this.$toast(this.$t('The number entered will be retained: ') + this.selectedSerie.serie +this.selectedSerie.number, 'success');
+                                this.$toast(this.$t('The number entered will be retained: ') + this.myDocument.serie.serie +this.myDocument.serie.number, 'success');
                                 this.serie = '';
                                 this.saveDocument();
                                 break;
                             case '2':
                                 // Asignar el siguiente valor disponible
                                 this.updateDate = true;
-                                this.selectedSerie.number = this.serie;
-                                this.$toast(this.$t('The following available number has been assigned: ') + this.selectedSerie.serie + this.selectedSerie.number, 'success');
+                                this.myDocument.serie.number = this.serie;
+                                this.$toast(this.$t('The following available number has been assigned: ') + this.myDocument.serie.serie + this.myDocument.serie.number, 'success');
                                 this.serie = '';
                                 this.saveDocument();
                                 break;
@@ -1508,8 +1545,8 @@ export default {
 
                     } else if (this.date > this.fecha) {
 
-                        let dateFormateado = this.dateFormat(this.date)
-                        let fechaFormateada = this.dateFormat(this.fecha)
+                        let dateFormateado = Datejs.dateFormat(this.date)
+                        let fechaFormateada = Datejs.dateFormat(this.fecha)
 
                         let respuesta = prompt(`La fecha seleccionada es anterior a la de la última factura, ¿deseas asignarle la fecha actual?\n1. Conservar la fecha seleccionada: ${fechaFormateada} \n2. Asignar la fecha actual: ${dateFormateado}`);
 
@@ -1525,7 +1562,7 @@ export default {
                                 break;
                             case '2':
                                 // Asignar la fecha actual
-                                this.fecha = getDate();
+                                this.fecha = Datejs.getDate();
                                 
                                 this.$toast(this.$t('The current date has been assigned.'), 'success');
 
@@ -1551,15 +1588,15 @@ export default {
         myDocumentSave() {
 
             if (!this.isChecked) {
-                this.myDocument.number = this.selectedSerie.serie + this.selectedSerie.number
-                this.myDocument.document_counter = this.selectedSerie.number
-                this.myDocument.company_id_company = this.selectedCompany.id 
-                this.myDocument.company_id_customer = this.selectedCustomer.id
-                this.myDocument.documents_series_id = this.selectedSerie.id
+                this.myDocument.number = this.myDocument.serie.serie + this.myDocument.serie.number
+                this.myDocument.document_counter = this.myDocument.serie.number
+                this.myDocument.company_id_company = this.myDocument.company.id 
+                this.myDocument.company_id_customer = this.myDocument.customer.id
+                this.myDocument.documents_series_id = this.myDocument.serie.id
             } else {
-                this.myDocument.number = this.selectedSerie.number
-                this.myDocument.company_id_company = this.selectedCustomer.id 
-                this.myDocument.company_id_customer = this.selectedCompany.id
+                this.myDocument.number = this.myDocument.serie.number
+                this.myDocument.company_id_company = this.myDocument.customer.id 
+                this.myDocument.company_id_customer = this.myDocument.company.id
                 this.myDocument.documents_series_id = ''
                 
             }
@@ -1570,11 +1607,11 @@ export default {
                 this.myDocument.date_paid = '';
             }
 
-            this.myDocument.documents_type_id = this.selectedType.id
+            this.myDocument.documents_type_id = this.myDocument.type.id
             
             if (this.updateDate) {
-                this.fecha =  this.getDate();
-                this.expiration =  this.getExpirationDate();
+                this.fecha =  Datejs.getDate();
+                this.expiration =  Datejs.getExpirationDate();
             } 
 
             this.myDocument.expiration = this.expiration
@@ -1596,7 +1633,7 @@ export default {
             
             this.myDocumentSave()
 
-            if(this.selectedType.id == 1 ) {
+            if(this.myDocument.type.id == 1 ) {
                 this.myDocument.invoiced = true
             }
             this.myDocument.concept = []
@@ -1611,7 +1648,7 @@ export default {
                         taxes: product.taxes,
                         discount: product.discount,
                         discount_reason: product.discount_reason,
-                        total: this.calculateTotal(product),
+                        total: Calculator.calculateTotal(product),
                         
                     };
                 
@@ -1633,24 +1670,6 @@ export default {
             }
             
         },
-
-        getDate() {    
-            const year = this.today.getFullYear();
-            const month = (this.today.getMonth() + 1).toString().padStart(2, '0');
-            const day = this.today.getDate().toString().padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        },
-
-        getExpirationDate() {
-            const expirationDate = new Date();
-            expirationDate.setDate(this.today.getDate() + 15);
-            const expYear = expirationDate.getFullYear();
-            const expMonth = (expirationDate.getMonth() + 1).toString().padStart(2, '0');
-            const expDay = expirationDate.getDate().toString().padStart(2, '0');
-            return `${expYear}-${expMonth}-${expDay}`;
-        },
-
-
         
         resetData() {
             this.isSaving = true;
@@ -1660,74 +1679,6 @@ export default {
             }, 1000);
             
         },
-
-        calculateGross(product) {
-            return product.quantity * product.price;
-        },
-
-        calculateTax(product) {
-            product.priceTax = parseFloat((product.taxes / 100) * parseFloat(product.subTotal));
-            return product.priceTax;
-        },
-
-
-        calculateTotal(product) {
-            let taxAmount = this.calculateTax(product)
-            product.total = taxAmount + parseFloat(product.subTotal)
-            return product.total.toFixed(2)
-        },
-
-        calculateSubtotal(product) {
-            let subtotalWithoutDiscount =  (parseFloat(product.quantity) * parseFloat(product.price))
-            product.subTotal = subtotalWithoutDiscount - ((product.discount/100) * subtotalWithoutDiscount);
-            return product.subTotal
-        },
-
-
-
-        dateFormat(fecha) {
-            // Convierte la fecha seleccionada a un objeto Date
-            let date = new Date(fecha);
-
-            // Obtén el día, mes y año de la fecha
-            let dia = date.getDate();
-            let mes = date.getMonth() + 1; // Los meses en JavaScript son de 0 a 11, por lo que se suma 1
-            let año = date.getFullYear();
-
-            // Añade un cero inicial si el día o mes son menores de 10
-            if (dia < 10) {
-            dia = '0' + dia;
-            }
-            if (mes < 10) {
-            mes = '0' + mes;
-            }
-
-            // Construye la cadena con el formato español
-            let fechaFormateada = `${dia}/${mes}/${año}`;
-
-            return fechaFormateada;
-        },
-
-        // Método para manejar el prompt
-        manejarFecha() {
-            let fechaFormateada = this.dateFormat(this.fecha);
-
-            let respuesta = prompt(
-            `La fecha seleccionada (${fechaFormateada}) es anterior a la de la última factura, ¿deseas asignarle la fecha actual?\n1. Conservar la fecha seleccionada. \n2. Asignar la fecha actual.`
-            );
-
-            // Ahora puedes manejar la respuesta del usuario
-            if (respuesta === '1') {
-            // Aquí puedes poner el código para conservar la fecha seleccionada
-            } else if (respuesta === '2') {
-            let fechaActual = new Date().toISOString().split('T')[0]; // Obtén la fecha actual en formato YYYY-MM-DD
-            let fechaActualFormateada = this.dateFormat(fechaActual); // Formatea la fecha actual a DD/MM/YYYY
-            // Aquí puedes poner el código para asignar la fecha actual
-            } else {
-            // Aquí puedes manejar opciones no válidas si es necesario
-            }
-        },
-
         
         exportToPDF() {
             this.myDocumentSave()
@@ -1772,7 +1723,7 @@ export default {
                 }
             });
                 }
-            },
+        },
     
 }
 </script>
