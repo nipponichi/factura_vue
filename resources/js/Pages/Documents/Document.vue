@@ -1160,7 +1160,7 @@ export default {
                 function errorCallback(type,message) { console.log("ERR"); }
 
                 let dataB64 = AutoScript.getBase64FromText(data);
-                AutoScript.sign('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "XAdES", "", null, successCallback, errorCallback);
+                AutoScript.sign('sign', (dataB64 != undefined && dataB64 != null && dataB64 != "") ? dataB64 : null, "SHA512withRSA", "AUTO", "", null, successCallback, errorCallback);
             }
         },
 
