@@ -764,13 +764,13 @@ class DocumentController extends Controller
             
             if (file_exists($document->document_blob)) {
                 $blob = fopen($document->document_blob, 'r');
-                //$blobContent = stream_get_contents($blob);
+                $blobContent = base64_decode(stream_get_contents($blob));
                 fclose($blob);
             } else {
                 return Redirect::to('/dashboard')->with('error', 'No se pudo encontrar el archivo especificado');
             }
 
-            return response($blob, 200)
+            return response($blobContent, 200)
                 ->header('Content-Type', 'application/xml')
                 ->header('Content-Disposition', 'attachment; filename="'. $today ."_". $document->number.'".xml"');
         
