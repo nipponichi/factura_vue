@@ -71,8 +71,8 @@ const showingNavigationDropdown = ref(false);
                                             {{ $t('XML') }}
                                         </Button>
                                         <Button @click="exportToXML">
-                                            {{ $t('XML Firmado') }}
-                                        </Button>
+                                            {{ $t('XML Firmadoo') }}
+                                        </Button>                                        
                                     </div>
                                 </div>
 
@@ -874,6 +874,12 @@ export default {
                     icon: 'pi pi-file-check',
                     command: () => this.downloadSignedXml(),
                 },
+                {
+                    label: this.$t('Enviar XML por Correo'),
+                    icon: 'pi pi-file-check',
+                    command: () => this.sendToMAilXML()
+                }
+
             ],
             taxMap: new Map(),
             today: new Date(),
@@ -1112,6 +1118,22 @@ export default {
     },
     
     methods: {
+
+        sendToMAilXML() {
+            this.myDocumentSave()
+            this.calculateTaxes().then(() => {
+                this.myDocument.document_counter = 1
+                console.log("contador: " + this.myDocument.document_counter)
+                const xmlContent = this.convertToFacturaeXML();
+                
+                let concv = 'mailto:'+this.selectedCustomer.email  
+                concv += '?subject= Factura en XML - '+this.myDocument.number
+                //concv += '&body= Factura en XML - '+this.myDocument.number+' : '
+                //concv += xmlContent
+                window.location.href = concv  
+
+            });
+        },
 
         saveAndSign() {
 
