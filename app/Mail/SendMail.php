@@ -29,7 +29,7 @@ class SendMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $mailData->subject,
+            subject: $this->mailData['subject'],
         );
     }
 
@@ -39,7 +39,7 @@ class SendMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.emails.facemail',
+            view: 'emails.factemail',
         );
     }
 

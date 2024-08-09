@@ -1145,7 +1145,7 @@ export default {
                 axios.post('/send-email', {
                     data: {
                         'email': 'janstopete@gmail.com', // this.selectedCustomer.email,
-                        'title': 'Factura ' + this.myDocument.number,
+                        'subject': 'Factura ' + this.myDocument.number,
                         'body': 'Factura ' + this.myDocument.number
                     }
                 })
