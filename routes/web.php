@@ -18,6 +18,7 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\RouteController;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\SendMailController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -104,6 +105,8 @@ Route::middleware([
     Route::post('/documents-sign', [DocumentController::class, 'documentSign']);
     Route::get('/documents-signed/{documentId}', [DocumentController::class, 'downloadSignedXML']);
 
+    // SendMail
+    Route::post('/send-email', [SendMailController::class, 'sendMail']);
 
     // Admin
     Route::resource('/admin-companies', AdminCompaniesController::class);
